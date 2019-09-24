@@ -1,0 +1,18 @@
+steps:
+#- name: 'gcr.io/cloud-builders/docker'
+#  args: [
+#    'build',
+#    '-t', 'gcr.io/$PROJECT_ID/compression:latest',
+#    '-t', 'gcr.io/$PROJECT_ID/compression:cpu',
+#    'compression']
+#- name: 'gcr.io/cloud-builders/docker'
+#  args: ['build', '-t', 'gcr.io/$PROJECT_ID/decoding:latest', 'decoding']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/evaluation:latest', 'evaluation']
+options:
+  machineType: 'N1_HIGHCPU_32'
+images:
+#  - 'gcr.io/$PROJECT_ID/compression:cpu'
+#  - 'gcr.io/$PROJECT_ID/compression:latest'
+#  - 'gcr.io/$PROJECT_ID/decoding:latest'
+  - 'gcr.io/$PROJECT_ID/evaluation:latest'

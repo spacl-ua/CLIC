@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+from PIL import Image
+from glob import glob
+import time
+import numpy as np
+import sys
+
+time.sleep(10)
+
+for image_file in glob('**/*.jpg', recursive=True):
+	print('Decoding ' + image_file)
+	time.sleep(2)
+	Image.open(image_file).save(image_file[:-3] + 'png')

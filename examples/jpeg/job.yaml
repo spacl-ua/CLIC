@@ -1,0 +1,82 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-lowrate-valid-jpeg
+  labels:
+    task: lowrate
+    phase: valid
+    team: jpeg
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: decode
+        image: "gcr.io/clic-215616/decoding"
+        command: [
+          "python3",
+          "/scripts/decode.py",
+          "--debug",
+          "--submission_bucket", "clic2020_submissions",
+          "--environment_bucket", "clic2020_environments",
+          "--exec_dir", "/var/lib/docker/submissions",
+          "--num_cpus", "1",
+          "--memory_limit", "12g",
+          "--timeout", "36000",
+          "--task", "lowrate",
+          "--phase", "valid",
+          "--team", "jpeg",
+          "--image", "gcr.io/clic-215616/compression"]
+        securityContext:
+          capabilities: {}
+          privileged: true
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "/var/run/secret/cloud.google.com/service-account.json"
+        volumeMounts:
+          - name: clic-sa-key-volume
+            mountPath: "/var/run/secret/cloud.google.com"
+          - name: docker-sock
+            mountPath: "/var/run/docker.sock"
+          - name: executable-volume
+            mountPath: "/var/lib/docker"
+          - name: scripts-volume
+            mountPath: "/scripts"
+      containers:
+      - name: evaluate
+        image: "gcr.io/clic-215616/evaluation"
+        command: [
+          "python3",
+          "/scripts/evaluate.py",
+          "--submission_bucket", "clic2020_submissions",
+          "--target_bucket", "clic2020_targets",
+          "--task", "lowrate",
+          "--phase", "valid",
+          "--team", "jpeg",
+          "--metrics", "PSNR", "MSSSIM"]
+        securityContext:
+          capabilities: {}
+          privileged: true
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "/var/run/secret/cloud.google.com/service-account.json"
+        volumeMounts:
+          - name: clic-sa-key-volume
+            mountPath: "/var/run/secret/cloud.google.com"
+          - name: scripts-volume
+            mountPath: "/scripts"
+      restartPolicy: Never
+      volumes:
+        - name: clic-sa-key-volume
+          secret:
+            secretName: clic-sa-key
+        - name: docker-sock
+          hostPath:
+            path: "/var/run/docker.sock"
+        - name: executable-volume
+          hostPath:
+            path: "/var/lib/docker"
+        - name: scripts-volume
+          configMap:
+            name: scripts
+  backoffLimit: 0
+
