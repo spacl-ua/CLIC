@@ -18,8 +18,7 @@ def main(args):
 	logger.info('Obtaining decoded images')
 	submission_dir = '/submission'
 	run('mkdir -p {dir}'.format(dir=submission_dir), shell=True)
-	run(
-		'gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir} > /dev/null'.format(
+	run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir} > /dev/null'.format(
 			subdir=os.path.join(args.task, args.phase, args.team),
 			bucket=args.submission_bucket,
 			dir=submission_dir),
@@ -29,8 +28,7 @@ def main(args):
 	logger.info('Obtaining target images')
 	target_dir = '/target'
 	run('mkdir -p {dir}'.format(dir=target_dir), shell=True)
-	run(
-		'gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir} > /dev/null'.format(
+	run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir} > /dev/null'.format(
 			subdir=os.path.join(args.task, args.phase),
 			bucket=args.target_bucket,
 			dir=target_dir),

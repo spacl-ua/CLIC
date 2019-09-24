@@ -9,7 +9,11 @@ RUN apt-get upgrade -y
 
 RUN apt-get install -y rsync
 RUN apt-get install -y docker.io
-RUN apt-get install -y python3.7
+RUN apt-get install -y python3.7 python3-pip
+
+WORKDIR /tmp
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
 
 # install gcsfuse for mounting cloud storage
 RUN apt-get install -y lsb-release curl gnupg2
@@ -27,7 +31,3 @@ RUN \
   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
   apt-get update && \
   apt-get install -y google-cloud-sdk
-
-WORKDIR /tmp
-COPY decode.py .
-ENTRYPOINT ["python3", "decode.py"]
