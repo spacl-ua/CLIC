@@ -7,13 +7,13 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
-	'polls.apps.PollsConfig',
 	'django.contrib.admin',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'teams.apps.TeamsConfig',
 ]
 
 MIDDLEWARE = [
@@ -31,7 +31,7 @@ ROOT_URLCONF = 'clic.urls'
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
-		'DIRS': [],
+		'DIRS': [os.path.join(BASE_DIR, 'templates')],
 		'APP_DIRS': True,
 		'OPTIONS': {
 			'context_processors': [
@@ -54,8 +54,8 @@ DATABASES = {
 		'NAME': os.environ.get('DB_NAME'),
 		'USER': os.environ.get('DB_USER'),
 		'PASSWORD': os.environ.get('DB_PASSWORD'),
-		'HOST': '127.0.0.1',
-		'PORT': '5432',
+		'HOST': os.environ.get('DB_HOST'),
+		'PORT': os.environ.get('DB_PORT', 3306),
 	}
 }
 
@@ -91,3 +91,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = 'http://storage.googleapis.com/clic2020_public/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+AUTH_USER_MODEL = 'teams.Team'
+
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'

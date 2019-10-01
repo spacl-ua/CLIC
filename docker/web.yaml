@@ -31,6 +31,10 @@ spec:
               secretKeyRef:
                 name: cloudsql
                 key: password
+          - name: DB_HOST
+            value: "127.0.0.1"
+          - name: DB_PORT
+            value: 5432
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: "/var/run/secret/cloud.google.com/service-account.json"
         ports:
