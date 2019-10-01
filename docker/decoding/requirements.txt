@@ -1,1 +1,2 @@
+mysqlclient==1.4.4
 django==2.1.12

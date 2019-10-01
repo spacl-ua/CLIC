@@ -1,0 +1,83 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: clic
+  labels:
+    app: polls
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: polls
+    spec:
+      containers:
+      - name: polls-app
+        image: gcr.io/clic-215616/web
+        command: ["gunicorn", "-b", ":8080", "clic.wsgi"]
+        env:
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: cloudsql
+                key: name
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: cloudsql
+                key: user
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cloudsql
+                key: password
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "/var/run/secret/cloud.google.com/service-account.json"
+        ports:
+        - containerPort: 8080
+
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.05
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql", "-instances=$(DB_INSTANCE)=tcp:5432"]
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "/var/run/secret/cloud.google.com/service-account.json"
+          - name: DB_INSTANCE
+            valueFrom:
+              secretKeyRef:
+                name: cloudsql
+                key: instance
+        volumeMounts:
+          - name: clic-sa-key-volume
+            mountPath: "/var/run/secret/cloud.google.com"
+            readOnly: true
+          - name: ssl-certs
+            mountPath: /etc/ssl/certs
+            readOnly: true
+          - name: cloudsql
+            mountPath: /cloudsql
+      volumes:
+        - name: clic-sa-key-volume
+          secret:
+            secretName: clic-sa-key
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs
+        - name: cloudsql
+          emptyDir:
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: polls
+  labels:
+    app: polls
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: polls

@@ -79,4 +79,3 @@ spec:
           configMap:
             name: scripts
   backoffLimit: 0
-
