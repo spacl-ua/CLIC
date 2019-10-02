@@ -3,7 +3,7 @@
 {% block content %}
 {% if user.is_authenticated %}
 <h2>Submit</h2>
-<form action="/submit" method="post">
+<form method="post" enctype="multipart/form-data">
 	{% csrf_token %}
 	{{ form.as_p }}
 	<div id="selectedFiles"></div>

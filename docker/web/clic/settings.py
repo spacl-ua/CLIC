@@ -46,6 +46,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'clic.wsgi.application'
 
+AUTH_USER_MODEL = 'teams.Team'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DATABASES = {
@@ -92,7 +97,8 @@ USE_TZ = True
 STATIC_URL = 'http://storage.googleapis.com/clic2020_public/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-AUTH_USER_MODEL = 'teams.Team'
-
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+# Google Cloud Storage
+# https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
+GS_BUCKET_NAME = os.environ.get('SUBMISSIONS_BUCKET')
+GS_MAX_MEMORY_SIZE = 10000000
+GS_BLOB_CHUNK_SIZE = 1048576

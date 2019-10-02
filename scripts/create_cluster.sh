@@ -6,11 +6,13 @@ gcloud container clusters create clic-cluster \
 	--num-nodes 2
 
 # add service account information to kubernetes
-read -p "Please enter a service account [clic2019@clic-215616.iam.gserviceaccount.com]: " SERVICE_ACCOUNT
-SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-clic2019@clic-215616.iam.gserviceaccount.com}
-gcloud iam service-accounts keys create --iam-account "${SERVICE_ACCOUNT}" service-account.json
+if [ ! -f service-account.json ]; then
+	# create service account key file
+	read -p "Please enter a service account [clic2019@clic-215616.iam.gserviceaccount.com]: " SERVICE_ACCOUNT
+	SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-clic2019@clic-215616.iam.gserviceaccount.com}
+	gcloud iam service-accounts keys create --iam-account "${SERVICE_ACCOUNT}" service-account.json
+fi
 kubectl create secret generic clic-sa-key --from-file service-account.json
-rm service-account.json
 
 # add SQL account information to kubernetes
 read -p "Please enter the SQL username [root]: " DB_USER
