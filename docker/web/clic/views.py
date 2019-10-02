@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 
-from teams import forms
+import teams
+import submissions
+import submissions.forms
 
 
 def signup(request):
 	if request.method == 'POST':
-		form = forms.TeamCreationForm(request.POST)
+		form = teams.forms.TeamCreationForm(request.POST)
 
 		if form.is_valid():
 			# create team
@@ -21,11 +23,14 @@ def signup(request):
 			return redirect('home')
 
 	else:
-		form = forms.TeamCreationForm()
+		form = teams.forms.TeamCreationForm()
 
 	return render(request, 'registration/signup.html', {'form': form})
 
 
 def home(request):
-	form = forms.AuthenticationForm()
+	if request.user.is_authenticated:
+		form = submissions.forms.SubmitForm()
+	else:
+		form = teams.forms.AuthenticationForm()
 	return render(request, 'home.html', {'form': form})

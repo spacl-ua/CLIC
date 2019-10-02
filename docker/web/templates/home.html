@@ -2,7 +2,40 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<a href="{% url 'logout' %}">logout</a>
+<h2>Submit</h2>
+<form action="/submit" method="post">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<div id="selectedFiles"></div>
+	<button type="submit">Submit</button>
+</form>
+<a href="{% url 'logout' %}">Logout</a>
+<script>
+	var selDiv = "";
+		
+	document.addEventListener("DOMContentLoaded", init, false);
+	
+	function init() {
+		document.querySelector('#id_files').addEventListener('change', handleFileSelect, false);
+		selDiv = document.querySelector("#selectedFiles");
+	}
+		
+	function handleFileSelect(e) {
+		
+		if(!e.target.files) return;
+		
+		selDiv.innerHTML = "";
+		
+		var files = e.target.files;
+		for(var i=0; i<files.length; i++) {
+			var f = files[i];
+			
+			selDiv.innerHTML += f.name + "<br/>";
+
+		}
+		
+	}
+</script>
 {% else %}
 <h2>Login</h2>
 <form action="/accounts/login/" method="post">
