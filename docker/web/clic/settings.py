@@ -3,8 +3,10 @@ import sentry_sdk
 from django.core.management.utils import get_random_secret_key
 from sentry_sdk.integrations.django import DjangoIntegration
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'm^=77vxm^gvs(&c6*1$xqk%v2j!tc&d6w6$$k5wgf1ejcxbk%4'
+# use random key if key is either unset or empty
+SECRET_KEY = get_random_secret_key()
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECRET_KEY) or SECRET_KEY
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = True
 ALLOWED_HOSTS = ['*']

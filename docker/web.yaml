@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: clic
   labels:
-    app: polls
+    app: clic
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: polls
+        app: clic
     spec:
       containers:
-      - name: polls-app
+      - name: clic-app
         image: gcr.io/clic-215616/web
         command: ["gunicorn", "-b", ":8080", "clic.wsgi"]
         env:
@@ -35,6 +35,16 @@ spec:
             value: "127.0.0.1"
           - name: DB_PORT
             value: 5432
+          - name: DJANGO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: django
+                key: secret_key
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: sentry
+                key: dsn
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: "/var/run/secret/cloud.google.com/service-account.json"
         ports:
@@ -75,13 +85,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: polls
+  name: clic
   labels:
-    app: polls
+    app: clic
 spec:
   type: LoadBalancer
   ports:
   - port: 80
     targetPort: 8080
   selector:
-    app: polls
+    app: clic

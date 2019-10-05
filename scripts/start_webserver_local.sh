@@ -12,6 +12,9 @@ read -p "Please enter the SQL password: " DB_PASSWORD
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_HOST=$(gcloud sql instances describe clic --format 'value(ipAddresses.ipAddress)')
 
+read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
+read -p "Please enter a secret key for Django (optional): " SECRET_KEY
+
 docker run \
 	--rm \
 	-ti \
@@ -23,6 +26,8 @@ docker run \
 	-e DB_PASSWORD="${DB_PASSWORD}" \
 	-e DB_HOST="${DB_HOST}" \
 	-e SUBMISSIONS_BUCKET="clic2020_submissions" \
+	-e SENTRY_DSN="${SENTRY_DSN}" \
+	-e DJANGO_SECRET_KEY="${SECRET_KEY}" \
 	-w "$(pwd)/docker/web" \
 	-v "$(pwd)/docker/web":"$(pwd)/docker/web" \
 	-p 8000:8000 \
