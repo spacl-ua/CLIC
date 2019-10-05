@@ -1,4 +1,7 @@
 import os
+import sentry_sdk
+from django.core.management.utils import get_random_secret_key
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'm^=77vxm^gvs(&c6*1$xqk%v2j!tc&d6w6$$k5wgf1ejcxbk%4'
@@ -97,8 +100,22 @@ USE_TZ = True
 STATIC_URL = 'http://storage.googleapis.com/clic2020_public/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+
 # Google Cloud Storage
 # https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
 GS_BUCKET_NAME = os.environ.get('SUBMISSIONS_BUCKET')
 GS_MAX_MEMORY_SIZE = 10000000
 GS_BLOB_CHUNK_SIZE = 1048576
+
+
+# Sentry error tracking, requires environment variable SENTRY_DSN to be set
+# https://docs.sentry.io/platforms/python/
+def before_send(event, hint):
+	# remove sensitive information
+	del event['user']['ip_address']
+	del event['user']['email']
+	return event
+sentry_sdk.init(
+	integrations=[DjangoIntegration()],
+	before_send=before_send,
+	send_default_pii=True)
