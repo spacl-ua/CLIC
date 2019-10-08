@@ -12,8 +12,8 @@ read -p "Please enter the SQL password: " DB_PASSWORD
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_HOST=$(gcloud sql instances describe clic --format 'value(ipAddresses.ipAddress)')
 
-read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
 read -p "Please enter a secret key for Django (optional): " SECRET_KEY
+read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
 
 docker run \
 	--rm \
