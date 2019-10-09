@@ -2,18 +2,32 @@
 
 if [ ! -f service-account.json ]; then
 	# create service account key file
-	read -p "Please enter a service account [clic2019@clic-215616.iam.gserviceaccount.com]: " SERVICE_ACCOUNT
-	SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-clic2019@clic-215616.iam.gserviceaccount.com}
-	gcloud iam service-accounts keys create --iam-account "${SERVICE_ACCOUNT}" service-account.json
+	if ( kubectl get secret clic-sa-key 2>&1 > /dev/null ); then
+		kubectl get secrets clic-sa-key -o 'go-template={{index .data "service-account.json"}}' | base64 -D - > service-account.json;
+	else
+		read -p "Please enter a service account [clic2019@clic-215616.iam.gserviceaccount.com]: " SERVICE_ACCOUNT
+		SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-clic2019@clic-215616.iam.gserviceaccount.com}
+		gcloud iam service-accounts keys create --iam-account "${SERVICE_ACCOUNT}" service-account.json
+	fi
 fi
-
-read -p "Please enter the SQL password: " DB_PASSWORD
 
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_HOST=$(gcloud sql instances describe clic --format 'value(ipAddresses.ipAddress)')
+DB_PASSWORD=$(kubectl get secrets cloudsql -o 'go-template={{index .data "password"}}' 2> /dev/null | base64 -D -)
+SECRET_KEY=$(kubectl get secrets django -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
+SENTRY_DSN=$(kubectl get secrets sentry -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -D -)
 
-read -p "Please enter a secret key for Django (optional): " SECRET_KEY
-read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
+if [ -z "$DB_PASSWORD" ]; then
+	read -p "Please enter the SQL password: " DB_PASSWORD
+fi
+
+if [ -z "$SECRET_KEY" ]; then
+	read -p "Please enter a secret key for Django (optional): " SECRET_KEY
+fi
+
+if [ -z "$SENTRY_DSN" ]; then
+	read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
+fi
 
 docker run \
 	--rm \
