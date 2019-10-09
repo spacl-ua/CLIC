@@ -2,9 +2,6 @@
 
 from PIL import Image
 from glob import glob
-import time
-import numpy as np
-import sys
 
 for image_file in glob('**/*.jpg', recursive=True):
 	print('Decoding ' + image_file)
