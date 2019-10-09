@@ -4,15 +4,16 @@ import yaml
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.core.files.storage import default_storage
+from django.core.exceptions import PermissionDenied
 from django.template.loader import get_template
-
+from django.http import StreamingHttpResponse, Http404
 from storages.backends.gcloud import GoogleCloudStorage
+from kubernetes.client.rest import ApiException
 
 import teams
 import submissions
 import submissions.forms
-
-from .utils import get_kubernetes_client
+from .kubernetes_client import KubernetesClient
 
 
 def signup(request):
@@ -58,9 +59,13 @@ def home(request):
 					job = yaml.load(job_template.render())
 
 					# submit job
-					client = get_kubernetes_client()
-					client.delete_namespaced_job(job['metadata']['name'], 'default')
-					client.create_namespaced_job('default', body=job)
+					client = KubernetesClient()
+					try:
+						client.delete_job(job)
+					except ApiException:
+						pass
+
+					client.create_job(job)
 
 				return redirect('home')
 		else:
@@ -69,3 +74,23 @@ def home(request):
 		form = teams.forms.AuthenticationForm()
 
 	return render(request, 'home.html', {'form': form})
+
+
+def logs(request, team, task, phase, container):
+	if not request.user.is_authenticated:
+		raise PermissionDenied()
+	if request.user.username != 'team' and not request.user.is_staff:
+		raise PermissionDenied()
+
+	client = KubernetesClient()
+
+	# find corresponding pods
+	job_name = f'run-{task}-{phase}-{team}'
+	pods = client.list_pods(label_selector=f'job-name={job_name}')
+
+	if len(pods) == 0:
+		raise Http404('Could not find logs.')
+
+	# stream logs
+	logs = client.read_log(pods[0], container=container, follow=True)
+	return StreamingHttpResponse(logs, content_type='text/plain')
