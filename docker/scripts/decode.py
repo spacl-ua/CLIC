@@ -91,6 +91,16 @@ def main(args):
 			logger.debug(error.stdout)
 			logger.debug(error.stderr)
 
+		# delete container if for some reason it already exists
+		containers = run('docker ps -a --format {{.Names}}',
+			stdout=PIPE, stderr=PIPE, check=True, shell=True)
+		if identifier in containers.decode().split():
+			logger.debug('Removing existing container')
+			run('docker stop {}'.format(identifier),
+				stdout=PIPE, stderr=PIPE, check=True, shell=True)
+			run('docker rm {}'.format(identifier),
+				stdout=PIPE, stderr=PIPE, check=True, shell=True)
+
 		try:
 			decode_cmd = [
 				s.format(
