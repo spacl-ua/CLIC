@@ -13,8 +13,9 @@ import os
 import sys
 import traceback
 from argparse import ArgumentParser
-from subprocess import run, CalledProcessError, TimeoutExpired, PIPE
+from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
 from utils import get_logger
+from zipfile import ZipFile
 
 DECODE_CMD = [
 	'docker', 'run',
@@ -82,6 +83,17 @@ def main(args):
 			shell=True)
 		run('sync', shell=True)
 
+		# unzip decoder if zipped
+		zip_path = os.path.join(work_dir, 'decoder.zip')
+		if os.path.exists(zip_path):
+			logger.info('Unzipping decoder')
+			ZipFile(zip_path).extractall(work_dir)
+
+		# check if decoder executable is present
+		if not os.path.exists(os.path.join(work_dir, 'decode')):
+			logger.error('Missing executable \'decode\'')
+			return 1
+
 		# make sure latest Docker image is present before decoder starts
 		try:
 			logger.info('Pulling Docker image')
@@ -93,7 +105,7 @@ def main(args):
 
 		# delete container if for some reason it already exists
 		containers = run('docker ps -a --format {{.Names}}',
-			stdout=PIPE, stderr=PIPE, check=True, shell=True)
+			stdout=PIPE, stderr=DEVNULL, check=True, shell=True).stdout
 		if identifier in containers.decode().split():
 			logger.debug('Removing existing container')
 			run('docker stop {}'.format(identifier),

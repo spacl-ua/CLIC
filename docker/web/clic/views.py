@@ -40,36 +40,60 @@ def signup(request):
 def home(request):
 	if request.user.is_authenticated:
 		if request.method == 'POST':
-			form = submissions.forms.SubmitForm(request.POST, request.FILES)
+			form = submissions.forms.SubmitForm(
+				request.POST,
+				request.FILES,
+				user=request.user)
 
 			if form.is_valid():
-				# upload files to storage bucket
+				if request.user.is_staff:
+					# staff can choose team freely
+					team_name = teams.models.Team.objects.get(id=form.cleaned_data['team']).username
+				else:
+					team_name = request.user.username
+
 				fs = GoogleCloudStorage()
-				for file in request.FILES.getlist('files'):
-					fs.save(
-						name=os.path.join(
-							form.cleaned_data.get('task'),
-							form.cleaned_data.get('phase'),
-							request.user.username,
-							file.name),
-						content=file)
+				fs_path = os.path.join(
+					form.cleaned_data['task'].lower(),
+					form.cleaned_data['phase'].lower(),
+					team_name.lower())
 
-					# create job
-					job_template = get_template('job.yaml')
-					job = yaml.load(job_template.render())
+				# delete previous submission
+				blobs = fs.bucket.list_blobs(prefix=fs_path)
+				for blob in blobs:
+					blob.delete()
 
-					# submit job
-					client = KubernetesClient()
-					try:
-						client.delete_job(job)
-					except ApiException:
-						pass
+				# upload encoded image files to storage bucket
+				for file in request.FILES.getlist('data'):
+					fs.save(name=os.path.join(fs_path, file.name), content=file)
 
-					client.create_job(job)
+				# upload decoder to storage bucket
+				if request.FILES['decoder'].name.lower().endswith('.zip'):
+					fs.save(name=os.path.join(fs_path, 'decoder.zip'), content=request.FILES['decoder'])
+				else:
+					fs.save(name=os.path.join(fs_path, 'decode'), content=request.FILES['decoder'])
 
-				return redirect('home')
+				# create job
+				job_template = get_template('job.yaml')
+				job_identifier = {
+						'task': form.cleaned_data['task'].lower(),
+						'phase': form.cleaned_data['phase'].lower(),
+						'team': team_name.lower()}
+				job = yaml.load(job_template.render(job_identifier))
+
+				# submit job
+				client = KubernetesClient()
+				try:
+					client.delete_job(job)
+				except ApiException:
+					pass
+				client.create_job(job)
+
+				return redirect('/submission/{task}/{phase}/{team}/'.format(**job_identifier))
 		else:
-			form = submissions.forms.SubmitForm()
+			form = submissions.forms.SubmitForm(
+				user=request.user,
+				initial={'team': request.user.id})
 	else:
 		form = teams.forms.AuthenticationForm()
 
@@ -79,13 +103,13 @@ def home(request):
 def logs(request, team, task, phase, container):
 	if not request.user.is_authenticated:
 		raise PermissionDenied()
-	if request.user.username != 'team' and not request.user.is_staff:
+	if request.user.username.lower() != team.lower() and not request.user.is_staff:
 		raise PermissionDenied()
 
 	client = KubernetesClient()
 
 	# find corresponding pods
-	job_name = f'run-{task}-{phase}-{team}'
+	job_name = f'run-{task}-{phase}-{team}'.lower()
 	pods = client.list_pods(label_selector=f'job-name={job_name}')
 
 	if len(pods) == 0:
@@ -94,3 +118,12 @@ def logs(request, team, task, phase, container):
 	# stream logs
 	logs = client.read_log(pods[0], container=container, follow=True)
 	return StreamingHttpResponse(logs, content_type='text/plain')
+
+
+def submission(request, team, task, phase):
+	if not request.user.is_authenticated:
+		raise PermissionDenied()
+	if request.user.username.lower() != team.lower() and not request.user.is_staff:
+		raise PermissionDenied()
+
+	return render(request, 'submission.html', {'team': team, 'task': task, 'phase': phase})

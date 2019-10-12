@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: run-lowrate-valid-jpeg
+  name: run-{{ task }}-{{ phase }}-{{ team }}
   labels:
-    task: lowrate
-    phase: valid
-    team: jpeg
+    task: {{ task }}
+    phase: {{ phase }}
+    team: {{ team }}
 spec:
   template:
     spec:
@@ -22,9 +22,9 @@ spec:
           "--num_cpus", "1",
           "--memory_limit", "12g",
           "--timeout", "36000",
-          "--task", "lowrate",
-          "--phase", "valid",
-          "--team", "jpeg",
+          "--task", "{{ task }}",
+          "--phase", "{{ phase }}",
+          "--team", "{{ team }}",
           "--image", "gcr.io/clic-215616/compression"]
         securityContext:
           capabilities: {}
@@ -49,9 +49,9 @@ spec:
           "/scripts/evaluate.py",
           "--submission_bucket", "clic2020_submissions",
           "--target_bucket", "clic2020_targets",
-          "--task", "lowrate",
-          "--phase", "valid",
-          "--team", "jpeg",
+          "--task", "{{ task }}",
+          "--phase", "{{ phase }}",
+          "--team", "{{ team }}",
           "--metrics", "PSNR", "MSSSIM"]
         securityContext:
           capabilities: {}
