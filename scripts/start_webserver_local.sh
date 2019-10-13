@@ -42,6 +42,7 @@ docker run \
 	-e SUBMISSIONS_BUCKET="clic2020_submissions" \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e DJANGO_SECRET_KEY="${SECRET_KEY}" \
+	-e DEBUG=1 \
 	-w "$(pwd)/docker/web" \
 	-v "$(pwd)/docker/web":"$(pwd)/docker/web" \
 	-p 8000:8000 \

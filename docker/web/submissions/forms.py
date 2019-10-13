@@ -14,6 +14,7 @@ class SubmitForm(forms.Form):
 	team = forms.ModelChoiceField(teams.models.Team.objects.all(), empty_label=None)
 	task = forms.ChoiceField(choices=[('lowrate', 'lowrate'), ('pframe', 'pframe')])
 	phase = forms.ChoiceField(choices=[('valid', 'validation'), ('test', 'test')])
+	gpu = forms.BooleanField(label='GPU')
 	decoder = forms.FileField(
 		help_text='An executable or a zip file containing an executable named \'decode\'.')
 	data = forms.FileField(

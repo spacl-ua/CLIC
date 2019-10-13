@@ -61,4 +61,5 @@ Create a public storage bucket to host static content:
 
 Upload static files:
 
-	gsutil -m rsync -R django/static/ gs://clic2020_public/static
+	./manage.py collectstatic
+	gsutil -m rsync -R web/static/ gs://clic2020_public/static/

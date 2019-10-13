@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
-from . import views
+from . import views, settings
 
 urlpatterns = [
 	path('', views.home, name='home'),
@@ -10,3 +11,6 @@ urlpatterns = [
 	path('logs/<task>/<phase>/<team>/<container>/', views.logs),
 	path('submission/<task>/<phase>/<team>/', views.submission),
 ]
+
+if settings.DEBUG:
+	urlpatterns += staticfiles_urlpatterns()

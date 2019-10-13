@@ -8,7 +8,7 @@ SECRET_KEY = get_random_secret_key()
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECRET_KEY) or SECRET_KEY
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEBUG = True
+DEBUG = bool(os.environ.get('DEBUG', False))
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -19,6 +19,7 @@ INSTALLED_APPS = [
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'teams.apps.TeamsConfig',
+	'clic'
 ]
 
 MIDDLEWARE = [
@@ -99,8 +100,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-STATIC_URL = 'http://storage.googleapis.com/clic2020_public/static/'
+STATIC_URL = '/static/' if DEBUG else 'http://storage.googleapis.com/clic2020_public/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 
 
 # Google Cloud Storage
