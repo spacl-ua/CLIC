@@ -14,15 +14,14 @@ class SubmitForm(forms.Form):
 	team = forms.ModelChoiceField(teams.models.Team.objects.all(), empty_label=None)
 	task = forms.ChoiceField(choices=[('lowrate', 'lowrate'), ('pframe', 'pframe')])
 	phase = forms.ChoiceField(choices=[('valid', 'validation'), ('test', 'test')])
-	gpu = forms.BooleanField(label='GPU')
 	decoder = forms.FileField(
 		help_text='An executable or a zip file containing an executable named \'decode\'.')
+	gpu = forms.BooleanField(label='Requires GPU', required=False)
 	data = forms.FileField(
 		validators=[validate_submission_data_field],
 		widget=forms.ClearableFileInput(attrs={'multiple': True}),
 		help_text='The encoded image files.')
-	hidden = forms.BooleanField(
-		help_text='Hide submission from leaderboard.')
+	hidden = forms.BooleanField(help_text='Hide submission from leaderboard.', required=False)
 
 	def __init__(self, *args, **kwargs):
 		user = kwargs.pop('user', None)

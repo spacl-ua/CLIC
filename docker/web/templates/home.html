@@ -1,47 +1,56 @@
 {% extends 'base.html' %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
-{% if user.is_authenticated %}
-<h2>Submit</h2>
-<form method="post" enctype="multipart/form-data">
-	{% csrf_token %}
-	{{ form.as_p }}
-	<div id="selectedFiles"></div>
-	<button type="submit">Submit</button>
-</form>
-<a href="{% url 'logout' %}">Logout</a>
-<script>
-	var selDiv = "";
+	{% if user.is_authenticated %}
+		<div class="card">
+			<h5 class="card-header">Create submission</h5>
+			<div class="card-body">
+				<form method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					{{ form | crispy }}
+					<div id="selectedFiles"></div>
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+			</div>
+		</div>
+		<script>
+			var selDiv = "";
 
-	document.addEventListener("DOMContentLoaded", init, false);
+			document.addEventListener("DOMContentLoaded", init, false);
 
-	function init() {
-		document.querySelector('#id_data').addEventListener('change', handleFileSelect, false);
-		selDiv = document.querySelector("#selectedFiles");
-	}
+			function init() {
+				document.querySelector('#id_data').addEventListener('change', handleFileSelect, false);
+				selDiv = document.querySelector("#selectedFiles");
+			}
 
-	function handleFileSelect(e) {
-		if(!e.target.files) return;
+			function handleFileSelect(e) {
+				if(!e.target.files) return;
 
-		selDiv.innerHTML = "";
+				selDiv.innerHTML = "";
 
-		var files = e.target.files;
-		for(var i = 0; i < files.length; i++) {
-			var f = files[i];
+				var files = e.target.files;
+				for(var i = 0; i < files.length; i++) {
+					var f = files[i];
 
-			selDiv.innerHTML += f.name + "<br/>";
+					selDiv.innerHTML += f.name + "<br/>";
 
-		}
-	}
-</script>
-{% else %}
-<h2>Login</h2>
-<form action="/accounts/login/" method="post">
-	{% csrf_token %}
-	{{ form.as_p }}
-	<button type="submit">Login</button>
-</form>
-<a href="{% url 'signup' %}">Sign up</a>
-{% endif %}
+				}
+			}
+		</script>
+	{% else %}
+		<div class="card">
+			<h5 class="card-header">Login</h5>
+			<div class="card-body">
+				<form action="/accounts/login/" method="post">
+					{% csrf_token %}
+					{{ form | crispy }}
+					<button type="submit" class="btn btn-primary">Login</button>
+				</form>
+			</div>
+			<div class="card-footer text-muted"><a href="{% url 'signup' %}">Sign up</a></div>
+		</div>
+	{% endif %}
 {% endblock %}
 
