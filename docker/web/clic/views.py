@@ -38,6 +38,8 @@ def signup(request):
 
 
 def home(request):
+	status = 200
+
 	if request.user.is_authenticated:
 		if request.method == 'POST':
 			form = submissions.forms.SubmitForm(
@@ -48,48 +50,17 @@ def home(request):
 			if form.is_valid():
 				if request.user.is_staff:
 					# staff can choose team freely
-					team_name = teams.models.Team.objects.get(id=form.cleaned_data['team']).username
+					team = teams.models.Team.objects.get(id=form.cleaned_data['team']).username
 				else:
-					team_name = request.user.username
+					team = request.user.username
 
-				fs = GoogleCloudStorage()
-				fs_path = os.path.join(
-					form.cleaned_data['task'].lower(),
-					form.cleaned_data['phase'].lower(),
-					team_name.lower())
-
-				# delete previous submission
-				blobs = fs.bucket.list_blobs(prefix=fs_path)
-				for blob in blobs:
-					blob.delete()
-
-				# upload encoded image files to storage bucket
-				for file in request.FILES.getlist('data'):
-					fs.save(name=os.path.join(fs_path, file.name), content=file)
-
-				# upload decoder to storage bucket
-				if request.FILES['decoder'].name.lower().endswith('.zip'):
-					fs.save(name=os.path.join(fs_path, 'decoder.zip'), content=request.FILES['decoder'])
-				else:
-					fs.save(name=os.path.join(fs_path, 'decode'), content=request.FILES['decoder'])
-
-				# create job
-				job_template = get_template('job.yaml')
-				job_identifier = {
-						'task': form.cleaned_data['task'].lower(),
-						'phase': form.cleaned_data['phase'].lower(),
-						'team': team_name.lower()}
-				job = yaml.load(job_template.render(job_identifier))
-
-				# submit job
-				client = KubernetesClient()
-				try:
-					client.delete_job(job)
-				except ApiException:
-					pass
-				client.create_job(job)
-
-				return redirect('/submission/{task}/{phase}/{team}/'.format(**job_identifier))
+				return submit(
+					request,
+					form.cleaned_data['task'],
+					form.cleaned_data['phase'],
+					team)
+			else:
+				status = 422
 		else:
 			form = submissions.forms.SubmitForm(
 				user=request.user,
@@ -97,10 +68,63 @@ def home(request):
 	else:
 		form = teams.forms.AuthenticationForm()
 
-	return render(request, 'home.html', {'form': form})
+	return render(request, 'home.html', {'form': form}, status=status)
 
 
-def logs(request, team, task, phase, container):
+def submit(request, task, phase, team):
+	"""
+	Creates a kubernetes job running the decoder.
+	"""
+
+	# kubernetes jobs only support lowercase names
+	team, task, phase = team.lower(), task.lower(), phase.lower()
+
+	if not request.user.is_authenticated:
+		raise PermissionDenied()
+
+	if not request.user.is_staff and team != request.user.username.lower():
+		# only staff can choose team freely
+		raise PermissionDenied()
+
+	fs = GoogleCloudStorage()
+	fs_path = os.path.join(task, phase, team)
+
+	# delete previous submission, if it exists
+	blobs = fs.bucket.list_blobs(prefix=fs_path)
+	for blob in blobs:
+		blob.delete()
+
+	# upload encoded image files to storage bucket
+	for file in request.FILES.getlist('data'):
+		fs.save(name=os.path.join(fs_path, file.name), content=file)
+
+	# upload decoder to storage bucket
+	if request.FILES['decoder'].name.lower().endswith('.zip'):
+		fs.save(name=os.path.join(fs_path, 'decoder.zip'), content=request.FILES['decoder'])
+	else:
+		fs.save(name=os.path.join(fs_path, 'decode'), content=request.FILES['decoder'])
+
+	# create job
+	job_template = get_template('job.yaml')
+	job_identifier = {'task': task, 'phase': phase, 'team': team}
+	job = yaml.load(job_template.render(job_identifier))
+
+	# submit job
+	client = KubernetesClient()
+	try:
+		client.delete_job(job)
+	except ApiException:
+		pass
+	client.create_job(job)
+
+	return redirect('/submission/{task}/{phase}/{team}/'.format(**job_identifier))
+
+
+def logs(request, task, phase, team, container):
+	"""
+	Streams logs of running submissions.
+	"""
+
 	if not request.user.is_authenticated:
 		raise PermissionDenied()
 	if request.user.username.lower() != team.lower() and not request.user.is_staff:
@@ -120,7 +144,11 @@ def logs(request, team, task, phase, container):
 	return StreamingHttpResponse(logs, content_type='text/plain')
 
 
-def submission(request, team, task, phase):
+def submission(request, task, phase, team):
+	"""
+	Allows a team to view its latest submission.
+	"""
+
 	if not request.user.is_authenticated:
 		raise PermissionDenied()
 	if request.user.username.lower() != team.lower() and not request.user.is_staff:

@@ -1,12 +1,9 @@
 import os
+import logging
 import sentry_sdk
-from django.core.management.utils import get_random_secret_key
 from sentry_sdk.integrations.django import DjangoIntegration
 
-# use random key if key is either unset or empty
-SECRET_KEY = get_random_secret_key()
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECRET_KEY) or SECRET_KEY
-
+SECRET_KEY = os.environ.get('SECRET_KEY', '\$t5(+2v272pm0ig76)ex1hgg-$s2%h@78xb#m*b^wz31fo_1bk')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = bool(os.environ.get('DEBUG', False))
 ALLOWED_HOSTS = ['*']
@@ -35,6 +32,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'clic.urls'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_CLASS_CONVERTERS = {'clearablefileinput': 'filestyle'}
 
 TEMPLATES = [
 	{

@@ -1,44 +1,20 @@
 {% extends 'base.html' %}
 
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
 	{% if user.is_authenticated %}
 		<div class="card">
 			<h5 class="card-header">Create submission</h5>
 			<div class="card-body">
-				<form method="post" enctype="multipart/form-data">
+				<form id="submission" method="post" enctype="multipart/form-data">
 					{% csrf_token %}
 					{{ form | crispy }}
-					<div id="selectedFiles"></div>
 					<button type="submit" class="btn btn-primary">Submit</button>
 				</form>
 			</div>
 		</div>
-		<script>
-			var selDiv = "";
-
-			document.addEventListener("DOMContentLoaded", init, false);
-
-			function init() {
-				document.querySelector('#id_data').addEventListener('change', handleFileSelect, false);
-				selDiv = document.querySelector("#selectedFiles");
-			}
-
-			function handleFileSelect(e) {
-				if(!e.target.files) return;
-
-				selDiv.innerHTML = "";
-
-				var files = e.target.files;
-				for(var i = 0; i < files.length; i++) {
-					var f = files[i];
-
-					selDiv.innerHTML += f.name + "<br/>";
-
-				}
-			}
-		</script>
 	{% else %}
 		<div class="card">
 			<h5 class="card-header">Login</h5>
@@ -54,3 +30,16 @@
 	{% endif %}
 {% endblock %}
 
+{% block scripts %}
+	<script type="text/javascript" src="{% static 'js/bootstrap-filestyle.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/bootstrap-fileprogress.js' %}"></script>
+	<script>
+		function getRedirectURL() {
+			var task = $('#id_task').val();
+			var phase = $('#id_phase').val();
+			return `/submission/${task}/${phase}/{{ user }}/`;
+		}
+
+		$("#submission").uploadprogress({redirect_url: getRedirectURL});
+	</script>
+{% endblock %}
