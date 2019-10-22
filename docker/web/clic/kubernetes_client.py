@@ -1,6 +1,8 @@
+import time
 import google.auth
 from google.cloud.container_v1 import ClusterManagerClient
 from kubernetes import client
+from kubernetes.client.rest import ApiException
 
 
 class KubernetesClient():
@@ -44,12 +46,40 @@ class KubernetesClient():
 		return self.batch_v1_api.delete_namespaced_job(**kwargs)
 
 
-	def read_log(self, pod, namespace='default', amt=65536, **kwargs):
+	def read_log(self, pod, namespace='default', **kwargs):
 		kwargs['namespace'] = namespace
 		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
 
-		if kwargs.get('follow', False):
-			kwargs['_preload_content'] = False
-			return self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
+		if isinstance(kwargs.get('container', None), (list, tuple)):
+			# concatenate logs
+			logs = []
+			for container in kwargs.pop('container'):
+				logs.append(self.read_log(pod, namespace, container=container))
+			return '\n'.join(logs)
 
 		return self.core_v1_api.read_namespaced_pod_log(**kwargs)
+
+
+	def stream_log(self, pod, namespace='default', amt=8192, max_retries=10, delay=2, **kwargs):
+		kwargs['namespace'] = namespace
+		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
+
+		# stream logs
+		kwargs['follow'] = True
+		kwargs['_preload_content'] = False
+
+		if isinstance(kwargs.get('container', None), (list, tuple)):
+			# concatenate logs
+			def _read_logs(containers):
+				for container in containers:
+					for content in self.stream_log(pod, namespace, amt, container=container):
+						yield content
+			return _read_logs(kwargs.pop('container'))
+
+		for i in range(max_retries):
+			try:
+				return self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
+			except ApiException:
+				time.sleep(delay)
+				if i == max_retries - 1:
+					raise

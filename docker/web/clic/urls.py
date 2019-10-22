@@ -9,6 +9,7 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('accounts/', include('django.contrib.auth.urls')),
 	path('logs/<task>/<phase>/<team>/<container>/', views.logs),
+	path('logs/<task>/<phase>/<team>/', views.logs),
 	path('submission/<task>/<phase>/<team>/', views.submission),
 ]
 

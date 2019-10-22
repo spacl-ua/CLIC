@@ -120,7 +120,7 @@ def submit(request, task, phase, team):
 	return redirect('/submission/{task}/{phase}/{team}/'.format(**job_identifier))
 
 
-def logs(request, task, phase, team, container):
+def logs(request, task, phase, team, container=None):
 	"""
 	Streams logs of running submissions.
 	"""
@@ -129,6 +129,12 @@ def logs(request, task, phase, team, container):
 		raise PermissionDenied()
 	if request.user.username.lower() != team.lower() and not request.user.is_staff:
 		raise PermissionDenied()
+	if container not in ['decode', 'evaluate', None]:
+		raise Http404('Could not find logs.')
+
+	if container is None:
+		# return both logs concatenated
+		container = ['decode', 'evaluate']
 
 	client = KubernetesClient()
 
@@ -140,7 +146,12 @@ def logs(request, task, phase, team, container):
 		raise Http404('Could not find logs.')
 
 	# stream logs
-	logs = client.read_log(pods[0], container=container, follow=True)
+	try:
+		logs = client.stream_log(pods[0], container=container)
+	except ApiException:
+		# container may yet have to start
+		raise Http404('Could not find logs.')
+
 	return StreamingHttpResponse(logs, content_type='text/plain')
 
 
