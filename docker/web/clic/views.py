@@ -13,6 +13,7 @@ from kubernetes.client.rest import ApiException
 import teams
 import submissions
 import submissions.forms
+import submissions.models
 from .kubernetes_client import KubernetesClient
 
 
@@ -50,15 +51,16 @@ def home(request):
 			if form.is_valid():
 				if request.user.is_staff:
 					# staff can choose team freely
-					team = teams.models.Team.objects.get(id=form.cleaned_data['team']).username
+					team = form.cleaned_data['team']
 				else:
-					team = request.user.username
+					team = request.user
 
 				return submit(
 					request,
 					form.cleaned_data['task'],
 					form.cleaned_data['phase'],
-					team)
+					team,
+					form.cleaned_data['docker_image'])
 			else:
 				status = 422
 		else:
@@ -71,23 +73,26 @@ def home(request):
 	return render(request, 'home.html', {'form': form}, status=status)
 
 
-def submit(request, task, phase, team):
+def submit(request, task, phase, team, docker_image):
 	"""
 	Creates a kubernetes job running the decoder.
 	"""
 
-	# kubernetes jobs only support lowercase names
-	team, task, phase = team.lower(), task.lower(), phase.lower()
-
 	if not request.user.is_authenticated:
 		raise PermissionDenied()
 
-	if not request.user.is_staff and team != request.user.username.lower():
-		# only staff can choose team freely
-		raise PermissionDenied()
+	if not request.user.is_staff:
+		# only staff is allowed to choose these
+		if team != request.user:
+			raise PermissionDenied()
+		if not phase.active:
+			raise PermissionDenied()
+		if not task.active:
+			raise PermissionDenied()
 
+	# submission will be stored here
 	fs = GoogleCloudStorage()
-	fs_path = os.path.join(task, phase, team)
+	fs_path = os.path.join(task.name.lower(), phase.name.lower(), team.username.lower())
 
 	# delete previous submission, if it exists
 	blobs = fs.bucket.list_blobs(prefix=fs_path)
@@ -106,7 +111,11 @@ def submit(request, task, phase, team):
 
 	# create job
 	job_template = get_template('job.yaml')
-	job_identifier = {'task': task, 'phase': phase, 'team': team}
+	job_identifier = {
+		'task': task.name.lower(),
+		'phase': phase.name.lower(),
+		'team': team.username.lower(),
+		'image': docker_image.name}
 	job = yaml.load(job_template.render(job_identifier))
 
 	# submit job

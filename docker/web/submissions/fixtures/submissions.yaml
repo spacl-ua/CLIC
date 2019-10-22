@@ -1,0 +1,27 @@
+- model: submissions.task
+  fields:
+    name: "lowrate"
+    description: "Low-rate"
+    active: true
+- model: submissions.task
+  fields:
+    name: "pframe"
+    description: "P-frame"
+    active: true
+
+- model: submissions.phase
+  fields:
+    name: "valid"
+    description: "Validation"
+    active: true
+- model: submissions.phase
+  fields:
+    name: "test"
+    description: "Test"
+    active: false
+
+- model: submissions.dockerimage
+  pk: 1
+  fields:
+    name: "gcr.io/clic-215616/compression:latest"
+    active: true

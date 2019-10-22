@@ -16,6 +16,7 @@ INSTALLED_APPS = [
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'teams.apps.TeamsConfig',
+	'submissions.apps.SubmissionsConfig',
 	'crispy_forms',
 ]
 

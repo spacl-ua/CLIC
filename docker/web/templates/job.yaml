@@ -25,7 +25,7 @@ spec:
           "--task", "{{ task }}",
           "--phase", "{{ phase }}",
           "--team", "{{ team }}",
-          "--image", "gcr.io/clic-215616/compression"]
+          "--image", "{{ image }}"]
         securityContext:
           capabilities: {}
           privileged: true
