@@ -49,18 +49,10 @@ def home(request):
 				user=request.user)
 
 			if form.is_valid():
-				if request.user.is_staff:
-					# staff can choose team freely
-					team = form.cleaned_data['team']
-				else:
-					team = request.user
+				if not request.user.is_staff:
+					form.cleaned_data['team'] = request.user
+				return submit(request, form)
 
-				return submit(
-					request,
-					form.cleaned_data['task'],
-					form.cleaned_data['phase'],
-					team,
-					form.cleaned_data['docker_image'])
 			else:
 				status = 422
 		else:
@@ -73,13 +65,17 @@ def home(request):
 	return render(request, 'home.html', {'form': form}, status=status)
 
 
-def submit(request, task, phase, team, docker_image):
+def submit(request, form):
 	"""
 	Creates a kubernetes job running the decoder.
 	"""
 
 	if not request.user.is_authenticated:
 		raise PermissionDenied()
+
+	team = form.cleaned_data['team']
+	task = form.cleaned_data['task']
+	phase = form.cleaned_data['phase']
 
 	if not request.user.is_staff:
 		# only staff is allowed to choose these
@@ -111,12 +107,12 @@ def submit(request, task, phase, team, docker_image):
 
 	# create job
 	job_template = get_template('job.yaml')
-	job_identifier = {
-		'task': task.name.lower(),
-		'phase': phase.name.lower(),
-		'team': team.username.lower(),
-		'image': docker_image.name}
-	job = yaml.load(job_template.render(job_identifier))
+	job_description = {
+		'team': form.cleaned_data['team'].username.lower(),
+		'task': form.cleaned_data['task'].name.lower(),
+		'phase': form.cleaned_data['phase'].name.lower(),
+		'image': form.cleaned_data['docker_image'].name}
+	job = yaml.load(job_template.render(job_description))
 
 	# submit job
 	client = KubernetesClient()
@@ -126,7 +122,9 @@ def submit(request, task, phase, team, docker_image):
 		pass
 	client.create_job(job)
 
-	return redirect('/submission/{task}/{phase}/{team}/'.format(**job_identifier))
+	# TODO: create submission entry in database
+
+	return redirect('/submission/{task}/{phase}/{team}/'.format(**job_description))
 
 
 def logs(request, task, phase, team, container=None):
