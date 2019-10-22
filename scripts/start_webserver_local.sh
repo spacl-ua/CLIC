@@ -48,4 +48,4 @@ docker run \
 	-p 8000:8000 \
 	gcr.io/clic-215616/web \
 	/bin/bash
-#	python3 manage.py runserver 0.0.0.0:8000
+#	gunicorn --bind :8000 --worker-class gevent --reload --log-level DEBUG clic.wsgi

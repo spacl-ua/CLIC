@@ -161,7 +161,7 @@ def logs(request, task, phase, team, container=None):
 		# container may yet have to start
 		raise Http404('Could not find logs.')
 
-	return StreamingHttpResponse(logs, content_type='text/plain')
+	return StreamingHttpResponse(logs, content_type='text/event-stream')
 
 
 def submission(request, task, phase, team):

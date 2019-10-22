@@ -60,7 +60,7 @@ class KubernetesClient():
 		return self.core_v1_api.read_namespaced_pod_log(**kwargs)
 
 
-	def stream_log(self, pod, namespace='default', amt=8192, max_retries=10, delay=2, **kwargs):
+	def stream_log(self, pod, namespace='default', amt=1024, max_retries=5, delay=2, **kwargs):
 		kwargs['namespace'] = namespace
 		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
 
@@ -76,7 +76,7 @@ class KubernetesClient():
 						yield content
 			return _read_logs(kwargs.pop('container'))
 
-		for i in range(max_retries):
+		for i in range(max_retries + 1):
 			try:
 				return self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
 			except ApiException:
