@@ -11,12 +11,17 @@ class Task(models.Model):
 
 
 class Phase(models.Model):
-	name = models.CharField(primary_key=True, max_length=32)
+	name = models.CharField(max_length=32)
+	task = models.ForeignKey(Task, on_delete=models.CASCADE)
 	description = models.CharField(max_length=32)
 	active = models.BooleanField(default=True)
+	decoder_size_limit = models.IntegerField(null=True)
+	decoder_fixed = models.BooleanField(default=False,
+		help_text='Only allow already submitted decoders to be resubmitted')
+	data_size_limit = models.IntegerField(null=True)
 
 	def __str__(self):
-		return self.description
+		return '{0} ({1})'.format(self.task, self.description)
 
 
 class DockerImage(models.Model):
@@ -56,7 +61,7 @@ class Submission(models.Model):
 	gpu = models.BooleanField(default=False)
 	decoder_hash = models.CharField(max_length=128)
 	decoder_size = models.IntegerField()
-	decoding_time = models.IntegerField()
+	decoding_time = models.IntegerField(null=True)
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
 	status = models.CharField(max_length=32, choices=STATUS_CHOICES, default=STATUS_CREATED)

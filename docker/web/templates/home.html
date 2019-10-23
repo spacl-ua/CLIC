@@ -34,12 +34,6 @@
 	<script type="text/javascript" src="{% static 'js/bootstrap-filestyle.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/bootstrap-fileprogress.js' %}"></script>
 	<script>
-		function getRedirectURL() {
-			var task = $('#id_task').val();
-			var phase = $('#id_phase').val();
-			return `/submission/${task}/${phase}/{{ user }}/`;
-		}
-
-		$("#submission").uploadprogress({redirect_url: getRedirectURL});
+		$("#submission").uploadprogress();
 	</script>
 {% endblock %}

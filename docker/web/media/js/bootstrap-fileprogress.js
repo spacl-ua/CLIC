@@ -112,7 +112,7 @@
                 url = response.location;
             }
             else{
-                url = this.options.redirect_url();
+                url = this.options.redirect_url;
             }
             window.location.href = url;
         },

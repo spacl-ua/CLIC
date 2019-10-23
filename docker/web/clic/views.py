@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate
 from django.core.files.storage import default_storage
 from django.core.exceptions import PermissionDenied
 from django.template.loader import get_template
-from django.http import StreamingHttpResponse, Http404
+from django.http import StreamingHttpResponse, HttpResponse, Http404
 from storages.backends.gcloud import GoogleCloudStorage
 from kubernetes.client.rest import ApiException
 
@@ -15,6 +15,7 @@ import submissions
 import submissions.forms
 import submissions.models
 from .kubernetes_client import KubernetesClient
+from .utils import hash_uploaded_file
 
 
 def signup(request):
@@ -49,10 +50,7 @@ def home(request):
 				user=request.user)
 
 			if form.is_valid():
-				if not request.user.is_staff:
-					form.cleaned_data['team'] = request.user
 				return submit(request, form)
-
 			else:
 				status = 422
 		else:
@@ -73,22 +71,36 @@ def submit(request, form):
 	if not request.user.is_authenticated:
 		raise PermissionDenied()
 
-	team = form.cleaned_data['team']
-	task = form.cleaned_data['task']
-	phase = form.cleaned_data['phase']
-
 	if not request.user.is_staff:
 		# only staff is allowed to choose these
-		if team != request.user:
+		if form.cleaned_data['team'] != request.user:
 			raise PermissionDenied()
-		if not phase.active:
+		if not form.cleaned_data['phase'].active:
 			raise PermissionDenied()
-		if not task.active:
+		if not form.cleaned_data['task'].active:
 			raise PermissionDenied()
+
+	job_description = {
+		'team': form.cleaned_data['team'].username.lower(),
+		'task': form.cleaned_data['task'].name.lower(),
+		'phase': form.cleaned_data['phase'].name.lower(),
+		'image': form.cleaned_data['docker_image'].name}
+
+	# check file size
+	data_size = 0
+	for file in request.FILES.getlist('data'):
+		data_size += file.size
+	decoder_size = request.FILES['decoder'].size
+
+	# check decoder
+	decoder_hash = hash_uploaded_file(request.FILES['decoder'])
 
 	# submission will be stored here
 	fs = GoogleCloudStorage()
-	fs_path = os.path.join(task.name.lower(), phase.name.lower(), team.username.lower())
+	fs_path = os.path.join(
+		job_description['task'],
+		job_description['phase'],
+		job_description['team'])
 
 	# delete previous submission, if it exists
 	blobs = fs.bucket.list_blobs(prefix=fs_path)
@@ -107,11 +119,6 @@ def submit(request, form):
 
 	# create job
 	job_template = get_template('job.yaml')
-	job_description = {
-		'team': form.cleaned_data['team'].username.lower(),
-		'task': form.cleaned_data['task'].name.lower(),
-		'phase': form.cleaned_data['phase'].name.lower(),
-		'image': form.cleaned_data['docker_image'].name}
 	job = yaml.load(job_template.render(job_description))
 
 	# submit job
@@ -122,9 +129,21 @@ def submit(request, form):
 		pass
 	client.create_job(job)
 
-	# TODO: create submission entry in database
+	submission = submissions.models.Submission(
+		team=form.cleaned_data['team'],
+		task=form.cleaned_data['task'],
+		phase=form.cleaned_data['phase'],
+		gpu=form.cleaned_data['gpu'],
+		docker_image=form.cleaned_data['docker_image'],
+		hidden=form.cleaned_data['hidden'],
+		decoder_size=decoder_size,
+		decoder_hash=decoder_hash,
+		data_size=data_size)
+	submission.save()
 
-	return redirect('/submission/{task}/{phase}/{team}/'.format(**job_description))
+	return HttpResponse(
+		'{{"location": "/submission/{task}/{phase}/{team}/"}}'.format(**job_description),
+		content_type='application/json')
 
 
 def logs(request, task, phase, team, container=None):

@@ -10,14 +10,32 @@
     active: true
 
 - model: submissions.phase
+  pk: 1
   fields:
+    task: "lowrate"
     name: "valid"
-    description: "Validation"
+    description: "validation"
     active: true
 - model: submissions.phase
+  pk: 2
   fields:
+    task: "lowrate"
     name: "test"
-    description: "Test"
+    description: "test"
+    active: false
+- model: submissions.phase
+  pk: 3
+  fields:
+    task: "pframe"
+    name: "valid"
+    description: "validation"
+    active: true
+- model: submissions.phase
+  pk: 4
+  fields:
+    task: "pframe"
+    name: "test"
+    description: "test"
     active: false
 
 - model: submissions.dockerimage
