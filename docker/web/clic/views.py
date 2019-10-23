@@ -84,7 +84,8 @@ def submit(request, form):
 		'team': form.cleaned_data['team'].username.lower(),
 		'task': form.cleaned_data['task'].name.lower(),
 		'phase': form.cleaned_data['phase'].name.lower(),
-		'image': form.cleaned_data['docker_image'].name}
+		'image': form.cleaned_data['docker_image'].name,
+		'gpu': form.cleaned_data['docker_image'].gpu}
 
 	# check file size
 	data_size = 0
@@ -133,7 +134,6 @@ def submit(request, form):
 		team=form.cleaned_data['team'],
 		task=form.cleaned_data['task'],
 		phase=form.cleaned_data['phase'],
-		gpu=form.cleaned_data['gpu'],
 		docker_image=form.cleaned_data['docker_image'],
 		hidden=form.cleaned_data['hidden'],
 		decoder_size=decoder_size,

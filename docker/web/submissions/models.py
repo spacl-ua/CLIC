@@ -30,7 +30,7 @@ class DockerImage(models.Model):
 	active = models.BooleanField(default=True)
 
 	def __str__(self):
-		return self.name
+		return '{0} ({1})'.format(self.name, 'GPU' if self.gpu else 'CPU')
 
 
 class Submission(models.Model):
@@ -58,7 +58,6 @@ class Submission(models.Model):
 	docker_image = models.ForeignKey(DockerImage, on_delete=models.PROTECT)
 	task = models.ForeignKey(Task, on_delete=models.PROTECT)
 	phase = models.ForeignKey(Phase, on_delete=models.PROTECT)
-	gpu = models.BooleanField(default=False)
 	decoder_hash = models.CharField(max_length=128)
 	decoder_size = models.IntegerField()
 	decoding_time = models.IntegerField(null=True)

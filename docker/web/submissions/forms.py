@@ -16,8 +16,6 @@ class SubmitForm(forms.Form):
 	data = forms.FileField(
 		widget=forms.ClearableFileInput(attrs={'multiple': True}),
 		help_text='Files representing the encoded images')
-	gpu = forms.BooleanField(
-		label='GPU', required=False, help_text='Tick this if your decoder requires a GPU')
 	docker_image = forms.ModelChoiceField(models.DockerImage.objects.all(), empty_label=None,
 		help_text='The environment in which your decoder will be run')
 	hidden = forms.BooleanField(help_text='Hide submission from leaderboard', required=False)

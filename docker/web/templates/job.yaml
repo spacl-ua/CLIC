@@ -9,9 +9,18 @@ metadata:
 spec:
   template:
     spec:
+      {% if gpu %}
+      nodeSelector:
+        accelerator: nvidia-tesla-k80
+      {% endif %}
       initContainers:
       - name: decode
         image: "gcr.io/clic-215616/decoding"
+        {% if gpu %}
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        {% endif %}
         command: [
           "python3",
           "/scripts/decode.py",
