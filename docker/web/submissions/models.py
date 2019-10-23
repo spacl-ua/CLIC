@@ -11,14 +11,14 @@ class Task(models.Model):
 
 
 class Phase(models.Model):
-	name = models.CharField(max_length=32)
 	task = models.ForeignKey(Task, on_delete=models.CASCADE)
+	name = models.CharField(max_length=32)
 	description = models.CharField(max_length=32)
 	active = models.BooleanField(default=True)
-	decoder_size_limit = models.IntegerField(null=True)
+	decoder_size_limit = models.IntegerField(null=True, blank=True)
 	decoder_fixed = models.BooleanField(default=False,
 		help_text='Only allow already submitted decoders to be resubmitted')
-	data_size_limit = models.IntegerField(null=True)
+	data_size_limit = models.IntegerField(null=True, blank=True)
 
 	def __str__(self):
 		return '{0} ({1})'.format(self.task, self.description)

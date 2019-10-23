@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 import teams
-from . import models
+from . import models, utils
 
 
 class SubmitForm(forms.Form):
@@ -16,7 +16,7 @@ class SubmitForm(forms.Form):
 	data = forms.FileField(
 		widget=forms.ClearableFileInput(attrs={'multiple': True}),
 		help_text='Files representing the encoded images')
-	docker_image = forms.ModelChoiceField(models.DockerImage.objects.all(), empty_label=None,
+	docker_image = forms.ModelChoiceField(models.DockerImage.objects.filter(active=True), empty_label=None,
 		help_text='The environment in which your decoder will be run')
 	hidden = forms.BooleanField(help_text='Hide submission from leaderboard', required=False)
 
@@ -27,6 +27,7 @@ class SubmitForm(forms.Form):
 
 		if getattr(self.user, 'is_staff', False):
 			self.fields['phase'].queryset = models.Phase.objects.order_by('task').all()
+			self.fields['docker_image'].queryset = models.DockerImage.objects.all()
 		else:
 			# remove fields only staff should be able to see
 			del self.fields['team']
@@ -52,4 +53,35 @@ class SubmitForm(forms.Form):
 		if not getattr(self.user, 'is_staff', False):
 			self.cleaned_data['team'] = self.user
 			self.cleaned_data['hidden'] = False
+
+		self.cleaned_data['data_size'] = 0
+		for file in self.files.getlist('data'):
+			self.cleaned_data['data_size'] += file.size
+		self.cleaned_data['decoder_size'] = self.files['decoder'].size
+		self.cleaned_data['decoder_hash'] = utils.hash_uploaded_file(self.files['decoder'])
+
+		if self.cleaned_data['phase'].decoder_fixed:
+			submissions = models.Submission.objects.filter(
+				decoder_hash=self.cleaned_data['decoder_hash'])
+			if submissions.count() < 1:
+				error = ValidationError(
+					'The decoder has to correspond to a previously submitted decoder')
+				self.add_error('decoder', error)
+
+		if self.cleaned_data['phase'].decoder_size_limit:
+			if self.cleaned_data['decoder_size'] > self.cleaned_data['phase'].decoder_size_limit:
+				error = ValidationError(
+					'Decoder should contain at most {1} bytes but contains {0} bytes'.format(
+						self.cleaned_data['decoder_size'],
+						self.cleaned_data['phase'].decoder_size_limit))
+				self.add_error('decoder', error)
+
+		if self.cleaned_data['phase'].data_size_limit:
+			if self.cleaned_data['data_size'] > self.cleaned_data['phase'].data_size_limit:
+				error = ValidationError(
+					'Data should contain less than {1} bytes but contains {0} bytes'.format(
+						self.cleaned_data['data_size'],
+						self.cleaned_data['phase'].data_size_limit))
+				self.add_error('data', error)
+
 		return self.cleaned_data

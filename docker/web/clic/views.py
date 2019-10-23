@@ -15,7 +15,6 @@ import submissions
 import submissions.forms
 import submissions.models
 from .kubernetes_client import KubernetesClient
-from .utils import hash_uploaded_file
 
 
 def signup(request):
@@ -87,15 +86,6 @@ def submit(request, form):
 		'image': form.cleaned_data['docker_image'].name,
 		'gpu': form.cleaned_data['docker_image'].gpu}
 
-	# check file size
-	data_size = 0
-	for file in request.FILES.getlist('data'):
-		data_size += file.size
-	decoder_size = request.FILES['decoder'].size
-
-	# check decoder
-	decoder_hash = hash_uploaded_file(request.FILES['decoder'])
-
 	# submission will be stored here
 	fs = GoogleCloudStorage()
 	fs_path = os.path.join(
@@ -136,9 +126,9 @@ def submit(request, form):
 		phase=form.cleaned_data['phase'],
 		docker_image=form.cleaned_data['docker_image'],
 		hidden=form.cleaned_data['hidden'],
-		decoder_size=decoder_size,
-		decoder_hash=decoder_hash,
-		data_size=data_size)
+		decoder_size=form.cleaned_data['decoder_size'],
+		decoder_hash=form.cleaned_data['decoder_hash'],
+		data_size=form.cleaned_data['data_size'])
 	submission.save()
 
 	return HttpResponse(
