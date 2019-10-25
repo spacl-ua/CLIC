@@ -49,4 +49,4 @@ kubectl create secret generic django --from-literal secret_key="$SECRET_KEY"
 kubectl create secret generic sentry --from-literal dsn="$SENTRY_DSN"
 
 # add evaluation code to kubernetes
-kubectl create configmap scripts --from-file docker/scripts/
+kubectl create configmap code --from-file code/

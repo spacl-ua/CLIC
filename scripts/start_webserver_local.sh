@@ -43,9 +43,8 @@ docker run \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e SECRET_KEY="${SECRET_KEY}" \
 	-e DEBUG=1 \
-	-w "$(pwd)/docker/web" \
-	-v "$(pwd)/docker/web":"$(pwd)/docker/web" \
+	-w "$(pwd)/web" \
+	-v "$(pwd)/web":"$(pwd)/web" \
 	-p 8000:8000 \
 	gcr.io/clic-215616/web \
-	/bin/bash
-#	gunicorn --bind :8000 --worker-class gevent --workers 2 --reload --log-level DEBUG clic.wsgi
+	gunicorn --bind :8000 --worker-class gevent --workers 2 --reload --log-level DEBUG clic.wsgi

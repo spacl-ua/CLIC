@@ -19,7 +19,7 @@ spec:
         {% endif %}
         command: [
           "python3",
-          "/scripts/decode.py",
+          "/code/decode.py",
           "--debug",
           "--submission_bucket", "clic2020_submissions",
           "--environment_bucket", "clic2020_environments",
@@ -44,14 +44,14 @@ spec:
             mountPath: "/var/run/docker.sock"
           - name: executable-volume
             mountPath: "/var/lib/docker"
-          - name: scripts-volume
-            mountPath: "/scripts"
+          - name: code-volume
+            mountPath: "/code"
       containers:
       - name: evaluate
         image: "gcr.io/clic-215616/evaluation"
         command: [
           "python3",
-          "/scripts/evaluate.py",
+          "/code/evaluate.py",
           "--submission_bucket", "clic2020_submissions",
           "--target_bucket", "clic2020_targets",
           "--task", "{{ task }}",
@@ -67,8 +67,8 @@ spec:
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
-          - name: scripts-volume
-            mountPath: "/scripts"
+          - name: code-volume
+            mountPath: "/code"
       restartPolicy: Never
       volumes:
         - name: clic-sa-key-volume
@@ -80,7 +80,7 @@ spec:
         - name: executable-volume
           hostPath:
             path: "/var/lib/docker"
-        - name: scripts-volume
+        - name: code-volume
           configMap:
-            name: scripts
+            name: code
   backoffLimit: 0
