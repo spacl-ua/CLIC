@@ -64,6 +64,8 @@
             this.$modal_footer.hide();
             this.$modal_bar.addClass('progress-bar-success');
             this.$modal_bar.removeClass('progress-bar-danger');
+            this.$modal_bar.removeClass('progress-bar-striped');
+            this.$modal_bar.removeClass('progress-bar-animated');
             if(this.xhr){
                 this.xhr.abort();
             }
@@ -148,6 +150,12 @@
             this.$modal_bar.attr('aria-valuenow', percent);
             this.$modal_bar.text(percent + '%');
             this.$modal_bar.css('width', percent + '%');
+
+            if(percent == 100){
+                this.$modal_title.text('Preparing');
+                this.$modal_bar.addClass('progress-bar-striped');
+                this.$modal_bar.addClass('progress-bar-animated');
+            }
         },
 
         progress: function(/*ProgressEvent*/e){
