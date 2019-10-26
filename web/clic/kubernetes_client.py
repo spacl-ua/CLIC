@@ -1,8 +1,10 @@
+import logging
 import time
 import google.auth
 from google.cloud.container_v1 import ClusterManagerClient
 from kubernetes import client
 from kubernetes.client.rest import ApiException
+from . import utils
 
 
 class KubernetesClient():
@@ -60,7 +62,7 @@ class KubernetesClient():
 		return self.core_v1_api.read_namespaced_pod_log(**kwargs)
 
 
-	def stream_log(self, pod, namespace='default', amt=1024, max_retries=5, delay=2, **kwargs):
+	def stream_log(self, pod, namespace='default', amt=1024, max_attempts=5, delay_attempt=2, **kwargs):
 		kwargs['namespace'] = namespace
 		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
 
@@ -70,16 +72,19 @@ class KubernetesClient():
 
 		if isinstance(kwargs.get('container', None), (list, tuple)):
 			# concatenate logs
-			def _read_logs(containers):
-				for container in containers:
-					for content in self.stream_log(pod, namespace, amt, container=container):
-						yield content
-			return _read_logs(kwargs.pop('container'))
+			for container in kwargs.pop('container'):
+				yield from self.stream_log(pod, namespace, amt, container=container)
+			return
 
-		for i in range(max_retries + 1):
+		for i in range(max_attempts):
 			try:
-				return self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
+				yield from self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
 			except ApiException:
-				time.sleep(delay)
-				if i == max_retries - 1:
+				if i < max_attempts - 1:
+					yield utils.log_message(logging.INFO, 'Waiting for container to start')
+					time.sleep(delay_attempt)
+				else:
+					yield utils.log_message(logging.ERROR, 'Unable to retrieve logs')
 					raise
+			else:
+				break
