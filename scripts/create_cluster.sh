@@ -21,7 +21,8 @@ read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
 gcloud container clusters create clic-cluster \
 	--zone us-west1-b \
 	--machine-type n1-standard-1 \
-	--num-nodes 2
+	--num-nodes 2 \
+	--verbosity error
 
 # add GPU nodes
 gcloud container node-pools create gpu-pool \
@@ -29,7 +30,8 @@ gcloud container node-pools create gpu-pool \
 	--accelerator type=nvidia-tesla-k80,count=1 \
 	--machine-type n1-standard-2 \
 	--cluster clic-cluster \
-	--num-nodes 1
+	--num-nodes 1 \
+	--verbosity error
 
 # install nvidia drivers on GPU nodes
 kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/daemonset.yaml

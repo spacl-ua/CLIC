@@ -11,7 +11,8 @@ spec:
     spec:
       initContainers:
       - name: decode
-        image: "gcr.io/clic-215616/decoding"
+        image: "gcr.io/clic-215616/decoding{% if gpu %}:gpu{% endif %}"
+        imagePullPolicy: Always
         {% if gpu %}
         resources:
           limits:

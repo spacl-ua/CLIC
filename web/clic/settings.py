@@ -3,7 +3,7 @@ import logging
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-SECRET_KEY = os.environ.get('SECRET_KEY', '\$t5(+2v272pm0ig76)ex1hgg-$s2%h@78xb#m*b^wz31fo_1bk')
+SECRET_KEY = os.environ.get('SECRET_KEY', '') or '\$t5(+2v272pm0ig76)ex1hgg-$s2%h@78xb#m*b^wz31fo_1bk'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = bool(os.environ.get('DEBUG', False))
 ALLOWED_HOSTS = ['*']
