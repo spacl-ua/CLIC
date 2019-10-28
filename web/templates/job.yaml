@@ -31,7 +31,8 @@ spec:
           "--task", "{{ task }}",
           "--phase", "{{ phase }}",
           "--team", "{{ team }}",
-          "--image", "{{ image }}"]
+          "--image", "{{ image }}"{% if gpu %},
+          "--gpu"{% endif %}]
         securityContext:
           capabilities: {}
           privileged: true

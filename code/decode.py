@@ -17,7 +17,7 @@ from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
 from utils import get_logger
 from zipfile import ZipFile
 
-DECODE_CMD = [
+DECODE_CMD_CPU = [
 	'docker', 'run',
 	'--network', 'none',
 	'--memory', '{memory_limit}',
@@ -26,8 +26,30 @@ DECODE_CMD = [
 	'--name', '{identifier}',
 	'-v', '{work_dir}:/home/{identifier}',
 	'-w', '/home/{identifier}',
+	'-e', 'TF_CPP_MIN_LOG_LEVEL=3',
 	'--entrypoint', './decode',
 	'{image}']
+
+DECODE_CMD_GPU = [
+	'docker', 'run',
+	'--network', 'none',
+	'--memory', '{memory_limit}',
+	'--memory-swap', '{memory_limit}',
+	'--cpus', '{num_cpus}',
+	'--name', '{identifier}',
+	'-v', '{work_dir}:/home/{identifier}',
+	'-v', '/home/kubernetes/bin/nvidia:/usr/local/nvidia:ro',
+	'-v', '/home/kubernetes/bin/nvidia/vulkan/icd.d:/etc/vulkan/icd.d:ro',
+	'--device', '/dev/nvidia0:/dev/nvidia0:mrw',
+	'--device', '/dev/nvidiactl:/dev/nvidiactl:mrw',
+	'--device', '/dev/nvidia-uvm:/dev/nvidia-uvm:mrw',
+	'--device', '/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:mrw',
+	'-w', '/home/{identifier}',
+	'-e', 'TF_CPP_MIN_LOG_LEVEL=3',
+	'--entrypoint', './decode',
+	'{image}']
+
+DECODE_CMD = {True: DECODE_CMD_GPU, False: DECODE_CMD_CPU}
 
 
 def main(args):
@@ -119,7 +141,7 @@ def main(args):
 					work_dir=work_dir,
 					identifier=identifier,
 					**vars(args))
-				for s in DECODE_CMD]
+				for s in DECODE_CMD[args.gpu]]
 
 			# run decoder
 			logger.info('Running decoder')
@@ -194,6 +216,8 @@ if __name__ == '__main__':
 	parser.add_argument('--debug', action='store_true')
 	parser.add_argument('--timeout', type=int, default=None,
 		help='Decoder is given this many seconds to complete')
+	parser.add_argument('--gpu', action='store_true',
+		help='Make GPU available to decoder')
 
 	args = parser.parse_args()
 
