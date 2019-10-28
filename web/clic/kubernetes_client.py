@@ -62,7 +62,7 @@ class KubernetesClient():
 		return self.core_v1_api.read_namespaced_pod_log(**kwargs)
 
 
-	def stream_log(self, pod, namespace='default', amt=1024, max_attempts=5, delay_attempt=2, **kwargs):
+	def stream_log(self, pod, namespace='default', amt=1024, max_attempts=10, delay_attempt=5, **kwargs):
 		kwargs['namespace'] = namespace
 		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
 
@@ -79,6 +79,7 @@ class KubernetesClient():
 		for i in range(max_attempts):
 			try:
 				yield from self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
+				break
 			except ApiException:
 				if i < max_attempts - 1:
 					yield utils.log_message(logging.INFO, 'Waiting for container to start')
@@ -86,5 +87,3 @@ class KubernetesClient():
 				else:
 					yield utils.log_message(logging.ERROR, 'Unable to retrieve logs')
 					raise
-			else:
-				break
