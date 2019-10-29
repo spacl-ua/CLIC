@@ -5,23 +5,38 @@
 	<h5 class="card-header">Submission</h5>
 	<div class="card-body">
 		<div class="row">
-			<div class="col-2">Team</div>
-			<div class="col">{{ submission.team }}</div>
+			<div class="col-3">Team</div>
+			<div class="col-9">{{ submission.team }}</div>
 		</div>
 		<hr class="mt-1 mb-1">
 		<div class="row">
-			<div class="col-2">Date</div>
-			<div class="col">{{ submission.timestamp|date:"M d, H:i" }}</div>
+			<div class="col-3">Date</div>
+			<div class="col-9">{{ submission.timestamp|date:"M d, H:i" }}</div>
 		</div>
 		<hr class="mt-1 mb-1">
 		<div class="row">
-			<div class="col-2">Task</div>
-			<div class="col">{{ submission.task.description|capfirst }}</div>
+			<div class="col-3">Task</div>
+			<div class="col-9">{{ submission.task.description|capfirst }}</div>
 		</div>
 		<hr class="mt-1 mb-1">
 		<div class="row">
-			<div class="col-2">Phase</div>
-			<div class="col">{{ submission.phase.description|capfirst }}</div>
+			<div class="col-3">Phase</div>
+			<div class="col-9">{{ submission.phase.description|capfirst }}</div>
+		</div>
+		<hr class="mt-1 mb-1">
+		<div class="row">
+			<div class="col-3 text-nowrap">Decoder hash</div>
+			<div class="col-9 text-truncate">{{ submission.decoder_hash }}</div>
+		</div>
+		<hr class="mt-1 mb-1">
+		<div class="row">
+			<div class="col-3 text-nowrap">Decoder size</div>
+			<div class="col-9">{{ submission.decoder_size|filesizeformat }}</div>
+		</div>
+		<hr class="mt-1 mb-1">
+		<div class="row">
+			<div class="col-3">Data size</div>
+			<div class="col-9">{{ submission.data_size|filesizeformat }}</div>
 		</div>
 	</div>
 </div>
