@@ -63,3 +63,7 @@ Upload static files:
 
 	./manage.py collectstatic
 	gsutil -m rsync -R web/static/ gs://clic2020_public/static/
+
+Start webserver:
+
+	kubectl apply -f web/web.yaml
