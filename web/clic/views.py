@@ -1,17 +1,17 @@
 import os
 import yaml
 
-from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.core.files.storage import default_storage
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.template.loader import get_template
 from django.http import StreamingHttpResponse, HttpResponse, Http404
+from django.shortcuts import render, redirect
+from django.template.loader import get_template
+from django.utils.crypto import get_random_string
 from storages.backends.gcloud import GoogleCloudStorage
 from kubernetes.client.rest import ApiException
 
 import teams
-import submissions
 import submissions.forms
 import submissions.models
 from .kubernetes_client import KubernetesClient
@@ -88,7 +88,8 @@ def submit(request, form):
 		hidden=form.cleaned_data['hidden'],
 		decoder_size=form.cleaned_data['decoder_size'],
 		decoder_hash=form.cleaned_data['decoder_hash'],
-		data_size=form.cleaned_data['data_size'])
+		data_size=form.cleaned_data['data_size'],
+		auth_token=get_random_string(length=32))
 	submission.save()
 
 	# submission will be stored here

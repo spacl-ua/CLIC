@@ -1,4 +1,5 @@
 import os
+
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
@@ -70,6 +71,7 @@ class Submission(models.Model):
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
 	status = models.CharField(max_length=32, choices=STATUS_CHOICES, default=STATUS_CREATED)
+	auth_token = models.CharField(max_length=32)
 
 	def job_name(self):
 		"""

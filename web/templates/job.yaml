@@ -18,7 +18,7 @@ spec:
     spec:
       initContainers:
       - name: decode
-        image: "gcr.io/clic-215616/decoding{% if submission.docker_image.gpu %}:gpu{% endif %}"
+        image: "gcr.io/clic-215616/decoding:latest"
         imagePullPolicy: Always
         {% if submission.docker_image.gpu %}
         resources:
@@ -29,6 +29,7 @@ spec:
           "python3",
           "/code/decode.py",
           "--debug",
+          "--auth_token", "{{ submission.auth_token }}",
           "--submission_bucket", "clic2020_submissions",
           "--submission_path", "{{ submission.fs_path }}",
           "--environment_bucket", "clic2020_environments",
@@ -63,6 +64,7 @@ spec:
           "python3",
           "/code/evaluate.py",
           "--debug",
+          "--auth_token", "{{ submission.auth_token }}",
           "--submission_bucket", "clic2020_submissions",
           "--submission_path", "{{ submission.fs_path }}",
           "--target_bucket", "clic2020_targets",
