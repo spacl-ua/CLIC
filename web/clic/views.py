@@ -93,13 +93,7 @@ def submit(request, form):
 
 	# submission will be stored here
 	fs = GoogleCloudStorage()
-	fs_path = os.path.join(
-		submission.task.name, submission.phase.name, submission.team.username)
-
-	# delete previous submission, if it exists
-	blobs = fs.bucket.list_blobs(prefix=fs_path)
-	for blob in blobs:
-		blob.delete()
+	fs_path = submission.fs_path()
 
 	# upload encoded image files to storage bucket
 	for file in request.FILES.getlist('data'):

@@ -65,7 +65,7 @@ def main(args):
 		submission_dir = '/submission'
 		run('mkdir -p {dir}'.format(dir=submission_dir), shell=True)
 		run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir}'.format(
-				subdir=os.path.join(args.task, args.phase, args.team),
+				subdir=args.submission_path,
 				bucket=args.submission_bucket,
 				dir=submission_dir),
 			stdout=PIPE,
@@ -202,6 +202,8 @@ if __name__ == '__main__':
 	parser = ArgumentParser()
 	parser.add_argument('--submission_bucket', type=str, required=True,
 		help='Name of the bucket which contains submissions')
+	parser.add_argument('--submission_path', type=str, required=True,
+		help='Path to where submission is stored')
 	parser.add_argument('--environment_bucket', type=str, required=True,
 		help='Name of the bucket which contains any extra files provided to decoders')
 	parser.add_argument('--task', type=str, required=True)

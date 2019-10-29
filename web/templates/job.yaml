@@ -30,6 +30,7 @@ spec:
           "/code/decode.py",
           "--debug",
           "--submission_bucket", "clic2020_submissions",
+          "--submission_path", "{{ submission.fs_path }}",
           "--environment_bucket", "clic2020_environments",
           "--exec_dir", "/var/lib/docker/submissions",
           "--num_cpus", "1",
@@ -61,7 +62,9 @@ spec:
         command: [
           "python3",
           "/code/evaluate.py",
+          "--debug",
           "--submission_bucket", "clic2020_submissions",
+          "--submission_path", "{{ submission.fs_path }}",
           "--target_bucket", "clic2020_targets",
           "--task", "{{ submission.task.name }}",
           "--phase", "{{ submission.phase.name }}",

@@ -1,4 +1,8 @@
+import os
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from storages.backends.gcloud import GoogleCloudStorage
 
 
 class Task(models.Model):
@@ -75,6 +79,25 @@ class Submission(models.Model):
 			task=self.task.name.lower(),
 			phase=self.phase.name.lower(),
 			team=self.team.username.lower())
+
+	def fs_path(self):
+		"""
+		Path to where submission is stored
+		"""
+		return os.path.join(
+			self.task.name,
+			self.phase.name,
+			self.team.username,
+			str(self.id))
+
+
+@receiver(post_delete, sender=Submission, dispatch_uid='delete_submission')
+def delete_submission(sender, instance, **kwargs):
+	# delete files corresponding to submission
+	fs = GoogleCloudStorage()
+	blobs = fs.bucket.list_blobs(prefix=instance.fs_path())
+	for blob in blobs:
+		blob.delete()
 
 
 class Measurement(models.Model):
