@@ -14,10 +14,11 @@ class Phase(models.Model):
 	task = models.ForeignKey(Task, on_delete=models.CASCADE)
 	name = models.CharField(max_length=32)
 	description = models.CharField(max_length=32)
-	active = models.BooleanField(default=True)
-	decoder_size_limit = models.IntegerField(null=True, blank=True)
+	active = models.BooleanField(default=True,
+		help_text='Controls whether submissions are currently accepted')
 	decoder_fixed = models.BooleanField(default=False,
 		help_text='Only allow already submitted decoders to be resubmitted')
+	decoder_size_limit = models.IntegerField(null=True, blank=True)
 	data_size_limit = models.IntegerField(null=True, blank=True)
 
 	def __str__(self):
@@ -27,7 +28,8 @@ class Phase(models.Model):
 class DockerImage(models.Model):
 	name = models.CharField(max_length=256)
 	gpu = models.BooleanField(default=False)
-	active = models.BooleanField(default=True)
+	active = models.BooleanField(default=True,
+		help_text='Controls whether docker image can be selected by non-staff users')
 
 	def __str__(self):
 		return '{0} ({1})'.format(self.name, 'GPU' if self.gpu else 'CPU')
@@ -53,7 +55,7 @@ class Submission(models.Model):
 			(STATUS_SUCCESS, 'Success'),
 		]
 
-	timestamp = models.DateField(auto_now_add=True)
+	timestamp = models.DateTimeField(auto_now_add=True)
 	team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
 	docker_image = models.ForeignKey(DockerImage, on_delete=models.PROTECT)
 	task = models.ForeignKey(Task, on_delete=models.PROTECT)
@@ -64,6 +66,15 @@ class Submission(models.Model):
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
 	status = models.CharField(max_length=32, choices=STATUS_CHOICES, default=STATUS_CREATED)
+
+	def job_name(self):
+		"""
+		Name used for Kubernetes jobs
+		"""
+		return 'run-{task}-{phase}-{team}'.format(
+			task=self.task.name.lower(),
+			phase=self.phase.name.lower(),
+			team=self.team.username.lower())
 
 
 class Measurement(models.Model):

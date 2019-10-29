@@ -1,19 +1,26 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: run-{{ task }}-{{ phase }}-{{ team }}
+  name: {{ submission.job_name }}
   labels:
-    task: {{ task }}
-    phase: {{ phase }}
-    team: {{ team }}
+    id: "{{ submission.id }}"
+    task: "{{ submission.task.name }}"
+    phase: "{{ submission.phase.name }}"
+    team: "{{ submission.team.username }}"
 spec:
   template:
+    metadata:
+      labels:
+        id: "{{ submission.id }}"
+        task: "{{ submission.task.name }}"
+        phase: "{{ submission.phase.name }}"
+        team: "{{ submission.team.username }}"
     spec:
       initContainers:
       - name: decode
-        image: "gcr.io/clic-215616/decoding{% if gpu %}:gpu{% endif %}"
+        image: "gcr.io/clic-215616/decoding{% if submission.docker_image.gpu %}:gpu{% endif %}"
         imagePullPolicy: Always
-        {% if gpu %}
+        {% if submission.docker_image.gpu %}
         resources:
           limits:
             nvidia.com/gpu: 1
@@ -28,10 +35,10 @@ spec:
           "--num_cpus", "1",
           "--memory_limit", "12g",
           "--timeout", "36000",
-          "--task", "{{ task }}",
-          "--phase", "{{ phase }}",
-          "--team", "{{ team }}",
-          "--image", "{{ image }}"{% if gpu %},
+          "--task", "{{ submission.task.name }}",
+          "--phase", "{{ submission.phase.name }}",
+          "--team", "{{ submission.team.username }}",
+          "--image", "{{ submission.docker_image.name }}"{% if submission.docker_image.gpu %},
           "--gpu"{% endif %}]
         securityContext:
           capabilities: {}
@@ -56,9 +63,9 @@ spec:
           "/code/evaluate.py",
           "--submission_bucket", "clic2020_submissions",
           "--target_bucket", "clic2020_targets",
-          "--task", "{{ task }}",
-          "--phase", "{{ phase }}",
-          "--team", "{{ team }}",
+          "--task", "{{ submission.task.name }}",
+          "--phase", "{{ submission.phase.name }}",
+          "--team", "{{ submission.team.name }}",
           "--metrics", "PSNR", "MSSSIM"]
         securityContext:
           capabilities: {}
