@@ -70,7 +70,7 @@ class Submission(models.Model):
 	decoding_time = models.IntegerField(null=True)
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
-	status = models.CharField(max_length=32, choices=STATUS_CHOICES, default=STATUS_CREATED)
+	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_CREATED)
 	auth_token = models.CharField(max_length=32)
 
 	def job_name(self):
@@ -105,4 +105,5 @@ def delete_submission(sender, instance, **kwargs):
 class Measurement(models.Model):
 	timestamp = models.DateField(auto_now_add=True)
 	metric = models.CharField(max_length=128)
+	value = models.FloatField()
 	submission = models.ForeignKey(Submission, on_delete=models.CASCADE)

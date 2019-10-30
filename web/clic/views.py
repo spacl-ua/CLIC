@@ -173,4 +173,8 @@ def submission(request, pk):
 	if request.user.username != submission.team and not request.user.is_staff:
 		raise PermissionDenied()
 
-	return render(request, 'submission.html', {'submission': submission})
+	measurements = submissions.models.Measurement.objects.filter(submission=submission)
+
+	return render(request, 'submission.html', {
+		'submission': submission,
+		'measurements': measurements})
