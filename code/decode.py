@@ -200,8 +200,6 @@ def main(args):
 
 if __name__ == '__main__':
 	parser = ArgumentParser()
-	parser.add_argument('--auth_token', type=str, required=True,
-		help='Used to communicate with Django server')
 	parser.add_argument('--submission_bucket', type=str, required=True,
 		help='Name of the bucket which contains submissions')
 	parser.add_argument('--submission_path', type=str, required=True,

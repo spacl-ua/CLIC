@@ -12,7 +12,6 @@ urlpatterns = [
 	path('logs/<pk>/<container>/', views.logs),
 	path('logs/<pk>/', views.logs),
 	path('submission/<pk>/', views.submission),
-	path('api/', include('submissions.urls')),
 ]
 
 if settings.DEBUG:

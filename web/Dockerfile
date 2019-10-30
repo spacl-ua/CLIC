@@ -6,8 +6,6 @@ MAINTAINER Lucas Theis
 RUN apt-get update
 RUN apt-get upgrade -y
 
-RUN apt-get install -y default-libmysqlclient-dev
-
 WORKDIR /tmp
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt

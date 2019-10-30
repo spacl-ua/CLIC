@@ -71,7 +71,6 @@ class Submission(models.Model):
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_CREATED)
-	auth_token = models.CharField(max_length=32)
 
 	def job_name(self):
 		"""
