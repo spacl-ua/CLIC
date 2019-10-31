@@ -13,12 +13,18 @@ fi
 
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_HOST=$(gcloud sql instances describe clic --format 'value(ipAddresses.ipAddress)')
-DB_PASSWORD=$(kubectl get secrets cloudsql -o 'go-template={{index .data "password"}}' 2> /dev/null | base64 -D -)
+DB_NAME=$(kubectl get secrets cloudsql -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -D -)
+DB_PASSWORD=$(kubectl get secrets cloudsql -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -D -)
 SECRET_KEY=$(kubectl get secrets django -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
 SENTRY_DSN=$(kubectl get secrets sentry -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -D -)
 
 if [ -z "$DB_PASSWORD" ]; then
 	read -p "Please enter the SQL password: " DB_PASSWORD
+fi
+
+if [ -z "$DB_NAME" ]; then
+	DB_NAME=clic2020
+	read -p "Please enter the SQL database [clic2020]: " DB_NAME
 fi
 
 if [ -z "$SECRET_KEY" ]; then
@@ -35,11 +41,11 @@ docker run \
 	-v "$(pwd)/service-account.json":"/secret/service-account.json" \
 	-e GOOGLE_APPLICATION_CREDENTIALS="/secret/service-account.json" \
 	-e DB_INSTANCE="${DB_INSTANCE}" \
-	-e DB_NAME=clic2020 \
+	-e DB_NAME="${DB_NAME}" \
 	-e DB_USER=root \
 	-e DB_PASSWORD="${DB_PASSWORD}" \
 	-e DB_HOST="${DB_HOST}" \
-	-e SUBMISSIONS_BUCKET="clic2020_submissions" \
+	-e BUCKET_SUBMISSIONS="clic2020_submissions" \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e SECRET_KEY="${SECRET_KEY}" \
 	-e DEBUG=1 \

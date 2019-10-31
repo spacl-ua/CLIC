@@ -62,7 +62,7 @@ class KubernetesClient():
 		return self.core_v1_api.read_namespaced_pod_log(**kwargs)
 
 
-	def stream_log(self, pod, namespace='default', amt=1024, max_attempts=10, delay_attempt=5, **kwargs):
+	def stream_log(self, pod, namespace='default', amt=1024, max_attempts=7, delay_attempt=10, **kwargs):
 		kwargs['namespace'] = namespace
 		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
 

@@ -21,21 +21,6 @@ spec:
             "--workers", "12",
             "clic.wsgi"]
         env:
-          - name: DB_NAME
-            valueFrom:
-              secretKeyRef:
-                name: cloudsql
-                key: name
-          - name: DB_USER
-            valueFrom:
-              secretKeyRef:
-                name: cloudsql
-                key: user
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: cloudsql
-                key: password
           - name: DB_HOST
             value: "127.0.0.1"
           - name: DB_PORT
@@ -52,6 +37,15 @@ spec:
                 key: dsn
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: "/var/run/secret/cloud.google.com/service-account.json"
+        envFrom:
+          - secretRef:
+              name: cloudsql
+          - secretRef:
+              name: buckets
+        volumeMounts:
+          - name: clic-sa-key-volume
+            mountPath: "/var/run/secret/cloud.google.com"
+            readOnly: true
         ports:
         - containerPort: 8080
 
@@ -61,11 +55,9 @@ spec:
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: "/var/run/secret/cloud.google.com/service-account.json"
-          - name: DB_INSTANCE
-            valueFrom:
-              secretKeyRef:
-                name: cloudsql
-                key: instance
+        envFrom:
+          - secretRef:
+              name: cloudsql
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
@@ -75,6 +67,7 @@ spec:
             readOnly: true
           - name: cloudsql
             mountPath: /cloudsql
+
       volumes:
         - name: clic-sa-key-volume
           secret:

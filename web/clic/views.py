@@ -88,8 +88,7 @@ def submit(request, form):
 		hidden=form.cleaned_data['hidden'],
 		decoder_size=form.cleaned_data['decoder_size'],
 		decoder_hash=form.cleaned_data['decoder_hash'],
-		data_size=form.cleaned_data['data_size'],
-		auth_token=get_random_string(length=32))
+		data_size=form.cleaned_data['data_size'])
 	submission.save()
 
 	# submission will be stored here

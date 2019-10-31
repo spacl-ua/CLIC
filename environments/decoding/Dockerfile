@@ -32,3 +32,10 @@ RUN \
 	curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
 	apt-get update && \
 	apt-get install -y google-cloud-sdk
+
+# connects to SQL server
+RUN \
+	mkdir /cloudsql && \
+	cd /cloudsql && \
+	curl https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -o cloud_sql_proxy && \
+	chmod +x cloud_sql_proxy

@@ -14,7 +14,7 @@ import sys
 import traceback
 from argparse import ArgumentParser
 from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
-from utils import get_logger
+from utils import get_logger, sql_setup
 from zipfile import ZipFile
 
 DECODE_CMD_CPU = [
@@ -55,13 +55,38 @@ DECODE_CMD = {True: DECODE_CMD_GPU, False: DECODE_CMD_CPU}
 def main(args):
 	logger = get_logger(debug=args.debug)
 
+	try:
+		# needs to be called before doing anything with Django
+		logger.debug('Connecting to SQL database')
+		sql_setup()
+	except:
+		logger.error('Unable to connect to SQL database')
+		logger.debug(traceback.format_exc())
+		sys.exit(1)
+
+	try:
+		# sql_setup needs to be called before importing anything from Django
+		from models import Submission
+		from django.core.exceptions import ObjectDoesNotExist
+
+		logger.info('Obtaining submission')
+		submission = Submission.objects.get(id=args.id)
+		submission.status = Submission.STATUS_DECODING
+		submission.save()
+	except ObjectDoesNotExist:
+		logger.error('Could not find submission')
+		return 1
+	except:
+		logger.error('Some unexpected error occured')
+		logger.debug(traceback.format_exc())
+		return 1
+
 	# directory on host in which decoder will be run
 	identifier = args.task + '_' + args.phase + '_' + args.team
 	work_dir = os.path.join(args.exec_dir, identifier)
 
 	# mount submission
 	try:
-		logger.info('Obtaining submission')
 		submission_dir = '/submission'
 		run('mkdir -p {dir}'.format(dir=submission_dir), shell=True)
 		run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir}'.format(
@@ -75,6 +100,8 @@ def main(args):
 	except CalledProcessError as error:
 		logger.error('Unable to mount submission bucket')
 		logger.debug(error.stderr)
+		submission.status = Submission.STATUS_ERROR
+		submission.save()
 		return 1
 
 	# mount environment files
@@ -93,6 +120,8 @@ def main(args):
 		logger.error('Unable to mount environment bucket')
 		logger.debug(error.stderr)
 		run('fusermount -u {}'.format(submission_dir), shell=True)
+		submission.status = Submission.STATUS_ERROR
+		submission.save()
 		return 1
 
 	try:
@@ -149,6 +178,9 @@ def main(args):
 			logger.info('Decoding complete')
 
 		except CalledProcessError as error:
+			submission.status = Submission.STATUS_DECODER_FAILED
+			submission.save()
+
 			if error.returncode == 125:
 				logger.error('Unable to start Docker container')
 				logger.debug(error)
@@ -180,6 +212,8 @@ def main(args):
 	except:
 		logger.error('Some unexpected error occured')
 		logger.debug(traceback.format_exc())
+		submission.status = Submission.STATUS_ERROR
+		submission.save()
 		return 1
 
 	finally:
@@ -187,6 +221,9 @@ def main(args):
 		run('rsync -r {source}/ {target}/'.format(source=work_dir, target=submission_dir),
 			shell=True)
 		run('sync', shell=True)
+
+		submission.status = Submission.STATUS_DECODED
+		submission.save()
 
 		# remove working directory
 		run('rm -rf {}'.format(work_dir), shell=True)
@@ -206,6 +243,8 @@ if __name__ == '__main__':
 		help='Path to where submission is stored')
 	parser.add_argument('--environment_bucket', type=str, required=True,
 		help='Name of the bucket which contains any extra files provided to decoders')
+	parser.add_argument('--id', type=int, required=True,
+		help='Used to identify the submission')
 	parser.add_argument('--task', type=str, required=True)
 	parser.add_argument('--phase', type=str, required=True)
 	parser.add_argument('--team', type=str, required=True)

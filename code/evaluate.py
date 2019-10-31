@@ -83,6 +83,8 @@ if __name__ == '__main__':
 		help='Path to where submission is stored')
 	parser.add_argument('--target_bucket', type=str, required=True,
 		help='Name of the bucket which contains target files')
+	parser.add_argument('--id', type=int, required=True,
+		help='Used to identify the submission')
 	parser.add_argument('--task', type=str, required=True)
 	parser.add_argument('--phase', type=str, required=True)
 	parser.add_argument('--team', type=str, required=True)

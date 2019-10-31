@@ -1,12 +1,33 @@
+"""
+Copy of models used by Django webserver.
+"""
+
 import os
 
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from storages.backends.gcloud import GoogleCloudStorage
+from django.contrib.auth.models import AbstractUser, UserManager
+
+
+class TeamManager(UserManager):
+	def get_by_natural_key(self, username):
+		case_insensitive_username_field = '{}__iexact'.format(self.model.USERNAME_FIELD)
+		return self.get(**{case_insensitive_username_field: username})
+
+
+class Team(AbstractUser):
+	class Meta:
+		app_label = 'teams'
+
+	def __str__(self):
+		return self.username
 
 
 class Task(models.Model):
+	class Meta:
+		app_label = 'submissions'
+
 	name = models.CharField(primary_key=True, max_length=32)
 	description = models.CharField(max_length=32)
 	active = models.BooleanField(default=True)
@@ -16,6 +37,9 @@ class Task(models.Model):
 
 
 class Phase(models.Model):
+	class Meta:
+		app_label = 'submissions'
+
 	task = models.ForeignKey(Task, on_delete=models.CASCADE)
 	name = models.CharField(max_length=32)
 	description = models.CharField(max_length=32)
@@ -31,6 +55,9 @@ class Phase(models.Model):
 
 
 class DockerImage(models.Model):
+	class Meta:
+		app_label = 'submissions'
+
 	name = models.CharField(max_length=256)
 	gpu = models.BooleanField(default=False)
 	active = models.BooleanField(default=True,
@@ -41,6 +68,9 @@ class DockerImage(models.Model):
 
 
 class Submission(models.Model):
+	class Meta:
+		app_label = 'submissions'
+
 	STATUS_ERROR = 0
 	STATUS_CREATED = 10
 	STATUS_DECODING = 20
@@ -61,7 +91,7 @@ class Submission(models.Model):
 		]
 
 	timestamp = models.DateTimeField(auto_now_add=True)
-	team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
+	team = models.ForeignKey(Team, on_delete=models.CASCADE)
 	docker_image = models.ForeignKey(DockerImage, on_delete=models.PROTECT)
 	task = models.ForeignKey(Task, on_delete=models.PROTECT)
 	phase = models.ForeignKey(Phase, on_delete=models.PROTECT)
@@ -72,15 +102,6 @@ class Submission(models.Model):
 	hidden = models.BooleanField(default=False)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_CREATED)
 
-	def job_name(self):
-		"""
-		Name used for Kubernetes jobs
-		"""
-		return 'run-{task}-{phase}-{team}'.format(
-			task=self.task.name.lower(),
-			phase=self.phase.name.lower(),
-			team=self.team.username.lower())
-
 	def fs_path(self):
 		"""
 		Path to where submission is stored
@@ -88,16 +109,10 @@ class Submission(models.Model):
 		return os.path.join(self.task.name, self.phase.name, self.team.username, str(self.id))
 
 
-@receiver(post_delete, sender=Submission, dispatch_uid='delete_submission')
-def delete_submission(sender, instance, **kwargs):
-	# delete files corresponding to submission
-	fs = GoogleCloudStorage()
-	blobs = fs.bucket.list_blobs(prefix=instance.fs_path())
-	for blob in blobs:
-		blob.delete()
-
-
 class Measurement(models.Model):
+	class Meta:
+		app_label = 'submissions'
+
 	timestamp = models.DateField(auto_now_add=True)
 	metric = models.CharField(max_length=128)
 	value = models.FloatField()

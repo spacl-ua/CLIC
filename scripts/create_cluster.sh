@@ -41,10 +41,16 @@ kubectl create secret generic clic-sa-key --from-file service-account.json
 
 # add SQL account information to kubernetes
 kubectl create secret generic cloudsql \
-	--from-literal user="$DB_USER" \
-	--from-literal password="$DB_PASSWORD" \
-	--from-literal instance="$DB_INSTANCE" \
-	--from-literal name="$DB_NAME"
+	--from-literal DB_USER="$DB_USER" \
+	--from-literal DB_PASSWORD="$DB_PASSWORD" \
+	--from-literal DB_INSTANCE="$DB_INSTANCE" \
+	--from-literal DB_NAME="$DB_NAME"
+
+# add bucket names
+kubectl create secret generic buckets \
+	--from-literal BUCKET_SUBMISSIONS="clic2020_submissions" \
+	--from-literal BUCKET_TARGETS="clic2020_targets" \
+	--from-literal BUCKET_ENVIRONMENTS="clic2020_environments"
 
 # add other secret information used by webserver
 kubectl create secret generic django --from-literal secret_key="$SECRET_KEY"

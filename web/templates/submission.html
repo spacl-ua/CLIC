@@ -39,11 +39,32 @@
 		</div>
 		<hr class="mt-1 mb-1">
 		<div class="row">
+			<div class="col-3 text-nowrap">Decoding time</div>
+			<div class="col-9">{{ submission.decoding_time }}</div>
+		</div>
+		<hr class="mt-1 mb-1">
+		<div class="row">
 			<div class="col-3">Data size</div>
 			<div class="col-9">{{ submission.data_size|filesizeformat }}</div>
 		</div>
 	</div>
 </div>
+{% if measurements %}
+<div class="card mb-3">
+	<h5 class="card-header">Metrics</h5>
+	<div class="card-body">
+		{% for measurement in measurements %}
+			<div class="row">
+				<div class="col-3">{{ measurement.metric }}</div>
+				<div class="col-9">{{ measurement.value }}</div>
+			</div>
+			{% if not forloop.last %}
+				<hr class="mt-1 mb-1">
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>
+{% endif %}
 <div class="card mb-3">
 	<h5 class="card-header">Logs</h5>
 	<div class="embed-responsive" style="height:400px">
