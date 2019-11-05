@@ -2,7 +2,9 @@ import logging
 import os
 import subprocess
 import sys
+import time
 
+import MySQLdb
 from django import setup as django_setup
 from django.conf import settings as django_settings
 
@@ -34,6 +36,25 @@ def sql_setup():
 		INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes'],
 	)
 	django_setup()
+
+
+def get_submission(id, max_attempts=4, delay_attempt=3):
+	"""
+	Retry obtaining submissions when MySQL connection is not ready yet.
+	"""
+
+	from models import Submission
+
+	for attempt in range(max_attempts):
+		try:
+			submission = Submission.objects.get(id=id)
+			return submission
+		except MySQLdb.Error:
+			if attempt < max_attempts - 1:
+				# Connection may not be ready yet, try again
+				time.sleep(delay_attempt)
+			else:
+				raise
 
 
 def get_logger(debug=False, warn=True, stdout=sys.stdout, stderr=sys.stderr):

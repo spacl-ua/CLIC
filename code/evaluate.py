@@ -7,7 +7,7 @@ import numpy as np
 from argparse import ArgumentParser
 from glob import glob
 from subprocess import run
-from utils import get_logger, sql_setup
+from utils import get_logger, get_submission, sql_setup
 from PIL import Image
 from metrics import evaluate
 
@@ -30,7 +30,7 @@ def main(args):
 		from django.db import transaction
 
 		logger.info('Obtaining submission')
-		submission = Submission.objects.get(id=args.id)
+		submission = get_submission(id=args.id)
 		submission.status = Submission.STATUS_EVALUATING
 		submission.save()
 	except ObjectDoesNotExist:

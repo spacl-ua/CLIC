@@ -14,7 +14,7 @@ import sys
 import traceback
 from argparse import ArgumentParser
 from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
-from utils import get_logger, sql_setup
+from utils import get_logger, get_submission, sql_setup
 from zipfile import ZipFile
 
 DECODE_CMD_CPU = [
@@ -69,7 +69,7 @@ def main(args):
 		from django.core.exceptions import ObjectDoesNotExist
 
 		logger.info('Obtaining submission')
-		submission = Submission.objects.get(id=args.id)
+		submission = get_submission(id=args.id)
 		submission.status = Submission.STATUS_DECODING
 		submission.save()
 	except ObjectDoesNotExist:
