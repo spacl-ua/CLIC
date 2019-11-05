@@ -30,18 +30,10 @@ spec:
           "/code/decode.py",
           "--debug",
           "--id", "{{ submission.id }}",
-          "--submission_bucket", "clic2020_submissions",
-          "--submission_path", "{{ submission.fs_path }}",
-          "--environment_bucket", "clic2020_environments",
           "--exec_dir", "/var/lib/docker/submissions",
           "--num_cpus", "1",
           "--memory_limit", "12g",
-          "--timeout", "36000",
-          "--task", "{{ submission.task.name }}",
-          "--phase", "{{ submission.phase.name }}",
-          "--team", "{{ submission.team.username }}",
-          "--image", "{{ submission.docker_image.name }}"{% if submission.docker_image.gpu %},
-          "--gpu"{% endif %}]
+          "--timeout", "36000"]
         securityContext:
           capabilities: {}
           privileged: true
@@ -70,12 +62,6 @@ spec:
           "/code/evaluate.py",
           "--debug",
           "--id", "{{ submission.id }}",
-          "--submission_bucket", "clic2020_submissions",
-          "--submission_path", "{{ submission.fs_path }}",
-          "--target_bucket", "clic2020_targets",
-          "--task", "{{ submission.task.name }}",
-          "--phase", "{{ submission.phase.name }}",
-          "--team", "{{ submission.team.username }}",
           "--metrics", "PSNR", "MSSSIM"]
         securityContext:
           capabilities: {}
@@ -86,6 +72,8 @@ spec:
         envFrom:
           - secretRef:
               name: cloudsql
+          - secretRef:
+              name: buckets
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"

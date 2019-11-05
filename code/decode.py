@@ -56,7 +56,6 @@ def main(args):
 	logger = get_logger(debug=args.debug)
 
 	try:
-		# needs to be called before doing anything with Django
 		logger.debug('Connecting to SQL database')
 		sql_setup()
 	except:
@@ -82,7 +81,7 @@ def main(args):
 		return 1
 
 	# directory on host in which decoder will be run
-	identifier = args.task + '_' + args.phase + '_' + args.team
+	identifier = submission.task.name + '_' + submission.phase.name + '_' + submission.team.username
 	work_dir = os.path.join(args.exec_dir, identifier)
 
 	# mount submission
@@ -90,8 +89,8 @@ def main(args):
 		submission_dir = '/submission'
 		run('mkdir -p {dir}'.format(dir=submission_dir), shell=True)
 		run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir}'.format(
-				subdir=args.submission_path,
-				bucket=args.submission_bucket,
+				subdir=submission.fs_path(),
+				bucket=os.environ['BUCKET_SUBMISSIONS'],
 				dir=submission_dir),
 			stdout=PIPE,
 			stderr=PIPE,
@@ -109,8 +108,8 @@ def main(args):
 		environment_dir = '/environment'
 		run('mkdir -p {}'.format(environment_dir), shell=True)
 		run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir}'.format(
-				subdir=os.path.join(args.task, args.phase),
-				bucket=args.environment_bucket,
+				subdir=os.path.join(submission.task.name, submission.phase.name),
+				bucket=os.environ['BUCKET_ENVIRONMENTS'],
 				dir=environment_dir),
 			stdout=PIPE,
 			stderr=PIPE,
@@ -148,7 +147,8 @@ def main(args):
 		# make sure latest Docker image is present before decoder starts
 		try:
 			logger.info('Pulling Docker image')
-			run('docker pull {} > /dev/null'.format(args.image), stdout=PIPE, stderr=PIPE, check=True, shell=True)
+			run('docker pull {} > /dev/null'.format(submission.docker_image.name),
+				stdout=PIPE, stderr=PIPE, check=True, shell=True)
 		except CalledProcessError as error:
 			logger.warn('Failed to pull Docker image')
 			logger.debug(error.stdout)
@@ -169,16 +169,20 @@ def main(args):
 				s.format(
 					work_dir=work_dir,
 					identifier=identifier,
+					image=submission.docker_image.name,
 					**vars(args))
-				for s in DECODE_CMD[args.gpu]]
+				for s in DECODE_CMD[submission.docker_image.gpu]]
 
 			# run decoder
 			logger.info('Running decoder')
 			run(decode_cmd, timeout=args.timeout, check=True, shell=False)
 			logger.info('Decoding complete')
 
+			submission.status = Submission.STATUS_DECODED
+			submission.save()
+
 		except CalledProcessError as error:
-			submission.status = Submission.STATUS_DECODER_FAILED
+			submission.status = Submission.STATUS_DECODING_FAILED
 			submission.save()
 
 			if error.returncode == 125:
@@ -222,9 +226,6 @@ def main(args):
 			shell=True)
 		run('sync', shell=True)
 
-		submission.status = Submission.STATUS_DECODED
-		submission.save()
-
 		# remove working directory
 		run('rm -rf {}'.format(work_dir), shell=True)
 
@@ -237,19 +238,8 @@ def main(args):
 
 if __name__ == '__main__':
 	parser = ArgumentParser()
-	parser.add_argument('--submission_bucket', type=str, required=True,
-		help='Name of the bucket which contains submissions')
-	parser.add_argument('--submission_path', type=str, required=True,
-		help='Path to where submission is stored')
-	parser.add_argument('--environment_bucket', type=str, required=True,
-		help='Name of the bucket which contains any extra files provided to decoders')
 	parser.add_argument('--id', type=int, required=True,
 		help='Used to identify the submission')
-	parser.add_argument('--task', type=str, required=True)
-	parser.add_argument('--phase', type=str, required=True)
-	parser.add_argument('--team', type=str, required=True)
-	parser.add_argument('--image', type=str, required=True,
-		help='Docker image used to launch decoding process')
 	parser.add_argument('--memory_limit', type=str, default='12g')
 	parser.add_argument('--num_cpus', type=int, default=2)
 	parser.add_argument('--exec_dir', type=str, default='/var/lib/docker/submissions',
@@ -257,8 +247,6 @@ if __name__ == '__main__':
 	parser.add_argument('--debug', action='store_true')
 	parser.add_argument('--timeout', type=int, default=None,
 		help='Decoder is given this many seconds to complete')
-	parser.add_argument('--gpu', action='store_true',
-		help='Make GPU available to decoder')
 
 	args = parser.parse_args()
 
