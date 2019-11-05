@@ -4,12 +4,12 @@ import yaml
 from django.contrib.auth import login, authenticate
 from django.core.files.storage import default_storage
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.db import transaction
 from django.http import StreamingHttpResponse, HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.utils.crypto import get_random_string
 from storages.backends.gcloud import GoogleCloudStorage
-from kubernetes.client.rest import ApiException
 
 import teams
 import submissions.forms
@@ -49,7 +49,7 @@ def home(request):
 				user=request.user)
 
 			if form.is_valid():
-				return submit(request, form)
+				return submit(request, **form.cleaned_data)
 			else:
 				status = 422
 		else:
@@ -62,7 +62,7 @@ def home(request):
 	return render(request, 'home.html', {'form': form}, status=status)
 
 
-def submit(request, form):
+def submit(request, **kwargs):
 	"""
 	Creates a kubernetes job running the decoder
 	"""
@@ -72,23 +72,23 @@ def submit(request, form):
 
 	if not request.user.is_staff:
 		# only staff is allowed to choose these
-		if form.cleaned_data['team'] != request.user:
+		if kwargs['team'] != request.user:
 			raise PermissionDenied()
-		if not form.cleaned_data['phase'].active:
+		if not kwargs['phase'].active:
 			raise PermissionDenied()
-		if not form.cleaned_data['task'].active:
+		if not kwargs['task'].active:
 			raise PermissionDenied()
 
 	# create entry in database
 	submission = submissions.models.Submission(
-		team=form.cleaned_data['team'],
-		task=form.cleaned_data['task'],
-		phase=form.cleaned_data['phase'],
-		docker_image=form.cleaned_data['docker_image'],
-		hidden=form.cleaned_data['hidden'],
-		decoder_size=form.cleaned_data['decoder_size'],
-		decoder_hash=form.cleaned_data['decoder_hash'],
-		data_size=form.cleaned_data['data_size'])
+		team=kwargs['team'],
+		task=kwargs['task'],
+		phase=kwargs['phase'],
+		docker_image=kwargs['docker_image'],
+		hidden=kwargs['hidden'],
+		decoder_size=kwargs['decoder_size'],
+		decoder_hash=kwargs['decoder_hash'],
+		data_size=kwargs['data_size'])
 	submission.save()
 
 	# submission will be stored here
@@ -111,12 +111,20 @@ def submit(request, form):
 
 	# submit job
 	client = KubernetesClient()
-	try:
-		client.delete_job(job)
-	except ApiException:
-		pass
-
+	client.delete_job(job)
 	client.create_job(job)
+
+	# mark running submission(s) as canceled
+	subs = submissions.models.Submission.objects.filter(
+		team=kwargs['team'],
+		task=kwargs['task'],
+		phase=kwargs['phase'],
+		status__in=submissions.models.Submission.STATUS_IN_PROGRESS)
+	subs = subs.exclude(id=submission.id)
+	with transaction.atomic():
+		for sub in subs:
+			sub.status = submissions.models.Submission.STATUS_CANCELED
+			sub.save()
 
 	return HttpResponse(
 		'{{"location": "/submission/{pk}/"}}'.format(pk=submission.pk),
@@ -147,11 +155,7 @@ def logs(request, pk, container=['decode', 'evaluate']):
 		return HttpResponse('Logs are no longer available.', content_type='text/event-stream')
 
 	# stream logs
-	try:
-		logs = client.stream_log(pods[0], container=container)
-	except ApiException:
-		# container may yet have to start
-		raise Http404('Could not find logs.')
+	logs = client.stream_log(pods[0], container=container)
 
 	return StreamingHttpResponse(logs, content_type='text/event-stream')
 

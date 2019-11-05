@@ -51,7 +51,10 @@ class KubernetesClient():
 		kwargs['propagation_policy'] = kwargs.get('propagation_policy', 'Background')
 		kwargs['grace_period_seconds'] = kwargs.get('grace_period_seconds', 0)
 		kwargs['name'] = job if isinstance(job, str) else job['metadata']['name']
-		return self.batch_v1_api.delete_namespaced_job(**kwargs)
+		try:
+			return self.batch_v1_api.delete_namespaced_job(**kwargs)
+		except ApiException:
+			pass
 
 
 	def read_log(self, pod, namespace='default', **kwargs):
