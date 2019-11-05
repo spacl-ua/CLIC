@@ -97,14 +97,12 @@ def submit(request, form):
 
 	# upload encoded image files to storage bucket
 	for file in request.FILES.getlist('data'):
-		print('Saving {0}'.format(os.path.join(fs_path, file.name)))
 		fs.save(name=os.path.join(fs_path, file.name), content=file)
 
 	# upload decoder to storage bucket
 	if request.FILES['decoder'].name.lower().endswith('.zip'):
 		fs.save(name=os.path.join(fs_path, 'decoder.zip'), content=request.FILES['decoder'])
 	else:
-		print('Saving {0}'.format(os.path.join(fs_path, 'decode')))
 		fs.save(name=os.path.join(fs_path, 'decode'), content=request.FILES['decoder'])
 
 	# create job
@@ -117,6 +115,7 @@ def submit(request, form):
 		client.delete_job(job)
 	except ApiException:
 		pass
+
 	client.create_job(job)
 
 	return HttpResponse(
@@ -169,7 +168,7 @@ def submission(request, pk):
 
 	if not request.user.is_authenticated:
 		raise PermissionDenied()
-	if request.user.username != submission.team and not request.user.is_staff:
+	if request.user != submission.team and not request.user.is_staff:
 		raise PermissionDenied()
 
 	measurements = submissions.models.Measurement.objects.filter(submission=submission)
@@ -177,3 +176,17 @@ def submission(request, pk):
 	return render(request, 'submission.html', {
 		'submission': submission,
 		'measurements': measurements})
+
+
+def submissions_list(request):
+	"""
+	List all submissions of a user.
+	"""
+
+	if not request.user.is_authenticated:
+		raise PermissionDenied()
+
+	subs = submissions.models.Submission.objects.filter(team=request.user).order_by('-timestamp')
+	subs = subs.prefetch_related('task', 'phase')
+
+	return render(request, 'submissions.html', {'submissions': subs})

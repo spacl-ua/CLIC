@@ -42,22 +42,35 @@ class DockerImage(models.Model):
 
 class Submission(models.Model):
 	STATUS_ERROR = 0
-	STATUS_CREATED = 10
+	STATUS_WAITING = 10
 	STATUS_DECODING = 20
 	STATUS_DECODING_FAILED = 30
 	STATUS_DECODED = 40
 	STATUS_EVALUATING = 50
 	STATUS_EVALUATION_FAILED = 60
 	STATUS_SUCCESS = 70
+	STATUS_CANCELED = 80
 	STATUS_CHOICES = [
 			(STATUS_ERROR, 'Error'),
-			(STATUS_CREATED, 'Created'),
+			(STATUS_WAITING, 'Waiting'),
 			(STATUS_DECODING, 'Decoding'),
 			(STATUS_DECODING_FAILED, 'Decoding failed'),
 			(STATUS_DECODED, 'Decoded'),
 			(STATUS_EVALUATING, 'Evaluating'),
 			(STATUS_EVALUATION_FAILED, 'Evaluation failed'),
 			(STATUS_SUCCESS, 'Success'),
+			(STATUS_CANCELED, 'Canceled'),
+		]
+	STATUS_ICONS = [
+			(STATUS_ERROR, 'bug'),
+			(STATUS_WAITING, 'clock'),
+			(STATUS_DECODING, 'hourglass-half'),
+			(STATUS_DECODING_FAILED, 'exclamation-circle'),
+			(STATUS_DECODED, 'hourglass-half'),
+			(STATUS_EVALUATING, 'hourglass-end'),
+			(STATUS_EVALUATION_FAILED, 'exclamation-circle'),
+			(STATUS_SUCCESS, 'check-circle'),
+			(STATUS_CANCELED, 'times'),
 		]
 
 	timestamp = models.DateTimeField(auto_now_add=True)
@@ -70,7 +83,7 @@ class Submission(models.Model):
 	decoding_time = models.IntegerField(null=True)
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
-	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_CREATED)
+	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_WAITING)
 
 	def job_name(self):
 		"""
@@ -86,6 +99,12 @@ class Submission(models.Model):
 		Path to where submission is stored
 		"""
 		return os.path.join(self.task.name, self.phase.name, self.team.username, str(self.id))
+
+	def status_icon(self):
+		"""
+		https://fontawesome.com/icons
+		"""
+		return dict(self.STATUS_ICONS).get(self.status, 'question')
 
 
 @receiver(post_delete, sender=Submission, dispatch_uid='delete_submission')

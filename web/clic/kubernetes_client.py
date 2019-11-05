@@ -35,6 +35,12 @@ class KubernetesClient():
 		return self.core_v1_api.list_namespaced_pod(namespace, **kwargs).items
 
 
+	def read_pod_status(self, pod, namespace='default', **kwargs):
+		kwargs['namespace'] = namespace
+		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
+		return self.core_v1_api.read_namespaced_pod_status(**kwargs)
+
+
 	def create_job(self, job, namespace='default', **kwargs):
 		kwargs['body'] = job
 		return self.batch_v1_api.create_namespaced_job(namespace, **kwargs)
@@ -62,7 +68,7 @@ class KubernetesClient():
 		return self.core_v1_api.read_namespaced_pod_log(**kwargs)
 
 
-	def stream_log(self, pod, namespace='default', amt=1024, max_attempts=7, delay_attempt=10, **kwargs):
+	def stream_log(self, pod, namespace='default', amt=1024, max_attempts=10, delay_attempt=15, **kwargs):
 		kwargs['namespace'] = namespace
 		kwargs['name'] = pod if isinstance(pod, str) else pod.metadata.name
 
@@ -74,16 +80,22 @@ class KubernetesClient():
 			# concatenate logs
 			for container in kwargs.pop('container'):
 				yield from self.stream_log(pod, namespace, amt, container=container)
+				if self.read_pod_status(pod).status.phase.lower() == 'failed':
+					# pod failed, stop streaming logs
+					break
 			return
 
 		for i in range(max_attempts):
 			try:
+				# attempt to stream logs
 				yield from self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
 				break
-			except ApiException:
-				if i < max_attempts - 1:
+			except ApiException as exception:
+				if self.read_pod_status(pod).status.phase.lower() == 'pending' and i < max_attempts - 1:
+					# waiting for container to start
 					yield utils.log_message(logging.INFO, 'Waiting for container to start')
 					time.sleep(delay_attempt)
 				else:
+					# container may have failed to start
 					yield utils.log_message(logging.ERROR, 'Unable to retrieve logs')
 					raise
