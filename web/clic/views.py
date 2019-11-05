@@ -191,6 +191,11 @@ def submissions_list(request):
 		raise PermissionDenied()
 
 	subs = submissions.models.Submission.objects.filter(team=request.user).order_by('-timestamp')
-	subs = subs.prefetch_related('task', 'phase')
+	subs = subs.prefetch_related('task', 'phase', 'measurement_set')
 
-	return render(request, 'submissions.html', {'submissions': subs})
+	metrics = set()
+	for sub in subs:
+		for measurement in sub.measurement_set.all():
+			metrics.add(measurement.metric)
+
+	return render(request, 'submissions.html', {'metrics': metrics, 'submissions': subs})

@@ -12,6 +12,7 @@ urlpatterns = [
 	path('logs/<pk>/<container>/', views.logs),
 	path('logs/<pk>/', views.logs),
 	path('submission/<pk>/', views.submission),
+	path('submissions/', views.submissions_list),
 ]
 
 if settings.DEBUG:
