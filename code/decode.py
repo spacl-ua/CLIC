@@ -20,8 +20,8 @@ from zipfile import ZipFile
 DECODE_CMD_CPU = [
 	'docker', 'run',
 	'--network', 'none',
-	'--memory', '{memory_limit}',
-	'--memory-swap', '{memory_limit}',
+	'--memory', '{memory_limit}m',
+	'--memory-swap', '{memory_limit}m',
 	'--cpus', '{num_cpus}',
 	'--name', '{identifier}',
 	'-v', '{work_dir}:/home/{identifier}',
@@ -33,8 +33,8 @@ DECODE_CMD_CPU = [
 DECODE_CMD_GPU = [
 	'docker', 'run',
 	'--network', 'none',
-	'--memory', '{memory_limit}',
-	'--memory-swap', '{memory_limit}',
+	'--memory', '{memory_limit}m',
+	'--memory-swap', '{memory_limit}m',
 	'--cpus', '{num_cpus}',
 	'--name', '{identifier}',
 	'-v', '{work_dir}:/home/{identifier}',
@@ -125,7 +125,6 @@ def main(args):
 
 	try:
 		# copy files to executable working directory
-		logger.info('Copying submission')
 		run('mkdir -p {dir}'.format(dir=work_dir), check=True, shell=True)
 		run('rsync -r {source}/ {target}/'.format(source=environment_dir, target=work_dir),
 			shell=True)
@@ -170,12 +169,13 @@ def main(args):
 					work_dir=work_dir,
 					identifier=identifier,
 					image=submission.docker_image.name,
-					**vars(args))
+					memory_limit=submission.phase.memory,
+					num_cpus=submission.phase.cpu)
 				for s in DECODE_CMD[submission.docker_image.gpu]]
 
 			# run decoder
 			logger.info('Running decoder')
-			run(decode_cmd, timeout=args.timeout, check=True, shell=False)
+			run(decode_cmd, timeout=submission.phase.timeout, check=True, shell=False)
 			logger.info('Decoding complete')
 
 			submission.status = Submission.STATUS_DECODED
@@ -197,7 +197,7 @@ def main(args):
 
 				if '"OOMKilled": true' in process.stdout.decode():
 					logger.error('The decoder exceeded the memory limit ({})'.format(
-						args.memory_limit))
+						submission.phase.memory))
 					return 1
 
 			logger.error('The decoder has failed ({})'.format(error.returncode))
@@ -205,13 +205,13 @@ def main(args):
 			return 1
 
 		except TimeoutExpired:
-			logger.error('Decoding exceeded the time limit ({} seconds)'.format(args.timeout))
+			logger.error('Decoding exceeded the time limit ({} seconds)'.format(submission.phase.timeout))
 			return 1
 
 		finally:
 			# remove docker container
 			run('docker rm {}'.format(identifier),
-				stderr=PIPE, stdout=PIPE, check=True, shell=True)
+				stderr=PIPE, stdout=PIPE, check=False, shell=True)
 
 	except:
 		logger.error('Some unexpected error occured')
@@ -240,13 +240,9 @@ if __name__ == '__main__':
 	parser = ArgumentParser()
 	parser.add_argument('--id', type=int, required=True,
 		help='Used to identify the submission')
-	parser.add_argument('--memory_limit', type=str, default='12g')
-	parser.add_argument('--num_cpus', type=int, default=2)
 	parser.add_argument('--exec_dir', type=str, default='/var/lib/docker/submissions',
 		help='Location of executable directory which exists both on host and inside container')
 	parser.add_argument('--debug', action='store_true')
-	parser.add_argument('--timeout', type=int, default=None,
-		help='Decoder is given this many seconds to complete')
 
 	args = parser.parse_args()
 

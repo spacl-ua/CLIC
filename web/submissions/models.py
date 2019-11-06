@@ -21,10 +21,18 @@ class Phase(models.Model):
 	description = models.CharField(max_length=32)
 	active = models.BooleanField(default=True,
 		help_text='Controls whether submissions are currently accepted')
+	cpu = models.IntegerField(
+		help_text='Number of CPUs provided to the decoder', null=False, default=2)
+	memory = models.IntegerField(
+		help_text='Amount of memory provided to the decoder (MB)', null=False, default=12000)
+	timeout = models.IntegerField(
+		help_text='Time provided to the decoder (seconds)', null=False, default=36000)
 	decoder_fixed = models.BooleanField(default=False,
 		help_text='Only allow already submitted decoders to be resubmitted')
-	decoder_size_limit = models.IntegerField(null=True, blank=True)
-	data_size_limit = models.IntegerField(null=True, blank=True)
+	decoder_size_limit = models.IntegerField(null=True, blank=True,
+		help_text='Optional limit of decoder size (bytes)')
+	data_size_limit = models.IntegerField(null=True, blank=True,
+		help_text='Optional limit of encoded data size (bytes)')
 
 	def __str__(self):
 		return '{0} ({1})'.format(self.task, self.description)
@@ -72,6 +80,7 @@ class Submission(models.Model):
 			(STATUS_SUCCESS, 'check-circle'),
 			(STATUS_CANCELED, 'times'),
 		]
+	STATUS_IN_PROGRESS = [STATUS_WAITING, STATUS_DECODING, STATUS_DECODED, STATUS_EVALUATING]
 
 	timestamp = models.DateTimeField(auto_now_add=True)
 	team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
@@ -105,6 +114,15 @@ class Submission(models.Model):
 		https://fontawesome.com/icons
 		"""
 		return dict(self.STATUS_ICONS).get(self.status, 'question')
+
+	def measurements(self):
+		"""
+		Returns evaluation results as a dictionary
+		"""
+		m_all = {}
+		for m in self.measurement_set.all():
+			m_all[m.metric] = m.value
+		return m_all
 
 
 @receiver(post_delete, sender=Submission, dispatch_uid='delete_submission')

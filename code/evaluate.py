@@ -111,6 +111,8 @@ def main(args):
 		submission.status = Submission.STATUS_SUCCESS
 		submission.save()
 
+		logger.info('Evaluation complete')
+
 	except:
 		logger.error('Some unexpected error occured')
 		logger.debug(traceback.format_exc())
