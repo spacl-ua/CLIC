@@ -107,7 +107,9 @@ def submit(request, **kwargs):
 
 	# create job
 	job_template = get_template('job.yaml')
-	job = yaml.load(job_template.render({'submission': submission}))
+	job = yaml.load(job_template.render({
+		'submission': submission,
+		'debug': request.user.is_staff}))
 
 	# submit job
 	client = KubernetesClient()

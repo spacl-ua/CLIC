@@ -53,4 +53,5 @@ docker run \
 	-v "$(pwd)/web":"$(pwd)/web" \
 	-p 8000:8000 \
 	gcr.io/clic-215616/web \
-	gunicorn --bind :8000 --worker-class gevent --workers 2 --reload --log-level DEBUG clic.wsgi
+	/bin/bash
+#	gunicorn --bind :8000 --worker-class gevent --workers 2 --reload --log-level DEBUG clic.wsgi

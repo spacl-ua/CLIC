@@ -4,9 +4,9 @@ import subprocess
 import sys
 import time
 
-import MySQLdb
 from django import setup as django_setup
 from django.conf import settings as django_settings
+from django.db.utils import OperationalError
 
 
 def sql_setup():
@@ -38,7 +38,7 @@ def sql_setup():
 	django_setup()
 
 
-def get_submission(id, max_attempts=4, delay_attempt=3):
+def get_submission(id, max_attempts=4, delay_attempt=4):
 	"""
 	Retry obtaining submissions when MySQL connection is not ready yet.
 	"""
@@ -49,7 +49,7 @@ def get_submission(id, max_attempts=4, delay_attempt=3):
 		try:
 			submission = Submission.objects.get(id=id)
 			return submission
-		except MySQLdb.Error:
+		except OperationalError:
 			if attempt < max_attempts - 1:
 				# Connection may not be ready yet, try again
 				time.sleep(delay_attempt)
@@ -57,7 +57,7 @@ def get_submission(id, max_attempts=4, delay_attempt=3):
 				raise
 
 
-def get_logger(debug=False, warn=True, stdout=sys.stdout, stderr=sys.stderr):
+def get_logger(debug=False, warn=True, stdout=sys.stdout, stderr=sys.stderr, filename=None):
 	"""
 	Creates a logger which sends some messages to stdout and some messagese to stderr.
 
@@ -68,6 +68,9 @@ def get_logger(debug=False, warn=True, stdout=sys.stdout, stderr=sys.stderr):
 
 	warn : bool
 		If False, ignore warning messages.
+
+	filename: str
+		Logs can additionally be written to this file
 
 	Returns
 	-------
@@ -95,5 +98,12 @@ def get_logger(debug=False, warn=True, stdout=sys.stdout, stderr=sys.stderr):
 	handler.setFormatter(formatter)
 	handler.setLevel(logging.WARNING if warn else logging.ERROR)
 	logger.addHandler(handler)
+
+	if filename:
+		# additionally store logs here
+		handler = logging.FileHandler(filename)
+		handler.setFormatter(formatter)
+		handler.setLevel(logging.DEBUG)
+		logger.addHandler(handler)
 
 	return logger

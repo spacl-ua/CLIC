@@ -82,9 +82,9 @@ class KubernetesClient():
 		if isinstance(kwargs.get('container', None), (list, tuple)):
 			# concatenate logs
 			for container in kwargs.pop('container'):
-				yield from self.stream_log(pod, namespace, amt, container=container)
-				if self.read_pod_status(pod).status.phase.lower() == 'failed':
-					# pod failed, stop streaming logs
+				try:
+					yield from self.stream_log(pod, namespace, amt, container=container)
+				except ApiException:
 					break
 			return
 
@@ -93,7 +93,7 @@ class KubernetesClient():
 				# attempt to stream logs
 				yield from self.core_v1_api.read_namespaced_pod_log(**kwargs).stream(amt=amt)
 				break
-			except ApiException as exception:
+			except ApiException:
 				if self.read_pod_status(pod).status.phase.lower() == 'pending' and i < max_attempts - 1:
 					# waiting for container to start
 					yield utils.log_message(logging.INFO, 'Waiting for container to start')
@@ -102,3 +102,5 @@ class KubernetesClient():
 					# container may have failed to start
 					yield utils.log_message(logging.ERROR, 'Unable to retrieve logs')
 					raise
+		else:
+			yield utils.log_message(logging.INFO, 'Please try again later')

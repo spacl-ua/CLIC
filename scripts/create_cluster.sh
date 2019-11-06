@@ -20,16 +20,22 @@ read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
 # create cluster and CPU nodes
 gcloud container clusters create clic-cluster \
 	--zone us-west1-b \
-	--machine-type n1-standard-1 \
+	--machine-type n1-standard-8 \
+	--enable-autoscaling \
+	--min-nodes 1 \
+	--max-nodes 3 \
 	--num-nodes 2 \
 	--verbosity error
 
 # add GPU nodes
 gcloud container node-pools create gpu-pool \
 	--zone us-west1-b \
+	--machine-type n1-standard-4 \
 	--accelerator type=nvidia-tesla-k80,count=1 \
-	--machine-type n1-standard-2 \
 	--cluster clic-cluster \
+	--enable-autoscaling \
+	--min-nodes 1 \
+	--max-nodes 2 \
 	--num-nodes 1 \
 	--verbosity error
 
