@@ -2,7 +2,7 @@ from django.contrib import admin
 from . import models
 
 class SubmissionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'team', 'phase', 'status', 'decoder_size', 'data_size', 'docker_image',)
 
 
 class PhaseAdmin(admin.ModelAdmin):
