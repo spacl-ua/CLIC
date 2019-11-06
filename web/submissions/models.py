@@ -35,7 +35,7 @@ class Phase(models.Model):
 		help_text='Optional limit of encoded data size (bytes)')
 
 	def __str__(self):
-		return '{0} ({1})'.format(self.task, self.description)
+		return '{0} ({1})'.format(self.task, self.description.lower())
 
 
 class DockerImage(models.Model):

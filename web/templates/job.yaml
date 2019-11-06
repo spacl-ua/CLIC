@@ -61,10 +61,10 @@ spec:
         resources:
           requests:
             cpu: 1
-            memory: "500M"{% if submission.docker_image.gpu %}
+            memory: "2G"{% if submission.docker_image.gpu %}
             nvidia.com/gpu: 1{% endif %}
           limits:
-            memory: "1G"
+            memory: "4G"
             cpu: 1{% if submission.docker_image.gpu %}
             nvidia.com/gpu: 1{% endif %}
         command: [
