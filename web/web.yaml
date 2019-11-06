@@ -13,12 +13,21 @@ spec:
     spec:
       containers:
       - name: clic-app
-        image: gcr.io/clic-215616/web
+        image: gcr.io/clic-215616/web:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "1G"
+            cpu: 1
+          limits:
+            memory: "4G"
+            cpu: 4
         command: [
             "gunicorn",
             "--bind", ":8080",
             "--worker-class", "gevent",
             "--workers", "12",
+            "--timeout", "600",
             "clic.wsgi"]
         env:
           - name: DB_HOST
@@ -88,6 +97,7 @@ metadata:
     app: clic
 spec:
   type: LoadBalancer
+  loadBalancerIP: "{{ IP_ADDRESS }}"
   ports:
   - port: 80
     targetPort: 8080

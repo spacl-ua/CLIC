@@ -59,11 +59,8 @@ Create a public storage bucket to host static content:
 	gsutil mb gs://clic2020_public
 	gsutil iam ch allUsers:objectViewer gs://clic2020_public
 
-Upload static files:
-
-	./manage.py collectstatic
-	gsutil -m rsync -R web/static/ gs://clic2020_public/static/
-
 Start webserver:
 
-	kubectl apply -f web/web.yaml
+	./scripts/start_webserver.sh
+
+This script will automatically upload static content and request a static IP address for the server.

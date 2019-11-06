@@ -3,7 +3,7 @@
 # request some information
 read -p "Please enter the SQL username [root]: " DB_USER
 read -p "Please enter the SQL password: " DB_PASSWORD
-DB_INSTANCE=$(gcloud sql instances describe clic | grep connectionName | cut -d ' ' -f 2)
+DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_USER=${DB_USER:-root}
 DB_NAME="clic2020"
 
