@@ -16,10 +16,6 @@ spec:
         phase: "{{ submission.phase.name }}"
         team: "{{ submission.team.username }}"
     spec:
-      {% if submission.docker_image.gpu %}
-      nodeSelector:
-        cloud.google.com/gke-accelerator: nvidia-tesla-k80
-      {% endif %}
       initContainers:
       - name: decode
         image: "gcr.io/clic-215616/decoding:latest"
@@ -27,16 +23,12 @@ spec:
         resources:
           requests:
             memory: "{{ submission.phase.memory }}M"
-            cpu: {{ submission.phase.cpu }}
-            {% if submission.docker_image.gpu %}
-            nvidia.com/gpu: 1
-            {% endif %}
+            cpu: {{ submission.phase.cpu }}{% if submission.docker_image.gpu %}
+            nvidia.com/gpu: 1{% endif %}
           limits:
             memory: "{{ submission.phase.memory|add:500 }}M"
-            cpu: {{ submission.phase.cpu }}
-            {% if submission.docker_image.gpu %}
-            nvidia.com/gpu: 1
-            {% endif %}
+            cpu: {{ submission.phase.cpu }}{% if submission.docker_image.gpu %}
+            nvidia.com/gpu: 1{% endif %}
         command: [
           "python3",
           "/code/decode.py",{% if debug %}
@@ -69,7 +61,12 @@ spec:
         resources:
           requests:
             cpu: 1
-            memory: "500M"
+            memory: "500M"{% if submission.docker_image.gpu %}
+            nvidia.com/gpu: 1{% endif %}
+          limits:
+            memory: "1G"
+            cpu: 1{% if submission.docker_image.gpu %}
+            nvidia.com/gpu: 1{% endif %}
         command: [
           "python3",
           "/code/evaluate.py",{% if debug %}
