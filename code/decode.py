@@ -17,6 +17,9 @@ from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
 from utils import get_logger, get_submission, sql_setup
 from zipfile import ZipFile
 
+EXECUTABLE_NAME = 'decode'
+ZIP_FILE_NAME = 'decoder.zip'
+
 DECODE_CMD_CPU = [
 	'docker', 'run',
 	'--network', 'none',
@@ -27,7 +30,7 @@ DECODE_CMD_CPU = [
 	'-v', '{work_dir}:/home/{identifier}',
 	'-w', '/home/{identifier}',
 	'-e', 'TF_CPP_MIN_LOG_LEVEL=3',
-	'--entrypoint', './decode',
+	'--entrypoint', './' + EXECUTABLE_NAME,
 	'{image}']
 
 DECODE_CMD_GPU = [
@@ -46,7 +49,7 @@ DECODE_CMD_GPU = [
 	'--device', '/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:mrw',
 	'-w', '/home/{identifier}',
 	'-e', 'TF_CPP_MIN_LOG_LEVEL=3',
-	'--entrypoint', './decode',
+	'--entrypoint', './' + EXECUTABLE_NAME,
 	'{image}']
 
 DECODE_CMD = {True: DECODE_CMD_GPU, False: DECODE_CMD_CPU}
@@ -82,22 +85,32 @@ def main(args):
 
 	# directory on host in which decoder will be run
 	identifier = submission.task.name + '_' + submission.phase.name + '_' + submission.team.username
+
+	# create working directory
 	work_dir = os.path.join(args.exec_dir, identifier)
+	run('mkdir -p {dir}'.format(dir=work_dir), check=True, shell=True)
+
+	# ativate service account (needed for gsutil)
+	run('gcloud auth activate-service-account --quiet --key-file={key_file}'.format(
+			key_file=os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')),
+		stdout=PIPE,
+		stderr=PIPE,
+		check=False,
+		shell=True)
 
 	# mount submission
 	try:
-		submission_dir = '/submission'
-		run('mkdir -p {dir}'.format(dir=submission_dir), shell=True)
-		run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir}'.format(
-				subdir=submission.fs_path(),
+		logger.debug('Copying submission files')
+		run('gsutil -m rsync -e -R gs://{bucket}/{path}/ {work_dir}'.format(
 				bucket=os.environ['BUCKET_SUBMISSIONS'],
-				dir=submission_dir),
+				path=submission.fs_path(),
+				work_dir=work_dir),
 			stdout=PIPE,
 			stderr=PIPE,
 			check=True,
 			shell=True)
 	except CalledProcessError as error:
-		logger.error('Unable to mount submission bucket')
+		logger.error('Failed to copy submission files')
 		logger.debug(error.stderr)
 		submission.status = Submission.STATUS_ERROR
 		submission.save()
@@ -105,18 +118,17 @@ def main(args):
 
 	# mount environment files
 	try:
-		environment_dir = '/environment'
-		run('mkdir -p {}'.format(environment_dir), shell=True)
-		run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir}'.format(
-				subdir=os.path.join(submission.task.name, submission.phase.name),
+		logger.debug('Copying environment files')
+		run('gsutil -m rsync -e -R gs://{bucket}/{path}/ {work_dir}'.format(
 				bucket=os.environ['BUCKET_ENVIRONMENTS'],
-				dir=environment_dir),
-			stdout=PIPE,
+				path=os.path.join(submission.task.name, submission.phase.name),
+				work_dir=work_dir),
 			stderr=PIPE,
+			stdout=PIPE,
 			check=True,
 			shell=True)
 	except CalledProcessError as error:
-		logger.error('Unable to mount environment bucket')
+		logger.error('Failed to copy environment files')
 		logger.debug(error.stderr)
 		run('fusermount -u {}'.format(submission_dir), shell=True)
 		submission.status = Submission.STATUS_ERROR
@@ -124,24 +136,19 @@ def main(args):
 		return 1
 
 	try:
-		# copy files to executable working directory
-		run('mkdir -p {dir}'.format(dir=work_dir), check=True, shell=True)
-		run('rsync -r {source}/ {target}/'.format(source=environment_dir, target=work_dir),
-			shell=True)
-		run('rsync -r {source}/ {target}/'.format(source=submission_dir, target=work_dir),
-			shell=True)
-		run('sync', shell=True)
-
 		# unzip decoder if zipped
-		zip_path = os.path.join(work_dir, 'decoder.zip')
+		zip_path = os.path.join(work_dir, ZIP_FILE_NAME)
 		if os.path.exists(zip_path):
 			logger.info('Unzipping decoder')
 			ZipFile(zip_path).extractall(work_dir)
 
 		# check if decoder executable is present
-		if not os.path.exists(os.path.join(work_dir, 'decode')):
-			logger.error('Missing executable \'decode\'')
+		executable_path = os.path.join(work_dir, EXECUTABLE_NAME)
+		if not os.path.exists(executable_path):
+			logger.error('Missing executable \'{}\''.format(EXECUTABLE_NAME))
 			return 1
+
+		run('chmod +x {}'.format(executable_path), check=True, shell=True)
 
 		# make sure latest Docker image is present before decoder starts
 		try:
@@ -222,16 +229,17 @@ def main(args):
 
 	finally:
 		# copy (intermediate) results back to submission directory
-		run('rsync -r {source}/ {target}/'.format(source=work_dir, target=submission_dir),
+		run('gsutil -m rsync -e -C -R {work_dir} gs://{bucket}/{path}/'.format(
+				bucket=os.environ['BUCKET_SUBMISSIONS'],
+				path=submission.fs_path(),
+				work_dir=work_dir),
+			stdout=PIPE,
+			stderr=PIPE,
+			check=False,
 			shell=True)
-		run('sync', shell=True)
 
 		# remove working directory
 		run('rm -rf {}'.format(work_dir), shell=True)
-
-		# unmount buckets
-		run('fusermount -u {}'.format(submission_dir), shell=True)
-		run('fusermount -u {}'.format(environment_dir), shell=True)
 
 	return 0
 
