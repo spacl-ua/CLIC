@@ -45,7 +45,7 @@
 		<hr class="mt-1 mb-1">
 		<div class="row">
 			<div class="col-3 text-nowrap">Decoding time</div>
-			<div class="col-9">{{ submission.decoding_time|default:"" }}</div>
+			<div class="col-9"><span id="decoding_time">{{ submission.decoding_time_live|default:"" }}</span></div>
 		</div>
 		<hr class="mt-1 mb-1">
 		<div class="row">
@@ -73,7 +73,7 @@
 <div class="card mb-3">
 	<h5 class="card-header">Logs</h5>
 	<div class="embed-responsive" style="height:400px">
-		<iframe class="embed-responsive-item" src="/logs/{{ submission.pk }}/"></iframe>
+		<iframe class="embed-responsive-item" src="/logs/{{ submission.pk }}/" {% if submission.in_progress %}onload="stop_counting()"{% endif %}></iframe>
 	</div>
 	<div class="card-footer text-muted">
 		<a target="_blank" href="/logs/{{ submission.pk }}/">Open in new window</a>
@@ -86,5 +86,17 @@
 		$(function () {
 			$('[data-toggle="tooltip"]').tooltip()
 		})
+
+		{% if submission.in_progress %}
+			var seconds = 0;
+			var secondCounter = setInterval(function() {
+				seconds++;
+				$('#decoding_time').text({{ submission.decoding_time_live }} + seconds);
+			}, 1000);
+
+			function stop_counting() {
+				clearInterval(secondCounter);
+			}
+		{% endif %}
 	</script>
 {% endblock %}

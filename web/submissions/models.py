@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from django.db import models
 from django.db.models.signals import post_delete
@@ -123,6 +124,14 @@ class Submission(models.Model):
 		for m in self.measurement_set.all():
 			m_all[m.metric] = m.value
 		return m_all
+
+	def in_progress(self):
+		return self.status in self.STATUS_IN_PROGRESS
+
+	def decoding_time_live(self):
+		if self.in_progress():
+			return (datetime.now() - self.timestamp).seconds
+		return self.decoding_time
 
 
 @receiver(post_delete, sender=Submission, dispatch_uid='delete_submission')

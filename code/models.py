@@ -3,6 +3,7 @@ Copy of models used by Django webserver.
 """
 
 import os
+from datetime import datetime
 
 from django.db import models
 from django.db.models.signals import post_delete
@@ -137,6 +138,11 @@ class Submission(models.Model):
 		for m in self.measurement_set.all():
 			m_all[m.metric] = m.value
 		return m_all
+
+	def decoding_time_live(self):
+		if self.status in self.STATUS_IN_PROGRESS:
+			return (datetime.now() - self.timestamp).seconds
+		return self.decoding_time
 
 
 class Measurement(models.Model):

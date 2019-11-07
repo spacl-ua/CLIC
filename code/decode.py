@@ -11,6 +11,7 @@ This script executes a submission by doing the following:
 
 import os
 import sys
+import time
 import traceback
 from argparse import ArgumentParser
 from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
@@ -182,9 +183,11 @@ def main(args):
 
 			# run decoder
 			logger.info('Running decoder')
+			start = time.time()
 			run(decode_cmd, timeout=submission.phase.timeout, check=True, shell=False)
 			logger.info('Decoding complete')
 
+			submission.decoding_time = time.time() - start
 			submission.status = Submission.STATUS_DECODED
 			submission.save()
 
