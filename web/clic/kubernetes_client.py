@@ -88,6 +88,11 @@ class KubernetesClient():
 					break
 			return
 
+		if self.read_pod_status(pod).status.phase.lower() == 'pending':
+			# waiting for container to start
+			yield utils.log_message(logging.INFO, 'Waiting for container to start')
+			time.sleep(delay_attempt)
+
 		for i in range(max_attempts):
 			try:
 				# attempt to stream logs
