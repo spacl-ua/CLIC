@@ -17,6 +17,7 @@ INSTALLED_APPS = [
 	'django.contrib.staticfiles',
 	'teams.apps.TeamsConfig',
 	'submissions.apps.SubmissionsConfig',
+	'clic.apps.CLICConfig',
 	'crispy_forms',
 ]
 

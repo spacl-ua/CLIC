@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load submissions_filters %}
+{% load clic_filters %}
 
 {% block content %}
 <div class="card mb-3">
@@ -10,29 +10,29 @@
 				<tr>
 					<th scope="col">#</th>
 					<th scope="col">Status</th>
-					<th scope="col">Date</th>
 					<th scope="col">Task</th>
 					<th scope="col">Phase</th>
 					{% for metric in metrics %}
 						<th scope="col">{{ metric}} </th>
 					{% endfor %}
+					<th scope="col">Date</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for submission in submissions %}
 					<tr>
-						<th scope="row"><a href="/submission/{{ submission.id }}/">{{ submission.id }}</a></th>
+						<th scope="row"><a href="/submission/{{ submission.id }}/" class="stretched-link">{{ submission.id }}</a></th>
 						<td>
 							<a data-toggle="tooltip" data-placement="top" title="{{ submission.get_status_display }}">
 								<i class="fas fa-{{ submission.status_icon }}"></i>
 							</a>
 						</td>
-						<td>{{ submission.timestamp|date:"M d, H:i" }}</td>
 						<td>{{ submission.task.description|capfirst }}</td>
 						<td>{{ submission.phase.description|capfirst }}</td>
 						{% for metric in metrics %}
-						<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
+							<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
 						{% endfor %}
+						<td>{{ submission.timestamp|date:"M d, H:i" }}</td>
 					</tr>
 				{% endfor %}
 			</tbody>

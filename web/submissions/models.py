@@ -1,9 +1,9 @@
 import os
-from datetime import datetime
 
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 from storages.backends.gcloud import GoogleCloudStorage
 
 
@@ -130,7 +130,7 @@ class Submission(models.Model):
 
 	def decoding_time_live(self):
 		if self.in_progress():
-			return (datetime.now() - self.timestamp).seconds
+			return (timezone.now() - self.timestamp).seconds
 		return self.decoding_time
 
 

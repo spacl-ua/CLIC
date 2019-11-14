@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load clic_filters %}
+
+{% block content %}
+<div class="card mb-3">
+	<h5 class="card-header">{{ phase }}</h5>
+	<div class="card-body">
+		<table class="table table-hover text-center">
+			<thead>
+				<tr>
+					<th scope="col">Team</th>
+					{% for metric in metrics %}
+						<th scope="col">{{ metric}} </th>
+					{% endfor %}
+					<th scope="col">Data size</th>
+					<th scope="col">Decoder size</th>
+					<th scope="col">Decoding time</th>
+					<th scope="col">Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for submission in submissions %}
+					<tr>
+						<td>{{ submission.team }}</td>
+						{% for metric in metrics %}
+							<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
+						{% endfor %}
+						<td>{{ submission.data_size }}</td>
+						<td>{{ submission.decoder_size }}</td>
+						<td>{{ submission.decoding_time|default_if_none:"" }}s</td>
+						<td>{{ submission.timestamp|date:"M d, H:i" }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}

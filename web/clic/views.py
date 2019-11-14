@@ -1,5 +1,6 @@
 import os
 import yaml
+from collections import defaultdict
 
 from django.contrib.auth import login, authenticate
 from django.core.files.storage import default_storage
@@ -201,3 +202,35 @@ def submissions_list(request):
 			metrics.add(measurement.metric)
 
 	return render(request, 'submissions.html', {'metrics': metrics, 'submissions': subs})
+
+
+def leaderboard(request, task, phase):
+	try:
+		task = submissions.models.Task.objects.filter(name=task)[0]
+		phase = submissions.models.Phase.objects.filter(name=phase, task=task)[0]
+	except IndexError:
+		raise Http404('Could not find task.')
+
+	subs = submissions.models.Submission.objects.filter(
+		task=task,
+		phase=phase,
+		hidden=False,
+		status=submissions.models.Submission.STATUS_SUCCESS)
+	subs = subs.prefetch_related('measurement_set')
+	subs_best = defaultdict(lambda: submissions.models.Measurement(value=float("-inf")))
+
+	metrics = set()
+	for sub in subs:
+		for measurement in sub.measurement_set.all():
+			# keep submission if it dominates others in at least one metric
+			if measurement.value > subs_best[sub.team, measurement.metric].value:
+				subs_best[sub.team, measurement.metric] = measurement
+			# collect metrics
+			metrics.add(measurement.metric)
+	subs_best = {measurement.submission for measurement in subs_best.values()}
+
+	return render(request, 'leaderboard.html', {
+			'phase': phase,
+			'metrics': metrics,
+			'submissions': subs_best,
+		})
