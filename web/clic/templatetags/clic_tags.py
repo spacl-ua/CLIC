@@ -12,7 +12,3 @@ def get_navigation(context, template='navigation.html'):
 			'phases': phases,
 		},
 		request=context['request'])
-
-print()
-print('ABC')
-print()

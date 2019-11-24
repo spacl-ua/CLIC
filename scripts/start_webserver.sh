@@ -5,7 +5,7 @@ docker run --rm -ti \
 	-w "$(pwd)/web" \
 	-v "$(pwd)/web":"$(pwd)/web" \
 	gcr.io/clic-215616/web \
-	python3 manage.py collectstatic --no-input
+	python3 manage.py collectstatic --no-input && \
 gsutil -m rsync -R web/static/ gs://clic2020_public/static/
 
 # allocate IP address if it does not already exist

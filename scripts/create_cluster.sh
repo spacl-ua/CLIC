@@ -23,7 +23,7 @@ gcloud container clusters create clic-cluster \
 	--machine-type n1-standard-8 \
 	--enable-autoscaling \
 	--min-nodes 1 \
-	--max-nodes 3 \
+	--max-nodes 8 \
 	--num-nodes 2 \
 	--verbosity error
 
@@ -31,11 +31,11 @@ gcloud container clusters create clic-cluster \
 gcloud container node-pools create gpu-pool \
 	--zone us-west1-b \
 	--machine-type n1-standard-4 \
-	--accelerator type=nvidia-tesla-k80,count=1 \
+	--accelerator type=nvidia-tesla-p100,count=1 \
 	--cluster clic-cluster \
 	--enable-autoscaling \
 	--min-nodes 1 \
-	--max-nodes 2 \
+	--max-nodes 8 \
 	--num-nodes 1 \
 	--verbosity error
 
