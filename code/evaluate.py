@@ -96,7 +96,7 @@ def main(args):
 				return 1
 
 		logger.info('Running evaluation')
-		results = evaluate(submission_images, target_images, metrics=args.metrics)
+		results = evaluate(submission_images, target_images, settings=submission.phase.settings)
 
 		with transaction.atomic():
 			for metric, value in results.items():
@@ -133,8 +133,6 @@ if __name__ == '__main__':
 	parser.add_argument('--id', type=int, required=True,
 		help='Used to identify the submission')
 	parser.add_argument('--debug', action='store_true')
-	parser.add_argument('--metrics', type=str, nargs='+', default=['PSNR', 'MSSSIM'],
-		choices=['PSNR', 'MSSSIM'])
 
 	args = parser.parse_args()
 

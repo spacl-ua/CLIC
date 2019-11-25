@@ -3,11 +3,12 @@ from PIL import Image
 from msssim import MultiScaleSSIM
 
 
-def evaluate(submission_images, target_images, metrics=['PSNR', 'MSSSIM']):
+def evaluate(submission_images, target_images, settings={}):
 	"""
 	Calculates metrics for the given images.
 	"""
 
+	metrics = settings.get('metrics', ['PSNR', 'MSSSIM'])
 	num_dims = 0
 	sqerror_values = []
 	msssim_values = []

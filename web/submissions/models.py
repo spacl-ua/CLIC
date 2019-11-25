@@ -6,6 +6,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from storages.backends.gcloud import GoogleCloudStorage
 
+from jsonfield import JSONField
+
 
 class Task(models.Model):
 	name = models.CharField(primary_key=True, max_length=32)
@@ -38,6 +40,7 @@ class Phase(models.Model):
 		help_text='Optional limit of combined file size (bytes)')
 	data_fraction = models.FloatField(null=True, blank=True,
 		help_text='Fraction of complete dataset (used to estimate total dataset size)')
+	settings = JSONField(blank=True, default='')
 
 	def __str__(self):
 		return '{0} ({1})'.format(self.task, self.description.lower())

@@ -71,8 +71,7 @@ spec:
           "python3",
           "/code/evaluate.py",{% if debug %}
           "--debug",{% endif %}
-          "--id", "{{ submission.id }}",
-          "--metrics", "PSNR", "MSSSIM"]
+          "--id", "{{ submission.id }}"]
         securityContext:
           capabilities: {}
           privileged: true

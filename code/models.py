@@ -10,6 +10,8 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser, UserManager
 
+from jsonfield import JSONField
+
 
 class TeamManager(UserManager):
 	def get_by_natural_key(self, username):
@@ -59,6 +61,11 @@ class Phase(models.Model):
 		help_text='Optional limit of decoder size (bytes)')
 	data_size_limit = models.IntegerField(null=True, blank=True,
 		help_text='Optional limit of encoded data size (bytes)')
+	total_size_limit = models.IntegerField(null=True, blank=True,
+		help_text='Optional limit of combined file size (bytes)')
+	data_fraction = models.FloatField(null=True, blank=True,
+		help_text='Fraction of complete dataset (used to estimate total dataset size)')
+	settings = JSONField(blank=True, default='')
 
 	def __str__(self):
 		return '{0} ({1})'.format(self.task, self.description)
