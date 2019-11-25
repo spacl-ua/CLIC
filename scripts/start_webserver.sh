@@ -12,5 +12,8 @@ gsutil -m rsync -R web/static/ gs://clic2020_public/static/
 gcloud compute addresses create clic2020-web --region us-west1 2> /dev/null
 IP_ADDRESS=$(gcloud compute addresses describe clic2020-web --region us-west1 --format 'value(address)')
 
+# get sha256 of latest image
+DIGEST=$(gcloud container images describe --format 'get(image_summary.digest)' gcr.io/clic-215616/web)
+
 # start webserver
-cat web/web.yaml | sed "s/{{ IP_ADDRESS }}/${IP_ADDRESS}/g" | kubectl apply -f -
+cat web/web.yaml | sed "s/{{ IP_ADDRESS }}/${IP_ADDRESS}/g" | sed "s/{{ DIGEST }}/${DIGEST}/g" | kubectl apply -f -

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: clic-app
-        image: gcr.io/clic-215616/web:latest
+        image: gcr.io/clic-215616/web@{{ DIGEST }}
         imagePullPolicy: Always
         resources:
           requests:
@@ -57,6 +57,13 @@ spec:
             readOnly: true
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
 
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.16
