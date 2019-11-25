@@ -84,4 +84,24 @@ class SubmitForm(forms.Form):
 						self.cleaned_data['phase'].data_size_limit))
 				self.add_error('data', error)
 
+		if self.cleaned_data['phase'].total_size_limit:
+			if self.cleaned_data['phase'].data_fraction:
+				total_size = self.cleaned_data['data_size'] / self.cleaned_data['phase'].data_fraction \
+					+ self.cleaned_data['decoder_size']
+				total_size = int(total_size)
+				if total_size > self.cleaned_data['phase'].total_size_limit:
+					error = ValidationError(
+						'Total file size should be less than {1} bytes but is estimated to be {0} bytes'.format(
+							total_size,
+							self.cleaned_data['phase'].total_size_limit))
+					self.add_error('data', error)
+			else:
+				total_size = self.cleaned_data['data_size'] + self.cleaned_data['decoder_size']
+				if total_size > self.cleaned_data['phase'].total_size_limit:
+					error = ValidationError(
+						'Combined file size should be less than {1} bytes but is {0} bytes'.format(
+							total_size,
+							self.cleaned_data['phase'].total_size_limit))
+					self.add_error('data', error)
+
 		return self.cleaned_data

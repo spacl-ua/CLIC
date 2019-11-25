@@ -34,6 +34,10 @@ class Phase(models.Model):
 		help_text='Optional limit of decoder size (bytes)')
 	data_size_limit = models.IntegerField(null=True, blank=True,
 		help_text='Optional limit of encoded data size (bytes)')
+	total_size_limit = models.IntegerField(null=True, blank=True,
+		help_text='Optional limit of combined file size (bytes)')
+	data_fraction = models.FloatField(null=True, blank=True,
+		help_text='Fraction of complete dataset (used to estimate total dataset size)')
 
 	def __str__(self):
 		return '{0} ({1})'.format(self.task, self.description.lower())
