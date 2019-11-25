@@ -43,11 +43,13 @@
 			<div class="col-9">{{ submission.decoder_size|filesizeformat }}</div>
 		</div>
 		<hr class="mt-1 mb-1">
-		<div class="row">
-			<div class="col-3 text-nowrap">Decoding time</div>
-			<div class="col-9"><span id="decoding_time">{{ submission.decoding_time_live|default:"" }}</span></div>
-		</div>
-		<hr class="mt-1 mb-1">
+		{% if submission.decoding_time %}
+			<div class="row">
+				<div class="col-3 text-nowrap">Decoding time</div>
+				<div class="col-9">{{ submission.decoding_time }}</div>
+			</div>
+			<hr class="mt-1 mb-1">
+		{% endif %}
 		<div class="row">
 			<div class="col-3">Data size</div>
 			<div class="col-9">{{ submission.data_size|filesizeformat }}</div>
@@ -86,17 +88,5 @@
 		$(function () {
 			$('[data-toggle="tooltip"]').tooltip()
 		})
-
-		{% if submission.in_progress %}
-			var seconds = 0;
-			var secondCounter = setInterval(function() {
-				seconds++;
-				$('#decoding_time').text({{ submission.decoding_time_live }} + seconds);
-			}, 1000);
-
-			function stop_counting() {
-				clearInterval(secondCounter);
-			}
-		{% endif %}
 	</script>
 {% endblock %}

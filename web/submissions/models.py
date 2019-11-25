@@ -132,11 +132,6 @@ class Submission(models.Model):
 	def in_progress(self):
 		return self.status in self.STATUS_IN_PROGRESS
 
-	def decoding_time_live(self):
-		if self.in_progress():
-			return (timezone.now() - self.timestamp).seconds
-		return self.decoding_time
-
 
 @receiver(post_delete, sender=Submission, dispatch_uid='delete_submission')
 def delete_submission(sender, instance, **kwargs):
