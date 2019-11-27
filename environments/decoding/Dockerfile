@@ -10,7 +10,7 @@ RUN apt-get upgrade -y
 RUN apt-get install -y rsync
 RUN apt-get install -y docker.io
 RUN apt-get install -y python3.7 python3-pip
-RUN apt-get install -y default-libmysqlclient-dev
+RUN apt-get install -y libssl-dev default-libmysqlclient-dev
 
 WORKDIR /tmp
 COPY requirements.txt .

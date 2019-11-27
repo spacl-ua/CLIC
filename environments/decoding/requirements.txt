@@ -1,3 +1,4 @@
 django==2.2.6
 django-storages[google]==1.7.2
 mysqlclient==1.4.4
+jsonfield==2.0.2
