@@ -1,21 +1,21 @@
 <ul class="navbar-nav mr-auto">
-	<li class="nav-item active">
-		<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+	<li class="nav-item{% if request.resolver_match.url_name == "home" %} active{% endif %}">
+		<a class="nav-link" href="/">Home</a>
 	</li>
 	<li class="nav-item">
-		<div class="dropdown">
+		<div class="dropdown{% if request.resolver_match.url_name == "leaderboard" %} active{% endif %}">
 			<a href="#" class="nav-link dropdown-toggle" id="lbMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Leaderboard</a>
 			<div class="dropdown-menu" aria-labelledby="lbMenu">
 				{% for phase in phases %}
-					<a class="dropdown-item" href="/leaderboard/{{ phase.task.name }}/{{ phase.name }}/">{{ phase.task.description }}</a>
+					<a class="dropdown-item" href="/leaderboard/{{ phase.task.name }}/{{ phase.name }}/">{{ phase }}</a>
 				{% endfor %}
 			</div>
 		</div>
 	</li>
 	{% if user.is_authenticated %}
-	<li class="nav-item">
-		<a class="nav-link" href="/submissions">Submissions</a>
-	</li>
+		<li class="nav-item{% if request.resolver_match.url_name == "submissions" %} active{% endif %}">
+			<a class="nav-link" href="/submissions">Submissions</a>
+		</li>
 	{% endif %}
 </ul>
 {% if user.is_authenticated %}

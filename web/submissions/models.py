@@ -24,6 +24,8 @@ class Phase(models.Model):
 	description = models.CharField(max_length=32)
 	active = models.BooleanField(default=True,
 		help_text='Controls whether submissions are currently accepted')
+	hidden = models.BooleanField(default=False,
+		help_text='Controls whether leaderboard is revealed or not')
 	cpu = models.IntegerField(
 		help_text='Number of CPUs provided to the decoder', null=False, default=2)
 	memory = models.IntegerField(

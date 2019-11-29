@@ -46,7 +46,7 @@
 		{% if submission.decoding_time %}
 			<div class="row">
 				<div class="col-3 text-nowrap">Decoding time</div>
-				<div class="col-9">{{ submission.decoding_time }}</div>
+				<div class="col-9">{{ submission.decoding_time }} second{{ submission.decoding_time|pluralize }}</div>
 			</div>
 			<hr class="mt-1 mb-1">
 		{% endif %}

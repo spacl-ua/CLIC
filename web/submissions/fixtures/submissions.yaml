@@ -16,6 +16,7 @@
     name: "valid"
     description: "validation"
     active: true
+    hidden: false
 - model: submissions.phase
   pk: 2
   fields:
@@ -23,6 +24,7 @@
     name: "test"
     description: "test"
     active: false
+    hidden: true
 - model: submissions.phase
   pk: 3
   fields:
@@ -30,6 +32,7 @@
     name: "valid"
     description: "validation"
     active: true
+    hidden: false
 - model: submissions.phase
   pk: 4
   fields:
@@ -37,6 +40,7 @@
     name: "test"
     description: "test"
     active: false
+    hidden: true
 
 - model: submissions.dockerimage
   pk: 1
