@@ -211,6 +211,9 @@ def leaderboard(request, task, phase):
 	except IndexError:
 		raise Http404('Could not find task.')
 
+	if phase.hidden and not request.user.is_staff:
+		raise PermissionDenied()
+
 	subs = submissions.models.Submission.objects.filter(
 		task=task,
 		phase=phase,

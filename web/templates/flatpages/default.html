@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load markdown_deux_tags %}
+{% load clic_tags %}
+
+{% block content %}
+	<div class="card mb-3">
+		<div class="card-body">
+		{% with flatpage.content|markdown as content %}
+			{% evaluate content %}
+		{% endwith %}
+		</div>
+	</div>
+{% endblock %}

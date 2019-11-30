@@ -3,6 +3,7 @@ import logging
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+SITE_ID = 1
 SECRET_KEY = os.environ.get('SECRET_KEY', '') or '\$t5(+2v272pm0ig76)ex1hgg-$s2%h@78xb#m*b^wz31fo_1bk'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = bool(os.environ.get('DEBUG', False))
@@ -15,10 +16,14 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django.contrib.sites',
+	'django.contrib.flatpages',
 	'teams.apps.TeamsConfig',
 	'submissions.apps.SubmissionsConfig',
 	'clic.apps.CLICConfig',
 	'crispy_forms',
+	'pagedown',
+	'markdown_deux',
 ]
 
 MIDDLEWARE = [
@@ -29,6 +34,7 @@ MIDDLEWARE = [
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
 ROOT_URLCONF = 'clic.urls'
@@ -112,6 +118,20 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 GS_BUCKET_NAME = os.environ.get('BUCKET_SUBMISSIONS')
 GS_MAX_MEMORY_SIZE = 10000000
 GS_BLOB_CHUNK_SIZE = 1048576
+
+
+# Markdown
+# https://github.com/trentm/django-markdown-deux
+# https://github.com/timmyomahony/django-pagedown
+PAGEDOWN_SHOW_PREVIEW = False
+MARKDOWN_DEUX_STYLES = {
+	'default': {
+		'extras': {
+			'code-friendly': None,
+		},
+		'safe_mode': False,
+	}
+}
 
 
 # Sentry error tracking, requires environment variable SENTRY_DSN to be set
