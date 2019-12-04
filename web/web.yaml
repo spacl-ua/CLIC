@@ -28,6 +28,7 @@ spec:
             "--worker-class", "gevent",
             "--workers", "12",
             "--timeout", "600",
+            "--log-level", "DEBUG",
             "clic.wsgi"]
         env:
           - name: DB_HOST
