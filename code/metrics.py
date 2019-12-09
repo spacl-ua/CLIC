@@ -22,14 +22,14 @@ def evaluate(submission_images, target_images, settings={}):
 		if 'PSNR' in metrics:
 			sqerror_values.append(mse(image1, image0))
 		if 'MSSSIM' in metrics:
-			msssim_values.append(msssim(image0, image1))
+			msssim_values.append(msssim(image0, image1) * image0.size)
 
 	results = {}
 
 	if 'PSNR' in metrics:
 		results['PSNR'] = mse2psnr(np.sum(sqerror_values) / num_dims)
 	if 'MSSSIM' in metrics:
-		results['MSSSIM'] = np.mean(msssim_values)
+		results['MSSSIM'] = np.sum(msssim_values) / num_dims
 
 	return results
 
