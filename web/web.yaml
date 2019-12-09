@@ -62,8 +62,8 @@ spec:
           httpGet:
             path: /
             port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 30
           successThreshold: 1
 
       - name: cloudsql-proxy
