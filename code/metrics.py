@@ -1,4 +1,5 @@
 import numpy as np
+import json
 from PIL import Image
 from msssim import MultiScaleSSIM
 
@@ -8,6 +9,8 @@ def evaluate(submission_images, target_images, settings={}):
 	Calculates metrics for the given images.
 	"""
 
+	if settings is None:
+		settings = {}
 	metrics = settings.get('metrics', ['PSNR', 'MSSSIM'])
 	num_dims = 0
 	sqerror_values = []
