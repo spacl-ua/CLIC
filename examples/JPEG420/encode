@@ -1,6 +1,16 @@
-#!/bin/bash
+#!/bin/zsh
 
-for f in ~/Downloads/test*/*.png; do
-	if [ $(python file_size.py) -lt 15749090 ]; then break; fi
-	convert "$f" -sampling-factor "4:2:0" -quality 6 "images/$(basename ${f/.png/.jpg})";
+for src in valid/*.png; do
+	target=$(basename "${src/.png/.jpg}");
+	target="valid_encoded/${target}";
+	convert "${src}" -sampling-factor "4:2:0" -quality 8 "${target}";
+done
+
+for src in valid/*.png; do
+	if [ $(python file_size.py) -lt 4722341 ];
+		then break;
+	fi
+	target=$(basename "${src/.png/.jpg}");
+	target="valid_encoded/${target}";
+	convert "${src}" -sampling-factor "4:2:0" -quality 7 "${target}";
 done
