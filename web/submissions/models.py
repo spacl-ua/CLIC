@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.db import models
 from django.db.models.signals import post_delete
@@ -108,10 +109,13 @@ class Submission(models.Model):
 		"""
 		Name used for Kubernetes jobs
 		"""
-		return 'run-{task}-{phase}-{team}'.format(
+		name = 'run-{task}-{phase}-{team}'.format(
 			task=self.task.name.lower(),
 			phase=self.phase.name.lower(),
 			team=self.team.username.lower())
+
+		# apply restrictions of Kubernetes
+		return re.sub('[^a-zA-Z0-9.]', '', name)[:253]
 
 	def fs_path(self):
 		"""
