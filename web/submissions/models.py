@@ -81,15 +81,15 @@ class Submission(models.Model):
 			(STATUS_CANCELED, 'Canceled'),
 		]
 	STATUS_ICONS = [
-			(STATUS_ERROR, 'bug'),
-			(STATUS_WAITING, 'clock'),
-			(STATUS_DECODING, 'hourglass-half'),
-			(STATUS_DECODING_FAILED, 'exclamation-circle'),
-			(STATUS_DECODED, 'hourglass-half'),
-			(STATUS_EVALUATING, 'hourglass-end'),
-			(STATUS_EVALUATION_FAILED, 'exclamation-circle'),
-			(STATUS_SUCCESS, 'check-circle'),
-			(STATUS_CANCELED, 'times'),
+			(STATUS_ERROR, 'fas fa-bug text-danger'),
+			(STATUS_WAITING, 'fas fa-clock'),
+			(STATUS_DECODING, 'fas fa-circle-notch fa-spin text-primary'),
+			(STATUS_DECODING_FAILED, 'fas fa-exclamation-circle text-danger'),
+			(STATUS_DECODED, 'fas fa-circle-notch fa-spin text-primary'),
+			(STATUS_EVALUATING, 'fas fa-circle-notch fa-spin text-primary'),
+			(STATUS_EVALUATION_FAILED, 'fas fa-exclamation-circle text-danger'),
+			(STATUS_SUCCESS, 'fas fa-check-circle text-success'),
+			(STATUS_CANCELED, 'fas fa-times text-warning'),
 		]
 	STATUS_IN_PROGRESS = [STATUS_WAITING, STATUS_DECODING, STATUS_DECODED, STATUS_EVALUATING]
 

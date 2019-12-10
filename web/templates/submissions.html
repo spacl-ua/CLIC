@@ -24,7 +24,7 @@
 						<th scope="row"><a href="/submission/{{ submission.id }}/">{{ submission.id }}</a></th>
 						<td>
 							<a data-toggle="tooltip" data-placement="top" title="{{ submission.get_status_display }}">
-								<i class="fas fa-{{ submission.status_icon }}"></i>
+								<i class="{{ submission.status_icon }}"></i>
 							</a>
 						</td>
 						<td>{{ submission.task.description|capfirst }}</td>
