@@ -12,7 +12,6 @@ if [ ! -f service-account.json ]; then
 fi
 
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
-DB_HOST=$(gcloud sql instances describe clic --format 'value(ipAddresses.ipAddress)')
 DB_NAME=$(kubectl get secrets cloudsql -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -D -)
 DB_PASSWORD=$(kubectl get secrets cloudsql -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -D -)
 SECRET_KEY=$(kubectl get secrets django -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
@@ -37,14 +36,27 @@ fi
 
 docker run \
 	--rm \
+	--name cloudsql \
+	-d \
+	-w "/cloudsql" \
+	-v "$(pwd)/service-account.json":"/secret/service-account.json" \
+	-e GOOGLE_APPLICATION_CREDENTIALS="/secret/service-account.json" \
+	-p 5432:5432 \
+	gcr.io/cloudsql-docker/gce-proxy:1.16 \
+	/cloud_sql_proxy \
+		-dir=/cloudsql \
+		-instances=${DB_INSTANCE}=tcp:0.0.0.0:5432
+
+docker run \
+	--rm \
 	-ti \
 	-v "$(pwd)/service-account.json":"/secret/service-account.json" \
 	-e GOOGLE_APPLICATION_CREDENTIALS="/secret/service-account.json" \
-	-e DB_INSTANCE="${DB_INSTANCE}" \
 	-e DB_NAME="${DB_NAME}" \
 	-e DB_USER=root \
 	-e DB_PASSWORD="${DB_PASSWORD}" \
-	-e DB_HOST="${DB_HOST}" \
+	-e DB_HOST="host.docker.internal" \
+	-e DB_PORT="5432" \
 	-e BUCKET_SUBMISSIONS="clic2020_submissions" \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e SECRET_KEY="${SECRET_KEY}" \
@@ -61,3 +73,5 @@ docker run \
 		--reload \
 		--log-level DEBUG \
 		clic.wsgi
+
+docker stop cloudsql
