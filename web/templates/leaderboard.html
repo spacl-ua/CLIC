@@ -10,7 +10,7 @@
 				<tr>
 					<th scope="col" data-sortable="true">Team</th>
 					{% for metric in metrics %}
-						<th scope="col" data-sortable="true">{{ metric}} </th>
+					<th scope="col" data-sortable="true">{{ metric }}{% if phase.task.name == 'pframe' and metric == 'MSSSIM' %} <i class="fas fa-award text-warning"></i>{% endif %}</th>
 					{% endfor %}
 					<th scope="col" data-sortable="true">
 						<a data-toggle="tooltip" data-placement="top" title="Bytes">
@@ -45,6 +45,14 @@
 				{% endfor %}
 			</tbody>
 		</table>
+	</div>
+	<div class="card-footer text-muted">
+		<i class="fas fa-award text-warning"></i>
+		{% if phase.task.name == 'lowrate' %}
+		Winners will be determined based only on MSSSIM
+		{% else %}
+		Winners will be determined based on a perceptual quality test using human evaluators
+		{% endif %}
 	</div>
 </div>
 {% endblock %}
