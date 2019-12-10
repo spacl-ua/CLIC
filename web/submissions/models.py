@@ -100,7 +100,7 @@ class Submission(models.Model):
 	phase = models.ForeignKey(Phase, on_delete=models.PROTECT)
 	decoder_hash = models.CharField(max_length=128)
 	decoder_size = models.IntegerField()
-	decoding_time = models.IntegerField(null=True)
+	decoding_time = models.IntegerField(null=True, blank=True)
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_WAITING)
