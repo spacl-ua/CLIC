@@ -115,7 +115,7 @@ class Submission(models.Model):
 			team=self.team.username.lower())
 
 		# apply restrictions of Kubernetes
-		return re.sub('[^a-zA-Z0-9.]', '', name)[:253]
+		return re.sub('[^a-zA-Z0-9.-]', '', name)[:253]
 
 	def fs_path(self):
 		"""
