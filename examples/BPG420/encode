@@ -3,16 +3,16 @@
 mkdir -p valid_encoded;
 
 for src in valid/*.png; do
-	target=$(basename "${src/.png/.jpg}");
+	target=$(basename "${src/.png/.bpg}");
 	target="valid_encoded/${target}";
-	convert "${src}" -sampling-factor "4:2:0" -quality 8 "${target}";
+	bpgenc -q 40 -f 444 -c ycgco -o "${target}" "${src}";
 done
 
 for src in valid/*.png; do
 	if [ $(python file_size.py) -lt 4722341 ];
 		then break;
 	fi
-	target=$(basename "${src/.png/.jpg}");
+	target=$(basename "${src/.png/.bpg}");
 	target="valid_encoded/${target}";
-	convert "${src}" -sampling-factor "4:2:0" -quality 7 "${target}";
+	bpgenc -q 41 -f 444 -c ycgco -o "${target}" "${src}";
 done
