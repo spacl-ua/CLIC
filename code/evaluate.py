@@ -62,6 +62,9 @@ def main(args):
 		shell=True)
 
 	try:
+		logger.info('Checking image dimensions')
+
+		# check images
 		target_images = glob(os.path.join(target_dir, '*.png'))
 		target_images = {os.path.basename(path): path for path in target_images}
 		submission_images = glob(os.path.join(submission_dir, '**/*.png'), recursive=True)
@@ -95,6 +98,7 @@ def main(args):
 				submission.save()
 				return 1
 
+		# start actual evaluation
 		logger.info('Running evaluation')
 		results = evaluate(submission_images, target_images, settings=submission.phase.settings)
 

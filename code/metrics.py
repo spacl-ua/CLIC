@@ -11,6 +11,11 @@ def evaluate(submission_images, target_images, settings={}):
 
 	if settings is None:
 		settings = {}
+	if isinstance(settings, str):
+		try:
+			settings = json.loads(settings)
+		except json.JSONDecodeError:
+			settings = {}
 	metrics = settings.get('metrics', ['PSNR', 'MSSSIM'])
 	num_dims = 0
 	sqerror_values = []

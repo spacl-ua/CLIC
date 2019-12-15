@@ -99,7 +99,7 @@ def main(args):
 		check=False,
 		shell=True)
 
-	# mount submission
+	# copy submission files
 	try:
 		logger.debug('Copying submission files')
 		run('gsutil -m rsync -e -R gs://{bucket}/{path}/ {work_dir}'.format(
@@ -117,7 +117,7 @@ def main(args):
 		submission.save()
 		return 1
 
-	# mount environment files
+	# copy environment files
 	try:
 		logger.debug('Copying environment files')
 		run('gsutil -m rsync -e -R gs://{bucket}/{path}/ {work_dir}'.format(
