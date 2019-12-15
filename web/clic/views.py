@@ -155,11 +155,16 @@ def logs(request, pk, container=['decode', 'evaluate']):
 	pods = client.list_pods(label_selector=f'id={submission.id}')
 
 	if len(pods) == 0:
-		return HttpResponse('Logs are no longer available.', content_type='text/event-stream')
+		return HttpResponse('Logs are no longer available.', content_type='text/plain')
 
 	# stream logs
 	logs = client.stream_log(pods[0], container=container)
 
+	if 'Gecko' in request.META['HTTP_USER_AGENT']:
+		# Firefox will try to download a text/event-stream
+		response = StreamingHttpResponse(logs, content_type='text/plain')
+		response['X-Content-Type-Options'] = 'nosniff'
+		return response
 	return StreamingHttpResponse(logs, content_type='text/event-stream')
 
 
