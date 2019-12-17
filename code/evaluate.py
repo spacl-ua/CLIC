@@ -6,7 +6,7 @@ import traceback
 import numpy as np
 from argparse import ArgumentParser
 from glob import glob
-from subprocess import run
+from subprocess import run, PIPE
 from utils import get_logger, get_submission, sql_setup
 from PIL import Image
 from metrics import evaluate
@@ -45,20 +45,26 @@ def main(args):
 	logger.info('Obtaining decoded images')
 	submission_dir = '/submission'
 	run('mkdir -p {dir}'.format(dir=submission_dir), shell=True)
-	run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir} > /dev/null'.format(
-			subdir=submission.fs_path(),
+	run('gsutil -m rsync -e -R gs://{bucket}/{path}/ {submission_dir}'.format(
 			bucket=os.environ['BUCKET_SUBMISSIONS'],
-			dir=submission_dir),
+			path=submission.fs_path(),
+			submission_dir=submission_dir),
+		stdout=PIPE,
+		stderr=PIPE,
+		check=True,
 		shell=True)
 
 	# mount target images
 	logger.info('Obtaining target images')
 	target_dir = '/target'
 	run('mkdir -p {dir}'.format(dir=target_dir), shell=True)
-	run('gcsfuse --implicit-dirs --file-mode 777 --only-dir {subdir} {bucket} {dir} > /dev/null'.format(
-			subdir=os.path.join(submission.task.name, submission.phase.name),
+	run('gsutil -m rsync -e -R gs://{bucket}/{path}/ {target_dir}'.format(
 			bucket=os.environ['BUCKET_TARGETS'],
-			dir=target_dir),
+			path=os.path.join(submission.task.name, submission.phase.name),
+			target_dir=target_dir),
+		stdout=PIPE,
+		stderr=PIPE,
+		check=True,
 		shell=True)
 
 	try:
@@ -126,8 +132,8 @@ def main(args):
 
 	finally:
 		# unmount buckets
-		run('fusermount -u {dir}'.format(dir=submission_dir), shell=True)
-		run('fusermount -u {dir}'.format(dir=target_dir), shell=True)
+		run('rm -rf {}'.format(submission_dir), shell=True)
+		run('rm -rf {}'.format(target_dir), shell=True)
 
 	return 0
 
