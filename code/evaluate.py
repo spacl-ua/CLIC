@@ -112,6 +112,10 @@ def main(args):
 			for metric, value in results.items():
 				logger.info(f'{metric}: {value}')
 
+				if np.isnan(value):
+					logger.warning(f'Evaluation of {metric} failed.')
+					continue
+
 				measurement = Measurement(
 					metric=metric,
 					value=value,
