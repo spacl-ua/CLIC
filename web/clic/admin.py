@@ -5,6 +5,8 @@ from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from django.utils.translation import ugettext_lazy as _
 
+from .models import Entry, Schedule
+
 
 class PagedownFlatpageAdmin(FlatPageAdmin):
 	formfield_overrides = {
@@ -23,5 +25,16 @@ class PagedownFlatpageAdmin(FlatPageAdmin):
 	list_filter = ()
 
 
+class EntryInline(admin.StackedInline):
+	model = Entry
+	extra = 1
+
+
+class ScheduleAdmin(admin.ModelAdmin):
+	list_display = ('id', 'name',)
+	inlines = [EntryInline]
+
+
 admin.site.unregister(FlatPage)
 admin.site.register(FlatPage, PagedownFlatpageAdmin)
+admin.site.register(Schedule, ScheduleAdmin)

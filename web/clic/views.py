@@ -16,6 +16,7 @@ import teams
 import submissions.forms
 import submissions.models
 from .kubernetes_client import KubernetesClient
+from . import models
 
 
 def signup(request):
@@ -242,3 +243,10 @@ def leaderboard(request, task, phase):
 			'metrics': metrics,
 			'submissions': subs_best,
 		})
+
+
+def schedule(request, pk):
+	schedule = models.Schedule.objects.get(pk=pk)
+	if request.GET.get('format', '').lower() == 'json':
+		return render(request, 'schedule.json', {'schedule': schedule}, content_type='application/json')
+	return render(request, 'schedule.html', {'schedule': schedule})

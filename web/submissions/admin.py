@@ -7,6 +7,7 @@ class MeasurementInline(admin.StackedInline):
 	extra = 1
 	max_num = 10
 
+
 class SubmissionAdmin(admin.ModelAdmin):
 	list_display = ('id', 'team', 'phase', 'status', 'decoder_size', 'data_size', 'docker_image',)
 	inlines = [MeasurementInline]

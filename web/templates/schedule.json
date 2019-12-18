@@ -1,0 +1,9 @@
+{
+	"name": "{{ schedule.name }}",
+	"entries": [{% for entry in schedule.entry_set.all %}
+		{
+			"datetime": "{{ entry.datetime|date:"M d, Y" }}",
+			"description": "{{ entry.description }}"
+		}{% if not forloop.last %},{% endif %}
+	{% endfor %}]
+}
