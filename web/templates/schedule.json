@@ -2,7 +2,7 @@
 	"name": "{{ schedule.name }}",
 	"entries": [{% for entry in schedule.entry_set.all %}
 		{
-			"datetime": "{{ entry.datetime|date:"M d, Y" }}",
+			"datetime": "{% if entry.custom %}{{ entry.custom }}{% else %}{{ entry.datetime|date:"M d, Y" }}{% endif %}",
 			"description": "{{ entry.description }}"
 		}{% if not forloop.last %},{% endif %}
 	{% endfor %}]
