@@ -35,11 +35,11 @@ class Phase(models.Model):
 		help_text='Time provided to the decoder (seconds)', null=False, default=36000)
 	decoder_fixed = models.BooleanField(default=False,
 		help_text='Only allow already submitted decoders to be resubmitted')
-	decoder_size_limit = models.IntegerField(null=True, blank=True,
+	decoder_size_limit = models.BigIntegerField(null=True, blank=True,
 		help_text='Optional limit of decoder size (bytes)')
-	data_size_limit = models.IntegerField(null=True, blank=True,
+	data_size_limit = models.BigIntegerField(null=True, blank=True,
 		help_text='Optional limit of encoded data size (bytes)')
-	total_size_limit = models.IntegerField(null=True, blank=True,
+	total_size_limit = models.BigIntegerField(null=True, blank=True,
 		help_text='Optional limit of combined file size (bytes)')
 	data_fraction = models.FloatField(null=True, blank=True,
 		help_text='Fraction of complete dataset (used to estimate total dataset size)')
