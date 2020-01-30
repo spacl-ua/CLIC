@@ -143,12 +143,27 @@ def main(args):
 		zip_path = os.path.join(work_dir, ZIP_FILE_NAME)
 		if os.path.exists(zip_path):
 			logger.info('Unzipping decoder')
-			ZipFile(zip_path).extractall(work_dir)
+			try:
+				ZipFile(zip_path).extractall(work_dir)
+			except UnicodeEncodeError:
+				logger.error('Unzipping failed')
+				logger.error('Filenames should only use ASCII characters')
+				submission.status = Submission.STATUS_ERROR
+				submission.save()
+				return 1
+			except:
+				logger.error('Unzipping failed')
+				submission.status = Submission.STATUS_ERROR
+				submission.save()
+				return 1
+
 
 		# check if decoder executable is present
 		executable_path = os.path.join(work_dir, EXECUTABLE_NAME)
 		if not os.path.exists(executable_path):
 			logger.error('Missing executable \'{}\''.format(EXECUTABLE_NAME))
+			submission.status = Submission.STATUS_ERROR
+			submission.save()
 			return 1
 
 		run('chmod +x {}'.format(executable_path), check=True, shell=True)
