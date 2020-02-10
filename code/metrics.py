@@ -4,7 +4,7 @@ from PIL import Image
 from msssim import MultiScaleSSIM
 
 
-def evaluate(submission_images, target_images, settings={}):
+def evaluate(submission_images, target_images, settings={}, logger=None):
 	"""
 	Calculates metrics for the given images.
 	"""
@@ -30,7 +30,13 @@ def evaluate(submission_images, target_images, settings={}):
 		if 'PSNR' in metrics:
 			sqerror_values.append(mse(image1, image0))
 		if 'MSSSIM' in metrics:
-			msssim_values.append(msssim(image0, image1) * image0.size)
+			value = msssim(image0, image1) * image0.size
+			if np.isnan(value):
+				value = 0.0
+				if logger:
+					logger.warning(
+						f'Evaluation of MSSSIM for `{name}` returned NaN. Assuming MSSSIM is zero.')
+			msssim_values.append(value)
 
 	results = {}
 

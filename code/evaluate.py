@@ -106,7 +106,7 @@ def main(args):
 
 			if image_size != target_size:
 				logger.error(
-					'Image {name} has incorrect size ({image_size} instead of {target_size}).'.format(
+					'Image {name} has incorrect size ({image_size} instead of {target_size})'.format(
 						name=name,
 						image_size='x'.join(image_size),
 						target_size='x'.join(target_size)))
@@ -116,14 +116,15 @@ def main(args):
 
 		# start actual evaluation
 		logger.info('Running evaluation')
-		results = evaluate(submission_images, target_images, settings=submission.phase.settings)
+		results = evaluate(
+			submission_images, target_images, settings=submission.phase.settings, logger=logger)
 
 		with transaction.atomic():
 			for metric, value in results.items():
 				logger.info(f'{metric}: {value}')
 
 				if np.isnan(value):
-					logger.warning(f'Evaluation of {metric} failed.')
+					logger.warning(f'Evaluation of {metric} failed')
 					continue
 
 				measurement = Measurement(
