@@ -57,8 +57,14 @@ class SubmitForm(forms.Form):
 		self.cleaned_data['data_size'] = 0
 		for file in self.files.getlist('data'):
 			self.cleaned_data['data_size'] += file.size
-		self.cleaned_data['decoder_size'] = self.files['decoder'].size
-		self.cleaned_data['decoder_hash'] = utils.hash_uploaded_file(self.files['decoder'])
+
+		if 'decoder' in self.files:
+			self.cleaned_data['decoder_size'] = self.files['decoder'].size
+			self.cleaned_data['decoder_hash'] = utils.hash_uploaded_file(self.files['decoder'])
+		else:
+			self.cleaned_data['decoder_size'] = 0
+			self.cleaned_data['decoder_hash'] = ''
+			self.add_error('decoder', ValidationError('Please select a file'))
 
 		if self.cleaned_data['phase'].decoder_fixed:
 			submissions = models.Submission.objects.filter(
