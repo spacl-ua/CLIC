@@ -13,6 +13,13 @@ image_path_in = tf.placeholder(tf.string)
 image = tf.io.read_file(image_path_in)
 image = tf.image.decode_image(image)
 
+filters = tf.zeros([1, 1, 3, 3])
+
+image = tf.cast(image, 'float32')
+image = tf.expand_dims(image, axis=0)
+image = tf.nn.conv2d(image, filters, 1, padding='SAME')
+image = tf.cast(image[0], 'uint8')
+
 # save image
 image_path_out = tf.placeholder(tf.string)
 image = tf.image.encode_png(image)
