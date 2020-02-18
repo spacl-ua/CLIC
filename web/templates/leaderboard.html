@@ -35,7 +35,11 @@
 					<tr>
 						<td>{{ submission.team }}</td>
 						{% for metric in metrics %}
-							<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
+							{% if metric == 'MSSSIM' %}
+								<td>{{ submission.measurements|get:metric|floatformat:4 }}</td>
+							{% else %}
+								<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
+							{% endif %}
 						{% endfor %}
 						<td>{{ submission.data_size }}</td>
 						<td>{{ submission.decoder_size }}</td>
