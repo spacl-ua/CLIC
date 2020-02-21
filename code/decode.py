@@ -15,6 +15,7 @@ import time
 import traceback
 from argparse import ArgumentParser
 from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
+from tempfile import mkdtemp
 from utils import get_logger, get_submission, sql_setup
 from zipfile import ZipFile
 
@@ -57,7 +58,8 @@ DECODE_CMD = {True: DECODE_CMD_GPU, False: DECODE_CMD_CPU}
 
 
 def main(args):
-	logger = get_logger(debug=args.debug)
+	log_file = os.path.join(mkdtemp(), '.log_decode')
+	logger = get_logger(debug=args.debug, filename=log_file)
 
 	try:
 		logger.debug('Connecting to SQL database')
@@ -232,6 +234,9 @@ def main(args):
 
 	finally:
 		# copy (intermediate) results back to submission directory
+		run('mv {log_file} {work_dir}'.format(log_file=log_file, work_dir=work_dir),
+			check=False,
+			shell=True)
 		run('gsutil -m rsync -e -C -R {work_dir} gs://{bucket}/{path}/'.format(
 				bucket=os.environ['BUCKET_SUBMISSIONS'],
 				path=submission.fs_path(),

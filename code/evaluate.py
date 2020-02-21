@@ -7,13 +7,15 @@ import numpy as np
 from argparse import ArgumentParser
 from glob import glob
 from subprocess import run, PIPE
+from tempfile import mkdtemp
 from utils import get_logger, get_submission, sql_setup
 from PIL import Image
 from metrics import evaluate
 
 
 def main(args):
-	logger = get_logger(debug=args.debug)
+	log_file = os.path.join(mkdtemp(), '.log_evaluate')
+	logger = get_logger(debug=args.debug, filename=log_file)
 
 	try:
 		logger.debug('Connecting to SQL database')
@@ -41,7 +43,15 @@ def main(args):
 		logger.debug(traceback.format_exc())
 		return 1
 
-	# mount submission
+	# ativate service account (needed for gsutil)
+	run('gcloud auth activate-service-account --quiet --key-file={key_file}'.format(
+			key_file=os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')),
+		stdout=PIPE,
+		stderr=PIPE,
+		check=False,
+		shell=True)
+
+	# obtain submission
 	logger.info('Obtaining decoded images')
 	submission_dir = '/submission'
 	run('mkdir -p {dir}'.format(dir=submission_dir), shell=True)
@@ -54,7 +64,7 @@ def main(args):
 		check=True,
 		shell=True)
 
-	# mount target images
+	# obtain target images
 	logger.info('Obtaining target images')
 	target_dir = '/target'
 	run('mkdir -p {dir}'.format(dir=target_dir), shell=True)
@@ -135,6 +145,17 @@ def main(args):
 		return 1
 
 	finally:
+		# store logs
+		run('gsutil cp {log_file} gs://{bucket}/{path}/'.format(
+				log_file=log_file,
+				bucket=os.environ['BUCKET_SUBMISSIONS'],
+				path=submission.fs_path()),
+			stdout=PIPE,
+			stderr=PIPE,
+			check=False,
+			shell=True)
+		run('rm {log_file}'.format(log_file=log_file), check=False, shell=True)
+
 		# unmount buckets
 		run('rm -rf {}'.format(submission_dir), shell=True)
 		run('rm -rf {}'.format(target_dir), shell=True)
