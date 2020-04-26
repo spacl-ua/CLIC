@@ -108,8 +108,8 @@ def main(args):
 				logger.error(
 					'Image {name} has incorrect size ({image_size} instead of {target_size})'.format(
 						name=name,
-						image_size='x'.join(image_size),
-						target_size='x'.join(target_size)))
+						image_size='x'.join(map(str, image_size)),
+						target_size='x'.join(map(str, target_size))))
 				submission.status = Submission.STATUS_EVALUATION_FAILED
 				submission.save()
 				return 1
