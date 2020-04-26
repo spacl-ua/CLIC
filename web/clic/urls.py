@@ -15,6 +15,7 @@ urlpatterns = [
 	path('submissions/', views.submissions_list, name='submissions'),
 	path('leaderboard/<task>/<phase>/', views.leaderboard, name='leaderboard'),
 	path('schedule/<pk>/', views.schedule, name='schedule'),
+	path('publications/', include('publications.urls'), name='publications'),
 ]
 
 if settings.DEBUG:
