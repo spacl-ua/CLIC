@@ -56,7 +56,8 @@ kubectl create secret generic cloudsql \
 kubectl create secret generic buckets \
 	--from-literal BUCKET_SUBMISSIONS="clic2020_submissions" \
 	--from-literal BUCKET_TARGETS="clic2020_targets" \
-	--from-literal BUCKET_ENVIRONMENTS="clic2020_environments"
+	--from-literal BUCKET_ENVIRONMENTS="clic2020_environments" \
+	--from-literal BUCKET_PUBLIC="clic2020_public"
 
 # add other secret information used by webserver
 kubectl create secret generic django --from-literal secret_key="$SECRET_KEY"

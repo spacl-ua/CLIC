@@ -58,6 +58,7 @@ docker run \
 	-e DB_HOST="host.docker.internal" \
 	-e DB_PORT="5432" \
 	-e BUCKET_SUBMISSIONS="clic2020_submissions" \
+	-e BUCKET_PUBLIC="clic2020_public" \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e SECRET_KEY="${SECRET_KEY}" \
 	-e DEBUG=1 \

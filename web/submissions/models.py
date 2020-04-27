@@ -1,6 +1,7 @@
 import os
 import re
 
+from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
@@ -145,7 +146,7 @@ class Submission(models.Model):
 @receiver(post_delete, sender=Submission, dispatch_uid='delete_submission')
 def delete_submission(sender, instance, **kwargs):
 	# delete files corresponding to submission
-	fs = GoogleCloudStorage()
+	fs = GoogleCloudStorage(bucket_name=settings.GS_BUCKET_SUBMISSIONS)
 	blobs = fs.bucket.list_blobs(prefix=instance.fs_path())
 	for blob in blobs:
 		blob.delete()

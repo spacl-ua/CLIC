@@ -109,6 +109,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
+MEDIA_URL = 'http://storage.googleapis.com/clic2020_public/'
 STATIC_URL = '/static/' if DEBUG else 'http://storage.googleapis.com/clic2020_public/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
@@ -116,7 +117,9 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 
 # Google Cloud Storage
 # https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
-GS_BUCKET_NAME = os.environ.get('BUCKET_SUBMISSIONS')
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_BUCKET_NAME = os.environ.get('BUCKET_PUBLIC')
+GS_BUCKET_SUBMISSIONS = os.environ.get('BUCKET_SUBMISSIONS')
 GS_MAX_MEMORY_SIZE = 10000000
 GS_BLOB_CHUNK_SIZE = 1048576
 

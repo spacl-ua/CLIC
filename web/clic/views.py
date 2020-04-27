@@ -3,6 +3,7 @@ import yaml
 from collections import defaultdict
 
 from django.contrib.auth import login, authenticate
+from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import transaction
@@ -94,7 +95,7 @@ def submit(request, **kwargs):
 	submission.save()
 
 	# submission will be stored here
-	fs = GoogleCloudStorage()
+	fs = GoogleCloudStorage(bucket_name=settings.GS_BUCKET_SUBMISSIONS)
 	fs_path = submission.fs_path()
 
 	# upload encoded image files to storage bucket
