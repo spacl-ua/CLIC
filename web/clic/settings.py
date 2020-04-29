@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 	'pagedown',
 	'markdown_deux',
 	'publications',
+	'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -37,6 +38,14 @@ MIDDLEWARE = [
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 	'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
+
+if DEBUG:
+	# Django Debug Toolbar
+	# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+	# https://stackoverflow.com/questions/26898597/django-debug-toolbar-and-docker
+	import socket
+	INTERNAL_IPS = [socket.gethostbyname(socket.gethostname())[:-1] + '1']
+	MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 ROOT_URLCONF = 'clic.urls'
 
