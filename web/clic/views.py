@@ -215,6 +215,7 @@ def leaderboard(request, task, phase):
 	try:
 		task = submissions.models.Task.objects.filter(name=task)[0]
 		phase = submissions.models.Phase.objects.filter(name=phase, task=task)[0]
+		phase.task = task
 	except IndexError:
 		raise Http404('Could not find task.')
 
@@ -222,11 +223,10 @@ def leaderboard(request, task, phase):
 		raise PermissionDenied()
 
 	subs = submissions.models.Submission.objects.filter(
-		task=task,
 		phase=phase,
 		hidden=False,
 		status=submissions.models.Submission.STATUS_SUCCESS)
-	subs = subs.prefetch_related('measurement_set')
+	subs = subs.prefetch_related('measurement_set', 'team')
 	subs_best = defaultdict(lambda: submissions.models.Measurement(value=float("-inf")))
 
 	metrics = set()
