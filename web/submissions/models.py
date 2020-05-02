@@ -105,6 +105,7 @@ class Submission(models.Model):
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_WAITING)
+	link = models.CharField(max_length=512, blank=True)
 
 	def job_name(self):
 		"""

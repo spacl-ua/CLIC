@@ -33,7 +33,11 @@
 			<tbody>
 				{% for submission in submissions %}
 					<tr>
-						<td>{{ submission.team }}</td>
+						{% if submission.link %}
+							<td><a href="{{ submission.link }}">{{ submission.team }}</a></td>
+						{% else %}
+							<td>{{ submission.team }}</td>
+						{% endif %}
 						{% for metric in metrics %}
 							{% if metric == 'MSSSIM' %}
 								<td>{{ submission.measurements|get:metric|floatformat:4 }}</td>
