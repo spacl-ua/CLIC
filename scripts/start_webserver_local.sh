@@ -66,14 +66,13 @@ docker run \
 	-v "$(pwd)/web":"$(pwd)/web" \
 	-p 8000:8000 \
 	gcr.io/clic-215616/web \
-	/bin/bash
-#	gunicorn \
-#		--bind :8000 \
-#		--worker-class gevent \
-#		--workers 2 \
-#		--timeout 600 \
-#		--reload \
-#		--log-level DEBUG \
-#		clic.wsgi
+	gunicorn \
+		--bind :8000 \
+		--worker-class gevent \
+		--workers 2 \
+		--timeout 600 \
+		--reload \
+		--log-level DEBUG \
+		clic.wsgi
 
 docker stop cloudsql
