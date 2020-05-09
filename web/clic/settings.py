@@ -31,7 +31,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.cache.UpdateCacheMiddleware',
 	'django.middleware.common.CommonMiddleware',
+	'django.middleware.cache.FetchFromCacheMiddleware',
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
@@ -87,6 +89,18 @@ DATABASES = {
 		'PASSWORD': os.environ.get('DB_PASSWORD'),
 		'HOST': os.environ.get('DB_HOST'),
 		'PORT': os.environ.get('DB_PORT', 3306),
+	}
+}
+
+
+# Caching
+# https://docs.djangoproject.com/en/2.2/topics/cache/#local-memory-caching
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 60
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
+CACHES = {
+	'default': {
+		'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
 	}
 }
 

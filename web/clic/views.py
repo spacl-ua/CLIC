@@ -226,7 +226,7 @@ def leaderboard(request, task, phase):
 		phase=phase,
 		hidden=False,
 		status=submissions.models.Submission.STATUS_SUCCESS)
-	subs = subs.prefetch_related('measurement_set', 'team')
+	subs = subs.prefetch_related('measurement_set').select_related('team')
 	subs_best = defaultdict(lambda: submissions.models.Measurement(value=float("-inf")))
 
 	metrics = set()

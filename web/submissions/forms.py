@@ -7,18 +7,24 @@ from . import models, utils
 
 class SubmitForm(forms.Form):
 	team = forms.ModelChoiceField(
-		teams.models.Team.objects.all(), empty_label=None)
+		teams.models.Team.objects.all(),
+		empty_label=None)
 	phase = forms.ModelChoiceField(
-		models.Phase.objects.filter(active=True), empty_label=None,
+		models.Phase.objects.filter(active=True),
+		empty_label=None,
 		label="Task and phase")
 	decoder = forms.FileField(
 		help_text='An executable or a zip file containing an executable named \'decode\'')
 	data = forms.FileField(
 		widget=forms.ClearableFileInput(attrs={'multiple': True}),
 		help_text='Files representing the encoded images')
-	docker_image = forms.ModelChoiceField(models.DockerImage.objects.filter(active=True), empty_label=None,
+	docker_image = forms.ModelChoiceField(
+		models.DockerImage.objects.filter(active=True),
+		empty_label=None,
 		help_text='The environment in which your decoder will be run')
-	hidden = forms.BooleanField(help_text='Hide submission from leaderboard', required=False)
+	hidden = forms.BooleanField(
+		help_text='Hide submission from leaderboard',
+		required=False)
 
 	def __init__(self, *args, **kwargs):
 		self.user = kwargs.pop('user', None)
@@ -26,7 +32,9 @@ class SubmitForm(forms.Form):
 		super(SubmitForm, self).__init__(*args, **kwargs)
 
 		if getattr(self.user, 'is_staff', False):
-			self.fields['phase'].queryset = models.Phase.objects.order_by('task').all()
+			# make all tasks and phases available to staff
+			self.fields['phase'].queryset = \
+				models.Phase.objects.order_by('task').all().select_related('task')
 			self.fields['docker_image'].queryset = models.DockerImage.objects.all()
 		else:
 			# remove fields only staff should be able to see
