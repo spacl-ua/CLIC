@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
+from django.views.generic.base import RedirectView
 
 from . import views, settings
 
@@ -14,6 +15,7 @@ urlpatterns = [
 	path('submission/<pk>/', views.submission),
 	path('submissions/', views.submissions_list, name='submissions'),
 	path('leaderboard/<task>/<phase>/', views.leaderboard, name='leaderboard'),
+	path('leaderboard/', RedirectView.as_view(url='/leaderboard/lowrate/valid/', permanent=False)),
 	path('schedule/<pk>/', views.schedule, name='schedule'),
 	path('publications/', include('publications.urls'), name='publications'),
 ]
