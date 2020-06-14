@@ -25,10 +25,13 @@
 			<a href="#" class="nav-link dropdown-toggle" id="lbMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Leaderboard</a>
 			<div class="dropdown-menu" aria-labelledby="lbMenu">
 				{% for phase in phases %}
-				<a class="dropdown-item{% if phase.task.name in request.path %} active{% endif %}" href="/leaderboard/{{ phase.task.name }}/{{ phase.name }}/">{{ phase }}</a>
+				<a class="dropdown-item{% if phase.task.name in request.path and phase.name in request.path %} active{% endif %}" href="/leaderboard/{{ phase.task.name }}/{{ phase.name }}/">{{ phase }}</a>
 				{% endfor %}
 			</div>
 		</div>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="/publications">Papers</a>
 	</li>
 	<li class="nav-item">
 		<a class="nav-link" href="https://groups.google.com/forum/#!forum/clic-2020">Forum</a>

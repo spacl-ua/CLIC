@@ -15,7 +15,7 @@ urlpatterns = [
 	path('submission/<pk>/', views.submission),
 	path('submissions/', views.submissions_list, name='submissions'),
 	path('leaderboard/<task>/<phase>/', views.leaderboard, name='leaderboard'),
-	path('leaderboard/', RedirectView.as_view(url='/leaderboard/lowrate/valid/', permanent=False)),
+	path('leaderboard/', RedirectView.as_view(url='/leaderboard/lowrate/test/', permanent=False)),
 	path('schedule/<pk>/', views.schedule, name='schedule'),
 	path('publications/', include('publications.urls'), name='publications'),
 ]
