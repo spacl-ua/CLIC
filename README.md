@@ -19,9 +19,9 @@ In the Google Cloud console, you can enable public access to the Docker images u
 
 Create the following storage buckets:
 
-	gsutil mb gs://clic2020_targets
-	gsutil mb gs://clic2020_environments
-	gsutil mb gs://clic2020_submissions
+	gsutil mb gs://clic2021_targets
+	gsutil mb gs://clic2021_environments
+	gsutil mb gs://clic2021_submissions
 
 For each task and phase, create folders `<task>/<phase>/` and upload corresponding files into these
 directories. The first bucket contains the target images, the second bucket contains any extra files
@@ -39,7 +39,7 @@ Change the root password:
 
 Create a database for this year's competition:
 
-	gcloud sql databases create clic2020 --instance clic
+	gcloud sql databases create clic2021 --instance clic
 
 # 5. Create kubernetes cluster
 
@@ -56,7 +56,7 @@ the server, run:
 
 Create a public storage bucket to host static content:
 
-	gsutil mb gs://clic2020_public
+	gsutil mb gs://clic2021_public
 	gsutil iam ch allUsers:objectViewer gs://clic2020_public
 
 Start webserver:

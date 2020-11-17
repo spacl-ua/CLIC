@@ -5,7 +5,7 @@ read -p "Please enter the SQL username [root]: " DB_USER
 read -p "Please enter the SQL password: " DB_PASSWORD
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_USER=${DB_USER:-root}
-DB_NAME="clic2020"
+DB_NAME="clic2021"
 
 if [ ! -f service-account.json ]; then
 	# create service account key file
@@ -34,9 +34,9 @@ gcloud container node-pools create gpu-pool \
 	--accelerator type=nvidia-tesla-p100,count=1 \
 	--cluster clic-cluster \
 	--enable-autoscaling \
-	--min-nodes 1 \
+	--min-nodes 0 \
 	--max-nodes 8 \
-	--num-nodes 1 \
+	--num-nodes 0 \
 	--verbosity error
 
 # install nvidia drivers on GPU nodes
@@ -54,10 +54,10 @@ kubectl create secret generic cloudsql \
 
 # add bucket names
 kubectl create secret generic buckets \
-	--from-literal BUCKET_SUBMISSIONS="clic2020_submissions" \
-	--from-literal BUCKET_TARGETS="clic2020_targets" \
-	--from-literal BUCKET_ENVIRONMENTS="clic2020_environments" \
-	--from-literal BUCKET_PUBLIC="clic2020_public"
+	--from-literal BUCKET_SUBMISSIONS="clic2021_submissions" \
+	--from-literal BUCKET_TARGETS="clic2021_targets" \
+	--from-literal BUCKET_ENVIRONMENTS="clic2021_environments" \
+	--from-literal BUCKET_PUBLIC="clic2021_public"
 
 # add other secret information used by webserver
 kubectl create secret generic django --from-literal secret_key="$SECRET_KEY"

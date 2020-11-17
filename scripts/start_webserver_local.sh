@@ -22,8 +22,8 @@ if [ -z "$DB_PASSWORD" ]; then
 fi
 
 if [ -z "$DB_NAME" ]; then
-	DB_NAME=clic2020
-	read -p "Please enter the SQL database [clic2020]: " DB_NAME
+	DB_NAME=clic2021
+	read -p "Please enter the SQL database [clic2021]: " DB_NAME
 fi
 
 if [ -z "$SECRET_KEY" ]; then
@@ -57,8 +57,8 @@ docker run \
 	-e DB_PASSWORD="${DB_PASSWORD}" \
 	-e DB_HOST="host.docker.internal" \
 	-e DB_PORT="5432" \
-	-e BUCKET_SUBMISSIONS="clic2020_submissions" \
-	-e BUCKET_PUBLIC="clic2020_public" \
+	-e BUCKET_SUBMISSIONS="clic2021_submissions" \
+	-e BUCKET_PUBLIC="clic2021_public" \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e SECRET_KEY="${SECRET_KEY}" \
 	-e DEBUG=1 \
