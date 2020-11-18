@@ -46,7 +46,7 @@ kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container
 kubectl create secret generic clic-sa-key --from-file service-account.json
 
 # add SQL account information to kubernetes
-kubectl create secret generic cloudsql \
+kubectl create secret generic cloudsql-clic2020 \
 	--from-literal DB_USER="$DB_USER" \
 	--from-literal DB_PASSWORD="$DB_PASSWORD" \
 	--from-literal DB_INSTANCE="$DB_INSTANCE" \
@@ -60,8 +60,8 @@ kubectl create secret generic buckets \
 	--from-literal BUCKET_PUBLIC="clic2021_public"
 
 # add other secret information used by webserver
-kubectl create secret generic django --from-literal secret_key="$SECRET_KEY"
-kubectl create secret generic sentry --from-literal dsn="$SENTRY_DSN"
+kubectl create secret generic django-clic2020 --from-literal secret_key="$SECRET_KEY"
+kubectl create secret generic sentry-clic2020 --from-literal dsn="$SENTRY_DSN"
 
 # add evaluation code to kubernetes
-kubectl create configmap code --from-file code/
+kubectl create configmap code-clic2020 --from-file code/

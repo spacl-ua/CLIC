@@ -12,10 +12,10 @@ if [ ! -f service-account.json ]; then
 fi
 
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
-DB_NAME=$(kubectl get secrets cloudsql -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -D -)
-DB_PASSWORD=$(kubectl get secrets cloudsql -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -D -)
-SECRET_KEY=$(kubectl get secrets django -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
-SENTRY_DSN=$(kubectl get secrets sentry -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -D -)
+DB_NAME=$(kubectl get secrets cloudsql-clic2020 -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -D -)
+DB_PASSWORD=$(kubectl get secrets cloudsql-clic2020 -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -D -)
+SECRET_KEY=$(kubectl get secrets django-clic2020 -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
+SENTRY_DSN=$(kubectl get secrets sentry-clic2020 -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -D -)
 
 if [ -z "$DB_PASSWORD" ]; then
 	read -p "Please enter the SQL password: " DB_PASSWORD

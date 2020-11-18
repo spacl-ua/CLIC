@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: clic
@@ -38,20 +38,20 @@ spec:
           - name: SECRET_KEY
             valueFrom:
               secretKeyRef:
-                name: django
+                name: django-clic2020
                 key: secret_key
           - name: SENTRY_DSN
             valueFrom:
               secretKeyRef:
-                name: sentry
+                name: sentry-clic2020
                 key: dsn
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: "/var/run/secret/cloud.google.com/service-account.json"
         envFrom:
           - secretRef:
-              name: cloudsql
+              name: cloudsql-clic2020
           - secretRef:
-              name: buckets
+              name: buckets-clic2020
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
@@ -94,6 +94,9 @@ spec:
             path: /etc/ssl/certs
         - name: cloudsql
           emptyDir:
+  selector:
+    matchLabels:
+      app: clic
 
 ---
 
