@@ -52,7 +52,13 @@ the server, run:
 
 	./scripts/delete_cluster.sh
 
-# 6. Start webserver
+# 6. Create SQL tables
+
+Create database tables:
+
+  ./scripts/tables.sh
+
+# 7. Start webserver
 
 Create a public storage bucket to host static content:
 
@@ -61,6 +67,16 @@ Create a public storage bucket to host static content:
 
 Start webserver:
 
-	./scripts/start_webserver.sh
+	./scripts/restart_webserver.sh
 
-This script will automatically upload static content and request a static IP address for the server.
+This script will automatically upload static content and request a static IP address
+for the server.
+
+The same script can be used to restart the webserver if its configuration is changed.
+Note that most changes to the webserver require rebuilding the Docker images first.
+
+# 8. Debugging
+
+If there is an issue with the website, it is often easier to debug it locally:
+
+  ./scripts/start_webserver_local.sh

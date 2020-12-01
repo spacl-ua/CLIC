@@ -31,6 +31,8 @@ spec:
             "--log-level", "DEBUG",
             "clic.wsgi"]
         env:
+          - name: DEBUG
+            value: "True"
           - name: DB_HOST
             value: "127.0.0.1"
           - name: DB_PORT

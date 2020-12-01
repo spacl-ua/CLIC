@@ -1,5 +1,7 @@
 #!/bin/sh
 
+LABEL=clic2021
+
 if [ ! -f service-account.json ]; then
 	# create service account key file
 	if ( kubectl get secret clic-sa-key 2>&1 > /dev/null ); then
@@ -12,18 +14,18 @@ if [ ! -f service-account.json ]; then
 fi
 
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
-DB_NAME=$(kubectl get secrets cloudsql-clic2020 -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -D -)
-DB_PASSWORD=$(kubectl get secrets cloudsql-clic2020 -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -D -)
-SECRET_KEY=$(kubectl get secrets django-clic2020 -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
-SENTRY_DSN=$(kubectl get secrets sentry-clic2020 -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -D -)
+DB_NAME=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -D -)
+DB_PASSWORD=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -D -)
+SECRET_KEY=$(kubectl get secrets django-${LABEL} -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
+SENTRY_DSN=$(kubectl get secrets sentry-${LABEL} -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -D -)
 
 if [ -z "$DB_PASSWORD" ]; then
 	read -p "Please enter the SQL password: " DB_PASSWORD
 fi
 
 if [ -z "$DB_NAME" ]; then
-	DB_NAME=clic2021
-	read -p "Please enter the SQL database [clic2021]: " DB_NAME
+	DB_NAME=${LABEL}
+	read -p "Please enter the SQL database [${LABEL}]: " DB_NAME
 fi
 
 if [ -z "$SECRET_KEY" ]; then
@@ -57,8 +59,8 @@ docker run \
 	-e DB_PASSWORD="${DB_PASSWORD}" \
 	-e DB_HOST="host.docker.internal" \
 	-e DB_PORT="5432" \
-	-e BUCKET_SUBMISSIONS="clic2021_submissions" \
-	-e BUCKET_PUBLIC="clic2021_public" \
+	-e BUCKET_SUBMISSIONS="${LABEL}_submissions" \
+	-e BUCKET_PUBLIC="${LABEL}_public" \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e SECRET_KEY="${SECRET_KEY}" \
 	-e DEBUG=1 \
