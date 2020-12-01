@@ -1,11 +1,13 @@
 #!/bin/bash
 
+LABEL=clic2021
+
 # request some information
 read -p "Please enter the SQL username [root]: " DB_USER
 read -p "Please enter the SQL password: " DB_PASSWORD
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_USER=${DB_USER:-root}
-DB_NAME="clic2021"
+DB_NAME="${LABEL}"
 
 if [ ! -f service-account.json ]; then
 	# create service account key file
@@ -46,22 +48,22 @@ kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container
 kubectl create secret generic clic-sa-key --from-file service-account.json
 
 # add SQL account information to kubernetes
-kubectl create secret generic cloudsql-clic2020 \
+kubectl create secret generic cloudsql-${LABEL} \
 	--from-literal DB_USER="$DB_USER" \
 	--from-literal DB_PASSWORD="$DB_PASSWORD" \
 	--from-literal DB_INSTANCE="$DB_INSTANCE" \
 	--from-literal DB_NAME="$DB_NAME"
 
 # add bucket names
-kubectl create secret generic buckets \
-	--from-literal BUCKET_SUBMISSIONS="clic2021_submissions" \
-	--from-literal BUCKET_TARGETS="clic2021_targets" \
-	--from-literal BUCKET_ENVIRONMENTS="clic2021_environments" \
-	--from-literal BUCKET_PUBLIC="clic2021_public"
+kubectl create secret generic buckets-${LABEL} \
+	--from-literal BUCKET_SUBMISSIONS="${LABEL}_submissions" \
+	--from-literal BUCKET_TARGETS="${LABEL}_targets" \
+	--from-literal BUCKET_ENVIRONMENTS="${LABEL}_environments" \
+	--from-literal BUCKET_PUBLIC="${LABEL}_public"
 
 # add other secret information used by webserver
-kubectl create secret generic django-clic2020 --from-literal secret_key="$SECRET_KEY"
-kubectl create secret generic sentry-clic2020 --from-literal dsn="$SENTRY_DSN"
+kubectl create secret generic django-${LABEL} --from-literal secret_key="$SECRET_KEY"
+kubectl create secret generic sentry-${LABEL} --from-literal dsn="$SENTRY_DSN"
 
 # add evaluation code to kubernetes
-kubectl create configmap code-clic2020 --from-file code/
+kubectl create configmap code-${LABEL} --from-file code/
