@@ -1,44 +1,50 @@
-<ul class="navbar-nav mr-auto">
-	<li class="nav-item{% if request.resolver_match.url_name == "home" %} active{% endif %}">
-		<a class="nav-link" href="/">Submit</a>
-	</li>
-	{% if user.is_authenticated %}
-		<li class="nav-item{% if request.resolver_match.url_name == "submissions" %} active{% endif %}">
-			<a class="nav-link" href="/submissions">Submissions</a>
-		</li>
-	{% endif %}
+<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+	<span>Workshop</span>
+</h6>
+<ul class="nav flex-column">
 	<li class="nav-item">
-		<div class="dropdown{% if request.path in "/tasks/,/motivation/,/prizes/,/faq/,/instructions/" and request.path != '/' %} active{% endif %}">
-			<a href="#" class="nav-link dropdown-toggle" id="chMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Challenge</a>
-			<div class="dropdown-menu" aria-labelledby="chMenu">
-				<a class="dropdown-item{% if request.path == '/motivation/' %} active{% endif %}" href="/motivation/">Motivation</a>
-				<a class="dropdown-item{% if request.path == '/tasks/' %} active{% endif %}" href="/tasks/">Tasks</a>
-				<a class="dropdown-item{% if request.path == '/instructions/' %} active{% endif %}" href="/instructions/">Instructions</a>
-				<a class="dropdown-item{% if request.path == '/prizes/' %} active{% endif %}" href="/prizes/">Prizes</a>
-				<a class="dropdown-item{% if request.path == '/faq/' %} active{% endif %}" href="/faq/">FAQ</a>
-				<a class="dropdown-item{% if request.path == '/schedule/1/' %} active{% endif %}" href="/schedule/1/">Schedule</a>
-			</div>
-		</div>
+		<a class="nav-link active" href="#">
+			<span data-feather="home"></span>
+			Dashboard <span class="sr-only">(current)</span>
+		</a>
 	</li>
 	<li class="nav-item">
-		<div class="dropdown{% if request.resolver_match.url_name == "leaderboard" %} active{% endif %}">
-			<a href="#" class="nav-link dropdown-toggle" id="lbMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Leaderboard</a>
-			<div class="dropdown-menu" aria-labelledby="lbMenu">
-				{% for phase in phases %}
-				<a class="dropdown-item{% if phase.task.name in request.path and phase.name in request.path %} active{% endif %}" href="/leaderboard/{{ phase.task.name }}/{{ phase.name }}/">{{ phase }}</a>
-				{% endfor %}
-			</div>
-		</div>
-	</li>
-	<li class="nav-item">
-		<a class="nav-link" href="/publications">Papers</a>
-	</li>
-	<li class="nav-item">
-		<a class="nav-link" href="https://groups.google.com/forum/#!forum/clic-2020">Forum</a>
+		<a class="nav-link" href="/publications/">Papers</a>
 	</li>
 </ul>
-{% if user.is_authenticated %}
-	<a class="nav-link" href="{% url 'logout' %}">Logout</a>
-{% else %}
-	<a class="nav-link" href="{% url 'signup' %}">Sign up</a>
-{% endif %}
+
+<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+	<span>Challenge</span>
+</h6>
+<ul class="nav flex-column mb-2">
+	<li class="nav-item">
+		<a class="nav-link" href="/tasks/">
+			<span data-feather="file-text"></span>
+			Tasks
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="/leaderboard/">
+			<span data-feather="file-text"></span>
+			Leaderboards
+		</a>
+	</li>
+</ul>
+
+<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+	<span>Past events</span>
+</h6>
+<ul class="nav flex-column mb-2">
+	<li class="nav-item">
+		<a class="nav-link" href="#">
+			<span data-feather="file-text"></span>
+			CLIC 2020 (Challenge)
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="#">
+			<span data-feather="file-text"></span>
+			CLIC 2020 (Workshop)
+		</a>
+	</li>
+</ul>
