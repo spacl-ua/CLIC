@@ -41,7 +41,7 @@ def signup(request):
 	return render(request, 'registration/signup.html', {'form': form})
 
 
-def home(request):
+def submit(request):
 	status = 200
 
 	if request.user.is_authenticated:
@@ -52,7 +52,7 @@ def home(request):
 				user=request.user)
 
 			if form.is_valid():
-				return submit(request, **form.cleaned_data)
+				return create_job(request, **form.cleaned_data)
 			else:
 				status = 422
 		else:
@@ -62,10 +62,10 @@ def home(request):
 	else:
 		form = teams.forms.AuthenticationForm()
 
-	return render(request, 'home.html', {'form': form}, status=status)
+	return render(request, 'submit.html', {'form': form}, status=status)
 
 
-def submit(request, **kwargs):
+def create_job(request, **kwargs):
 	"""
 	Creates a kubernetes job running the decoder
 	"""

@@ -6,7 +6,7 @@ from django.views.generic.base import RedirectView
 from . import views, settings
 
 urlpatterns = [
-	path('', views.home, name='home'),
+	path('submit/', views.submit, name='submit'),
 	path('signup/', views.signup, name='signup'),
 	path('admin/', admin.site.urls),
 	path('accounts/', include('django.contrib.auth.urls')),

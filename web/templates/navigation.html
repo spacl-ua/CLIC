@@ -3,13 +3,14 @@
 </h6>
 <ul class="nav flex-column">
 	<li class="nav-item">
-		<a class="nav-link active" href="#">
-			<span data-feather="home"></span>
-			Dashboard <span class="sr-only">(current)</span>
+		<a class="nav-link{% if request.path == '/' %} active{% endif %}" href="#">
+			<i data-feather="home"></i> Home
 		</a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link" href="/publications/">Papers</a>
+		<a class="nav-link{% if request.path == '/publications/' %} active{% endif %}" href="/publications/">
+			<i data-feather="book-open"></i> Papers
+		</a>
 	</li>
 </ul>
 
@@ -18,15 +19,28 @@
 </h6>
 <ul class="nav flex-column mb-2">
 	<li class="nav-item">
-		<a class="nav-link" href="/tasks/">
-			<span data-feather="file-text"></span>
-			Tasks
+		<a class="nav-link{% if request.path == '/introduction/' %} active{% endif %}" href="/tasks/">
+			<i data-feather="file-text"></i> Introduction
 		</a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link" href="/leaderboard/">
-			<span data-feather="file-text"></span>
-			Leaderboards
+		<a class="nav-link{% if request.path == '/tasks/' %} active{% endif %}" href="/tasks/">
+			<i data-feather="file-text"></i> Tasks
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link{% if request.resolver_match.url_name == "leaderboards" %} active{% endif %}" href="/leaderboard/">
+			<i data-feather="align-justify"></i> Leaderboards
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link{% if request.path == '/faq/' %} active{% endif %}" href="/faq/">
+			<i data-feather="help-circle"></i> FAQ
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link{% if request.resolver_match.url_name == "submit" %} active{% endif %}" href="/submit/">
+			<i data-feather="upload"></i> Submit
 		</a>
 	</li>
 </ul>
@@ -36,15 +50,21 @@
 </h6>
 <ul class="nav flex-column mb-2">
 	<li class="nav-item">
-		<a class="nav-link" href="#">
-			<span data-feather="file-text"></span>
-			CLIC 2020 (Challenge)
+		<a class="nav-link" href="http://compression.cc/2020/">
+			<i data-feather="link"></i>
+			CLIC 2020
 		</a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link" href="#">
-			<span data-feather="file-text"></span>
-			CLIC 2020 (Workshop)
+		<a class="nav-link" href="http://compression.cc/2019/">
+			<i data-feather="link"></i>
+			CLIC 2019
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="http://compression.cc/2018/">
+			<i data-feather="link"></i>
+			CLIC 2018
 		</a>
 	</li>
 </ul>
