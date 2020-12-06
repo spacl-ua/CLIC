@@ -1,27 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card mb-3">
-	<h5 class="card-header">Schedule</h5>
-	<div class="card-body">
-		{% for entry in schedule.entry_set.all %}
-			<div class="row{% if entry.passed %} text-muted{% endif %}">
-				<div class="col-2">
-					{% if entry.custom %}
-						{{ entry.custom }}
-					{% else %}
-						{{ entry.datetime|date:"M d, Y" }}
-					{% endif %}
-				</div>
-				<div class="col-10">{{ entry.description }}</div>
+	<h2>{{ schedule.name }}</h2>
+	{% for entry in schedule.entry_set.all %}
+		<div class="row{% if entry.passed %} text-muted{% endif %}">
+			<div class="col-3">
+				{% if entry.custom %}
+					{{ entry.custom }}
+				{% else %}
+					{{ entry.datetime|date:"M d, Y" }}
+				{% endif %}
 			</div>
-			{% if not forloop.last %}
-				<hr class="mt-1 mb-1">
-			{% endif %}
-		{% endfor %}
-	</div>
-	<div class="card-footer text-muted">
+			<div class="col-7">{{ entry.description }}</div>
+		</div>
+		<hr class="mt-1 mb-1">
+	{% endfor %}
+	<div class="text-muted">
 		All deadlines are 23:59:59 PST
 	</div>
-</div>
 {% endblock %}

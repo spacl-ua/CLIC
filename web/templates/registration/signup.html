@@ -3,14 +3,10 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-	<div class="card">
-		<h5 class="card-header">Sign up</h5>
-		<div class="card-body">
-			<form method="post">
-				{% csrf_token %}
-				{{ form | crispy }}
-				<button type="submit" class="btn btn-primary">Sign up</button>
-			</form>
-		</div>
-	</div>
+	<h2>Sign up</h2>
+	<form method="post">
+		{% csrf_token %}
+		{{ form | crispy }}
+		<button type="submit" class="btn btn-primary">Sign up</button>
+	</form>
 {% endblock %}

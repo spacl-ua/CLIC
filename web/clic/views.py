@@ -239,7 +239,14 @@ def leaderboard(request, task, phase):
 			metrics.add(measurement.metric)
 	subs_best = {measurement.submission for measurement in subs_best.values()}
 
+
+	phases = submissions.models.Phase.objects.filter(hidden=False)
+
+	for p in phases:
+		p.current = (p.id == phase.id)
+
 	return render(request, 'leaderboard.html', {
+			'phases': phases,
 			'phase': phase,
 			'metrics': metrics,
 			'submissions': subs_best,

@@ -4,12 +4,7 @@
 {% load clic_tags %}
 
 {% block content %}
-	<div class="card mb-3">
-		<h5 class="card-header">{{ flatpage.title }}</h5>
-		<div class="card-body">
-		{% with flatpage.content|markdown as content %}
-			{% evaluate content %}
-		{% endwith %}
-		</div>
-	</div>
+	{% with flatpage.content|markdown as content %}
+		{% evaluate content %}
+	{% endwith %}
 {% endblock %}

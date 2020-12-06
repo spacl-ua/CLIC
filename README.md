@@ -56,7 +56,11 @@ the server, run:
 
 Create database tables:
 
-  ./scripts/tables.sh
+	python3 manage.py migrate
+
+Create an admin:
+
+	python3 manage.py createsuperuser
 
 # 7. Start webserver
 

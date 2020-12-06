@@ -7,9 +7,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="card mb-3">
-	<h5 class="card-header">Publications</h5>
-	<div class="card-body">
+	<h2>Workshop papers</h2>
+	{% if not years %}
+	<p>Papers will be published here before the workshop starts.</p>
+	{% endif %}
 	{% for year, publications in years %}
 		{% for publication in publications %}
 			<div{% if not forloop.last %} style="margin-bottom: 20px;"{% endif %}>
@@ -17,6 +18,11 @@
 			</div>
 		{% endfor %}
 	{% endfor %}
-	</div>
-</div>
+
+	<h2> Previous years</h2>
+	<ul>
+		<li><a href="https://openaccess.thecvf.com/CVPR2020_workshops/CVPR2020_w7">CLIC 2020</a></li>
+		<li><a href="https://openaccess.thecvf.com/CVPR2019_workshops/CVPR2019_CLIC_2019">CLIC 2019</a></li>
+		<li><a href="https://openaccess.thecvf.com/CVPR2018_workshops/CVPR2018_W50">CLIC 2018</a></li>
+	</ul>
 {% endblock %}

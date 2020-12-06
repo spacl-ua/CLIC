@@ -3,13 +3,18 @@
 </h6>
 <ul class="nav flex-column">
 	<li class="nav-item">
-		<a class="nav-link{% if request.path == '/' %} active{% endif %}" href="#">
+		<a class="nav-link{% if request.path == '/' %} active{% endif %}" href="/">
 			<i data-feather="home"></i> Home
 		</a>
 	</li>
 	<li class="nav-item">
 		<a class="nav-link{% if request.path == '/publications/' %} active{% endif %}" href="/publications/">
 			<i data-feather="book-open"></i> Papers
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link{% if request.path == '/schedule/2/' %} active{% endif %}" href="/schedule/2/">
+			<i data-feather="calendar"></i> Dates
 		</a>
 	</li>
 </ul>
@@ -19,7 +24,7 @@
 </h6>
 <ul class="nav flex-column mb-2">
 	<li class="nav-item">
-		<a class="nav-link{% if request.path == '/introduction/' %} active{% endif %}" href="/tasks/">
+		<a class="nav-link{% if request.path == '/introduction/' %} active{% endif %}" href="/introduction/">
 			<i data-feather="file-text"></i> Introduction
 		</a>
 	</li>
@@ -29,8 +34,18 @@
 		</a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link{% if request.resolver_match.url_name == "leaderboards" %} active{% endif %}" href="/leaderboard/">
+		<a class="nav-link{% if request.path == '/schedule/1/' %} active{% endif %}" href="/schedule/1/">
+			<i data-feather="calendar"></i> Dates
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link{% if request.resolver_match.url_name == "leaderboard" %} active{% endif %}" href="/leaderboard/lowrate/valid/">
 			<i data-feather="align-justify"></i> Leaderboards
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="https://groups.google.com/forum/#!forum/clic-2020">
+			<i data-feather="message-circle"></i> Forum
 		</a>
 	</li>
 	<li class="nav-item">

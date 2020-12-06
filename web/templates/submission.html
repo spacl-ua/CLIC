@@ -1,86 +1,74 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card mb-3">
-	<h5 class="card-header">Submission</h5>
-	<div class="card-body">
+<h2>Submission</h2>
+	<div class="row">
+		<div class="col-3">Team</div>
+		<div class="col-9">{{ submission.team }}</div>
+	</div>
+	<hr class="mt-1 mb-1">
+	<div class="row">
+		<div class="col-3">Date</div>
+		<div class="col-9">{{ submission.timestamp|date:"M d, H:i" }}</div>
+	</div>
+	<hr class="mt-1 mb-1">
+	<div class="row">
+		<div class="col-3">Task</div>
+		<div class="col-9">{{ submission.task.description|capfirst }}</div>
+	</div>
+	<hr class="mt-1 mb-1">
+	<div class="row">
+		<div class="col-3">Phase</div>
+		<div class="col-9">{{ submission.phase.description|capfirst }}</div>
+	</div>
+	<hr class="mt-1 mb-1">
+	<div class="row">
+		<div class="col-3 text-nowrap">Docker image</div>
+		<div class="col-9 text-truncate">{{ submission.docker_image }}</div>
+	</div>
+	<hr class="mt-1 mb-1">
+	<div class="row">
+		<div class="col-3 text-nowrap">Decoder hash</div>
+		<div class="col-9 text-truncate">
+			<a data-toggle="tooltip" data-placement="top" title="SHA224">
+				{{ submission.decoder_hash }}
+			</a>
+		</div>
+	</div>
+	<hr class="mt-1 mb-1">
+	<div class="row">
+		<div class="col-3 text-nowrap">Decoder size</div>
+		<div class="col-9">{{ submission.decoder_size|filesizeformat }}</div>
+	</div>
+	<hr class="mt-1 mb-1">
+	{% if submission.decoding_time %}
 		<div class="row">
-			<div class="col-3">Team</div>
-			<div class="col-9">{{ submission.team }}</div>
+			<div class="col-3 text-nowrap">Decoding time</div>
+			<div class="col-9">{{ submission.decoding_time }} second{{ submission.decoding_time|pluralize }}</div>
 		</div>
 		<hr class="mt-1 mb-1">
+	{% endif %}
+	<div class="row">
+		<div class="col-3">Data size</div>
+		<div class="col-9">{{ submission.data_size|filesizeformat }}</div>
+	</div>
+{% if measurements %}
+	<h2>Metrics</h2>
+	{% for measurement in measurements %}
 		<div class="row">
-			<div class="col-3">Date</div>
-			<div class="col-9">{{ submission.timestamp|date:"M d, H:i" }}</div>
+			<div class="col-3">{{ measurement.metric }}</div>
+			<div class="col-9">{{ measurement.value }}</div>
 		</div>
-		<hr class="mt-1 mb-1">
-		<div class="row">
-			<div class="col-3">Task</div>
-			<div class="col-9">{{ submission.task.description|capfirst }}</div>
-		</div>
-		<hr class="mt-1 mb-1">
-		<div class="row">
-			<div class="col-3">Phase</div>
-			<div class="col-9">{{ submission.phase.description|capfirst }}</div>
-		</div>
-		<hr class="mt-1 mb-1">
-		<div class="row">
-			<div class="col-3 text-nowrap">Docker image</div>
-			<div class="col-9 text-truncate">{{ submission.docker_image }}</div>
-		</div>
-		<hr class="mt-1 mb-1">
-		<div class="row">
-			<div class="col-3 text-nowrap">Decoder hash</div>
-			<div class="col-9 text-truncate">
-				<a data-toggle="tooltip" data-placement="top" title="SHA224">
-					{{ submission.decoder_hash }}
-				</a>
-			</div>
-		</div>
-		<hr class="mt-1 mb-1">
-		<div class="row">
-			<div class="col-3 text-nowrap">Decoder size</div>
-			<div class="col-9">{{ submission.decoder_size|filesizeformat }}</div>
-		</div>
-		<hr class="mt-1 mb-1">
-		{% if submission.decoding_time %}
-			<div class="row">
-				<div class="col-3 text-nowrap">Decoding time</div>
-				<div class="col-9">{{ submission.decoding_time }} second{{ submission.decoding_time|pluralize }}</div>
-			</div>
+		{% if not forloop.last %}
 			<hr class="mt-1 mb-1">
 		{% endif %}
-		<div class="row">
-			<div class="col-3">Data size</div>
-			<div class="col-9">{{ submission.data_size|filesizeformat }}</div>
-		</div>
-	</div>
-</div>
-{% if measurements %}
-<div class="card mb-3">
-	<h5 class="card-header">Metrics</h5>
-	<div class="card-body">
-		{% for measurement in measurements %}
-			<div class="row">
-				<div class="col-3">{{ measurement.metric }}</div>
-				<div class="col-9">{{ measurement.value }}</div>
-			</div>
-			{% if not forloop.last %}
-				<hr class="mt-1 mb-1">
-			{% endif %}
-		{% endfor %}
-	</div>
-</div>
+	{% endfor %}
 {% endif %}
-<div class="card mb-3">
-	<h5 class="card-header">Logs</h5>
-	<div class="embed-responsive" style="height:400px">
-		<iframe class="embed-responsive-item" src="/logs/{{ submission.pk }}/" {% if submission.in_progress %}onload="stop_counting()"{% endif %}></iframe>
-	</div>
-	<div class="card-footer text-muted">
-		<a target="_blank" href="/logs/{{ submission.pk }}/">Open in new window</a>
-	</div>
+<h2>Logs</h2>
+<div class="embed-responsive" style="height:400px">
+	<iframe class="embed-responsive-item" src="/logs/{{ submission.pk }}/" {% if submission.in_progress %}onload="stop_counting()"{% endif %}></iframe>
 </div>
+<a target="_blank" href="/logs/{{ submission.pk }}/">Open in new window</a>
 {% endblock %}
 
 {% block scripts %}

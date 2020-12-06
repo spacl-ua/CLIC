@@ -7,9 +7,7 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def get_navigation(context, template='navigation.html'):
-	phases = Phase.objects.filter(hidden=False).prefetch_related('task')
 	return get_template(template).render({
-			'phases': phases,
 		},
 		request=context['request'])
 
