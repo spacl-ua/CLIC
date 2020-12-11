@@ -96,7 +96,7 @@ DATABASES = {
 # Caching
 # https://docs.djangoproject.com/en/2.2/topics/cache/#local-memory-caching
 CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_SECONDS = 60
+CACHE_MIDDLEWARE_SECONDS = 1 if DEBUG else 60
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHES = {
 	'default': {

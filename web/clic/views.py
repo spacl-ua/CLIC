@@ -241,6 +241,7 @@ def leaderboard(request, task, phase):
 
 
 	phases = submissions.models.Phase.objects.filter(hidden=False)
+	phases = phases.prefetch_related('task')
 
 	for p in phases:
 		p.current = (p.id == phase.id)
