@@ -75,8 +75,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'clic.wsgi.application'
 
 AUTH_USER_MODEL = 'teams.Team'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'submit'
+LOGOUT_REDIRECT_URL = 'submit'
 
 
 # Database

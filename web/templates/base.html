@@ -33,25 +33,27 @@
 			</ul>
 		</nav>
 
-		<nav class="col-md-2 d-none d-md-block bg-light sidebar" style="font-size: .875rem">
-			<div class="sidebar-sticky">
-				{% block navigation %}
-					{% get_navigation %}
-				{% endblock %}
-			</div>
-		</nav>
+		<div class="row">
+			<nav class="col-md-2 d-none d-md-block bg-light sidebar" style="font-size: .875rem">
+				<div class="sidebar-sticky">
+					{% block navigation %}
+						{% get_navigation %}
+					{% endblock %}
+				</div>
+			</nav>
 
-		<main role="main" class="col-md-10 ml-sm-auto px-md-4 pt-3">
-			{% block content %}{% endblock %}
-			<hr>
-			<div class="container-fluid text-center text-muted sponsors">
-				Sponsored by<br>
-				<a href="https://google.com" target="_blank"><img src="{% static 'img/sponsors/google.png' %}" height="40"></a>
-				<a href="https://twitter.com" target="_blank"><img src="{% static 'img/sponsors/twitter.png' %}" height="70"></a>
-				<a href="https://www.vision.ee.ethz.ch" target="_blank"><img src="{% static 'img/sponsors/cvl.png' %}" height="38"></a>
-				<a href="https://apple.com" target="_blank"><img src="{% static 'img/sponsors/apple.png' %}" height="60"></a>
-			</div>
-		</main>
+			<main role="main" class="col-md-10 ml-sm-auto px-md-4 pt-3">
+				{% block content %}{% endblock %}
+				<hr>
+				<div class="container-fluid text-center text-muted sponsors">
+					Sponsored by<br>
+					<a href="https://google.com" target="_blank"><img src="{% static 'img/sponsors/google.png' %}" height="40"></a>
+					<a href="https://twitter.com" target="_blank"><img src="{% static 'img/sponsors/twitter.png' %}" height="70"></a>
+					<a href="https://www.vision.ee.ethz.ch" target="_blank"><img src="{% static 'img/sponsors/cvl.png' %}" height="38"></a>
+					<a href="https://apple.com" target="_blank"><img src="{% static 'img/sponsors/apple.png' %}" height="60"></a>
+				</div>
+			</main>
+		</div>
 
 		{% block scripts %}{% endblock %}
 		<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>

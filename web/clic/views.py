@@ -34,7 +34,7 @@ def signup(request):
 				password=form.cleaned_data.get('password1'))
 			login(request, user)
 
-			return redirect('home')
+			return redirect('submit')
 	else:
 		form = teams.forms.TeamCreationForm()
 
