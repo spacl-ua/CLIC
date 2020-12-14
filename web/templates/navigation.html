@@ -58,6 +58,13 @@
 			<i data-feather="upload"></i> Submit
 		</a>
 	</li>
+	{% if user.is_authenticated %}
+		<li class="nav-item">
+			<a class="nav-link{% if request.resolver_match.url_name == "submissions" %} active{% endif %}" href="/submissions/">
+				<i data-feather="list"></i> Submissions
+			</a>
+		</li>
+	{% endif %}
 </ul>
 
 <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">

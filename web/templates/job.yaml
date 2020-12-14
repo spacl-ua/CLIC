@@ -43,9 +43,9 @@ spec:
             value: "/var/run/secret/cloud.google.com/service-account.json"
         envFrom:
           - secretRef:
-              name: cloudsql
+              name: cloudsql-clic2021
           - secretRef:
-              name: buckets
+              name: buckets-clic2021
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
@@ -80,9 +80,9 @@ spec:
             value: "/var/run/secret/cloud.google.com/service-account.json"
         envFrom:
           - secretRef:
-              name: cloudsql
+              name: cloudsql-clic2021
           - secretRef:
-              name: buckets
+              name: buckets-clic2021
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
