@@ -117,7 +117,10 @@ def main(args):
 		# start actual evaluation
 		logger.info('Running evaluation')
 		results = evaluate(
-			submission_images, target_images, settings=submission.phase.settings, logger=logger)
+			submission_images,
+			target_images,
+			settings=submission.phase.settings,
+			logger=logger)
 
 		with transaction.atomic():
 			for metric, value in results.items():
