@@ -1,4 +1,5 @@
 #!/bin/bash
 
-kubectl delete configmap code 2> /dev/null
-kubectl create configmap code --from-file code
+LABEL=clic2021
+kubectl delete configmap code-${LABEL} 2> /dev/null
+kubectl create configmap code-${LABEL} --from-file code

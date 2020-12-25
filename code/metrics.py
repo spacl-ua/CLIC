@@ -47,8 +47,8 @@ def evaluate(submission_images, target_images, settings={}, logger=None):
 		if 'KID' in metrics or 'FID' in metrics:
 			if image0.shape[0] >= patch_size and image0.shape[1] >= patch_size:
 				# extract random patches for later use
-				i = rs.random.randint(image0.shape[0] - patch_size + 1)
-				j = rs.random.randint(image0.shape[1] - patch_size + 1)
+				i = rs.randint(image0.shape[0] - patch_size + 1)
+				j = rs.randint(image0.shape[1] - patch_size + 1)
 				target_patches.append(image0[i:i + patch_size, j:j + patch_size])
 				submission_patches.append(image1[i:i + patch_size, j:j + patch_size])
 
@@ -72,7 +72,9 @@ def fid(images0, images1):
 	model = mmd.Inception()
 	features0 = mmd.featurize(images0, model, **kwargs)[-1]
 	features1 = mmd.featurize(images1, model, **kwargs)[-1]
-	return mmd.fid_score(features0, features1, splits=10, split_method='bootstrap')
+	# average across splits
+	return np.mean(
+		mmd.fid_score(features0, features1, splits=10, split_method='bootstrap'))
 
 
 def mse(image0, image1):

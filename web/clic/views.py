@@ -52,7 +52,7 @@ def submit(request):
 				user=request.user)
 
 			if form.is_valid():
-				return create_job(request, **form.cleaned_data)
+				return _decode(request, **form.cleaned_data)
 			else:
 				status = 422
 		else:
@@ -65,9 +65,9 @@ def submit(request):
 	return render(request, 'submit.html', {'form': form}, status=status)
 
 
-def create_job(request, **kwargs):
+def _decode(request, **kwargs):
 	"""
-	Creates a kubernetes job running the decoder
+	Creates a kubernetes job running the decoder and the evaluation
 	"""
 
 	if not request.user.is_authenticated:
@@ -130,6 +130,41 @@ def create_job(request, **kwargs):
 		for sub in subs:
 			sub.status = submissions.models.Submission.STATUS_CANCELED
 			sub.save()
+
+	return HttpResponse(
+		'{{"location": "/submission/{pk}/"}}'.format(pk=submission.pk),
+		content_type='application/json')
+
+
+def reevaluate(request, pk):
+	"""
+	Creates a kubernetes job running only the evaluation
+	"""
+
+	if not request.user.is_staff:
+		# only staff is allowed to restart an evaluation
+		raise PermissionDenied()
+
+	try:
+		submission = submissions.models.Submission.objects.get(pk=pk)
+	except ObjectDoesNotExist:
+		raise Http404('Could not find submission.')
+
+	# submission is stored here
+	fs = GoogleCloudStorage(bucket_name=settings.GS_BUCKET_SUBMISSIONS)
+	fs_path = submission.fs_path()
+
+	# create job
+	job_template = get_template('job.yaml')
+	job = yaml.load(job_template.render({
+    'eval_only': True,
+		'submission': submission,
+		'debug': request.user.is_staff}))
+
+	# submit job
+	client = KubernetesClient()
+	client.delete_job(job)
+	client.create_job(job)
 
 	return HttpResponse(
 		'{{"location": "/submission/{pk}/"}}'.format(pk=submission.pk),

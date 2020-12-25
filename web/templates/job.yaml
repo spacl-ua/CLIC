@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ submission.job_name }}
+  name: {{ submission.job_name }}{% if eval_only %}-eval{% endif %}
   labels:
     id: "{{ submission.id }}"
     task: "{{ submission.task.name }}"
@@ -15,7 +15,7 @@ spec:
         task: "{{ submission.task.name }}"
         phase: "{{ submission.phase.name }}"
         team: "{{ submission.team.username }}"
-    spec:
+    spec:{% if not eval_only %}
       initContainers:
       - name: decode
         image: "gcr.io/clic-215616/decoding:latest"
@@ -54,19 +54,19 @@ spec:
           - name: executable-volume
             mountPath: "/var/lib/docker"
           - name: code-volume
-            mountPath: "/code"
+            mountPath: "/code"{% endif %}
       containers:
       - name: evaluate
         image: "gcr.io/clic-215616/evaluation"
         resources:
           requests:
             cpu: 1
-            memory: "2G"{% if submission.docker_image.gpu %}
-            nvidia.com/gpu: 1{% endif %}
+            memory: "2G"
+            nvidia.com/gpu: 1
           limits:
             memory: "4G"
-            cpu: 1{% if submission.docker_image.gpu %}
-            nvidia.com/gpu: 1{% endif %}
+            cpu: 1
+            nvidia.com/gpu: 1
         command: [
           "python3",
           "/code/evaluate.py",{% if debug %}

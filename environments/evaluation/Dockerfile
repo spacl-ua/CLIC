@@ -7,5 +7,7 @@ RUN apt-get update
 RUN apt-get upgrade -y
 
 WORKDIR /tmp
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+COPY requirements1.txt .
+COPY requirements2.txt .
+RUN pip3 install -r requirements1.txt
+RUN pip3 install -r requirements2.txt
