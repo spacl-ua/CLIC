@@ -1,3 +1,4 @@
+
 <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
 	<span>Workshop</span>
 </h6>
@@ -8,13 +9,18 @@
 		</a>
 	</li>
 	<li class="nav-item">
+		<a class="nav-link{% if request.path == '/schedule/2/' %} active{% endif %}" href="/schedule/2/">
+			<i data-feather="calendar"></i> Dates
+		</a>
+	</li>
+	<li class="nav-item">
 		<a class="nav-link{% if request.path == '/publications/' %} active{% endif %}" href="/publications/">
 			<i data-feather="book-open"></i> Papers
 		</a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link{% if request.path == '/schedule/2/' %} active{% endif %}" href="/schedule/2/">
-			<i data-feather="calendar"></i> Dates
+		<a class="nav-link{% if request.path == '/organizers/' %} active{% endif %}" href="/organizers/">
+			<i data-feather="user"></i> Organizers
 		</a>
 	</li>
 </ul>
@@ -30,12 +36,7 @@
 	</li>
 	<li class="nav-item">
 		<a class="nav-link{% if request.path == '/tasks/' %} active{% endif %}" href="/tasks/">
-			<i data-feather="file-text"></i> Tasks
-		</a>
-	</li>
-	<li class="nav-item">
-		<a class="nav-link{% if request.path == '/schedule/1/' %} active{% endif %}" href="/schedule/1/">
-			<i data-feather="calendar"></i> Dates
+			<i data-feather="check-square"></i> Tasks
 		</a>
 	</li>
 	<li class="nav-item">
