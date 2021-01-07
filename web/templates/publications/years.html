@@ -7,22 +7,32 @@
 {% endblock %}
 
 {% block content %}
-	<h2>Workshop papers</h2>
-	{% if not years %}
-	<p>Papers will be published here before the workshop starts.</p>
-	{% endif %}
-	{% for year, publications in years %}
-		{% for publication in publications %}
-			<div{% if not forloop.last %} style="margin-bottom: 20px;"{% endif %}>
-				{% include "publications/publication.html" %}
-			</div>
+<div class="card mb-2">
+	<div class="card-body">
+		<h5 class="card-title">Workshop papers</h5>
+		{% if not years %}
+		<p class="card-text">Papers will be published here before the workshop starts</p>
+		{% endif %}
+		{% for year, publications in years %}
+			{% for publication in publications %}
+			<p {% if forloop.last %}class="card-text"{% else %}class="card-text mb-2"{% endif %}>
+					{% include "publications/publication.html" %}
+				</p>
+			{% endfor %}
 		{% endfor %}
-	{% endfor %}
+	</div>
+</div>
 
-	<h2> Previous years</h2>
-	<ul>
-		<li><a href="https://openaccess.thecvf.com/CVPR2020_workshops/CVPR2020_w7">CLIC 2020</a></li>
-		<li><a href="https://openaccess.thecvf.com/CVPR2019_workshops/CVPR2019_CLIC_2019">CLIC 2019</a></li>
-		<li><a href="https://openaccess.thecvf.com/CVPR2018_workshops/CVPR2018_W50">CLIC 2018</a></li>
-	</ul>
+<div class="card">
+	<div class="card-body">
+		<h5 class="card-title">Previous years</h5>
+		<p class="card-text">
+			<ul>
+				<li><a href="https://openaccess.thecvf.com/CVPR2020_workshops/CVPR2020_w7">CLIC 2020</a></li>
+				<li><a href="https://openaccess.thecvf.com/CVPR2019_workshops/CVPR2019_CLIC_2019">CLIC 2019</a></li>
+				<li><a href="https://openaccess.thecvf.com/CVPR2018_workshops/CVPR2018_W50">CLIC 2018</a></li>
+			</ul>
+		</p>
+	</div>
+</div>
 {% endblock %}

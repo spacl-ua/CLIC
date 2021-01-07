@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
-{% load markdown_deux_tags %}
 {% load clic_tags %}
 
 {% block content %}
-	{% with flatpage.content|markdown as content %}
+	{% with flatpage.content as content %}
 		{% evaluate content %}
 	{% endwith %}
 {% endblock %}

@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Submission</h2>
+<div class="card mb-3">
+<div class="card-body">
+<h5 class="card-title">Submission</h5>
 <div class="row">
 	<div class="col-3">Team</div>
 	<div class="col-9">{{ submission.team }}</div>
@@ -52,9 +54,13 @@
 	<div class="col-3">Data size</div>
 	<div class="col-9">{{ submission.data_size|filesizeformat }}</div>
 </div>
+</div>
+</div>
 
 {% if measurements %}
-	<h2 class="mt-4">Metrics</h2>
+<div class="card mb-3">
+<div class="card-body">
+	<h5 class="card-title">Metrics</h5>
 	{% for measurement in measurements %}
 		<div class="row">
 			<div class="col-3">{{ measurement.metric }}</div>
@@ -64,13 +70,19 @@
 			<hr class="mt-1 mb-1">
 		{% endif %}
 	{% endfor %}
+</div>
+</div>
 {% endif %}
 
-<h2 class="mt-4">Logs</h2>
-<div class="embed-responsive bg-light" style="height:400px">
-	<iframe class="embed-responsive-item" src="/logs/{{ submission.pk }}/" {% if submission.in_progress %}onload="stop_counting()"{% endif %}></iframe>
+<div class="card">
+<div class="card-body">
+	<h5 class="card-title">Logs</h5>
+	<div class="embed-responsive bg-light" style="height:400px">
+		<iframe class="embed-responsive-item" src="/logs/{{ submission.pk }}/" {% if submission.in_progress %}onload="stop_counting()"{% endif %}></iframe>
+	</div>
+	<a target="_blank" href="/logs/{{ submission.pk }}/">Open in new window</a>
 </div>
-<a target="_blank" href="/logs/{{ submission.pk }}/">Open in new window</a>
+</div>
 {% endblock %}
 
 {% block scripts %}
