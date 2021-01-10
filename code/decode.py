@@ -14,7 +14,7 @@ import sys
 import time
 import traceback
 from argparse import ArgumentParser
-from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL
+from subprocess import run, CalledProcessError, TimeoutExpired, PIPE, DEVNULL, STDOUT
 from tempfile import mkdtemp
 from utils import get_logger, get_submission, sql_setup
 from zipfile import ZipFile
@@ -201,7 +201,9 @@ def main(args):
 			# run decoder
 			logger.info('Running decoder')
 			start = time.time()
+
 			run(decode_cmd, timeout=submission.phase.timeout, check=True, shell=False)
+
 			logger.info('Decoding complete')
 
 			submission.decoding_time = time.time() - start
@@ -236,6 +238,13 @@ def main(args):
 			return 1
 
 		finally:
+			# write decoder's output to logs
+			with open(log_file, 'ab') as handle:
+				docker_logs = run('docker logs {}'.format(identifier),
+					stdout=PIPE, stderr=STDOUT, check=False, shell=True)
+				handle.write(b'\n')
+				handle.write(docker_logs.stdout)
+
 			# remove docker container
 			run('docker rm {}'.format(identifier),
 				stderr=PIPE, stdout=PIPE, check=False, shell=True)

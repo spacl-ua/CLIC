@@ -1,5 +1,4 @@
-"""
-Based on:
+"""Based on:
 https://github.com/mbinkowski/MMD-GAN/blob/678bb5e2d5f7b0bb8dd5c3591d7759e1bb3f8018/gan/compute_scores.py
 
 BSD 3-Clause License
@@ -35,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import division, print_function
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import os.path, sys, tarfile
 import numpy as np
 from scipy import linalg
@@ -55,8 +56,7 @@ class TqdmUpTo(tqdm):
 class Inception(object):
     def __init__(self):
         MODEL_DIR = '/tmp/imagenet'
-        DATA_URL = ('http://download.tensorflow.org/models/image/imagenet/'
-                    'inception-2015-12-05.tgz')
+        DATA_URL = ('http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz')
         self.softmax_dim = 1008
         self.coder_dim = 2048
 
@@ -66,20 +66,17 @@ class Inception(object):
         filepath = os.path.join(MODEL_DIR, filename)
 
         if not os.path.exists(filepath):
-            with TqdmUpTo(unit='B', unit_scale=True, miniters=1,
-                          desc=filename) as t:
-                filepath, _ = urllib.request.urlretrieve(
-                    DATA_URL, filepath, reporthook=t.update_to)
+            filepath, _ = urllib.request.urlretrieve(DATA_URL, filepath)
 
         tarfile.open(filepath, 'r:gz').extractall(MODEL_DIR)
-        with tf.gfile.FastGFile(os.path.join(
+        with tf.io.gfile.GFile(os.path.join(
                 MODEL_DIR, 'classify_image_graph_def.pb'), 'rb') as f:
-            graph_def = tf.GraphDef()
+            graph_def = tf.compat.v1.GraphDef()
             graph_def.ParseFromString(f.read())
             tf.import_graph_def(graph_def, name='')
 
         # Works with an arbitrary minibatch size.
-        self.sess = sess = tf.Session()
+        self.sess = sess = tf.compat.v1.Session()
         #with sess:
         pool3 = sess.graph.get_tensor_by_name('pool_3:0')
         ops = pool3.graph.get_operations()
@@ -230,11 +227,13 @@ def fid_score(codes_g, codes_r, eps=1e-6, output=sys.stdout, **split_args):
             cov_g = np.cov(part_g, rowvar=False)
             cov_r = np.cov(part_r, rowvar=False)
 
+            settings = np.seterr(all='ignore')
             covmean, _ = linalg.sqrtm(cov_g.dot(cov_r), disp=False)
             if not np.isfinite(covmean).all():
                 cov_g[range(d), range(d)] += eps
                 cov_r[range(d), range(d)] += eps
                 covmean = linalg.sqrtm(cov_g.dot(cov_r))
+            np.seterr(**settings)
 
             scores[i] = np.sum((mn_g - mn_r) ** 2) + (
                 np.trace(cov_g) + np.trace(cov_r) - 2 * np.trace(covmean))

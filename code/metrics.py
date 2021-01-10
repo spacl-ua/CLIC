@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import json
 import mmd
@@ -65,16 +66,24 @@ def evaluate(submission_images, target_images, settings={}, logger=None):
 
 
 def fid(images0, images1):
-	kwargs = {
-		'get_codes': True,
-		'get_preds': False,
-		'batch_size': 100}
-	model = mmd.Inception()
-	features0 = mmd.featurize(images0, model, **kwargs)[-1]
-	features1 = mmd.featurize(images1, model, **kwargs)[-1]
-	# average across splits
-	return np.mean(
-		mmd.fid_score(features0, features1, splits=10, split_method='bootstrap'))
+	with open(os.devnull, 'w') as devnull:
+		kwargs = {
+			'get_codes': True,
+			'get_preds': False,
+			'batch_size': 100,
+			'output': devnull}
+		model = mmd.Inception()
+		features0 = mmd.featurize(images0, model, **kwargs)[-1]
+		features1 = mmd.featurize(images1, model, **kwargs)[-1]
+		# average across splits
+		score = np.mean(
+			mmd.fid_score(
+				features0,
+				features1,
+				splits=10,
+				split_method='bootstrap',
+				output=devnull))
+	return score
 
 
 def mse(image0, image1):
