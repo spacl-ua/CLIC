@@ -2,6 +2,15 @@
 
 LABEL=clic2021
 
+INTERACTIVE=false
+
+for arg in "$@"; do
+  case $arg in
+    -i|--interactive)
+      INTERACTIVE=true
+  esac
+done
+
 if [ ! -f service-account.json ]; then
 	# create service account key file
 	if ( kubectl get secret clic-sa-key 2>&1 > /dev/null ); then
@@ -36,6 +45,21 @@ if [ -z "$SENTRY_DSN" ]; then
 	read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
 fi
 
+if $INTERACTIVE; then
+  COMMAND="/bin/bash"
+else
+  COMMAND="gunicorn \
+      --bind :8000 \
+      --worker-class gevent \
+      --workers 2 \
+      --timeout 600 \
+      --reload \
+      --log-level DEBUG \
+      clic.wsgi"
+fi
+
+
+# open connection to MySQL server
 docker run \
 	--rm \
 	--name cloudsql \
@@ -49,6 +73,7 @@ docker run \
 		-dir=/cloudsql \
 		-instances=${DB_INSTANCE}=tcp:0.0.0.0:5432
 
+# start webserver
 docker run \
 	--rm \
 	-ti \
@@ -68,13 +93,8 @@ docker run \
 	-v "$(pwd)/web":"$(pwd)/web" \
 	-p 8000:8000 \
 	gcr.io/clic-215616/web \
-	gunicorn \
-		--bind :8000 \
-		--worker-class gevent \
-		--workers 2 \
-		--timeout 600 \
-		--reload \
-		--log-level DEBUG \
-		clic.wsgi
+	/bin/bash \
+	-c "${COMMAND}"
 
+# close connection to MySQL server
 docker stop cloudsql
