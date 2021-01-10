@@ -5,10 +5,10 @@ LABEL=clic2021
 INTERACTIVE=false
 
 for arg in "$@"; do
-  case $arg in
-    -i|--interactive)
-      INTERACTIVE=true
-  esac
+	case $arg in
+		-i|--interactive)
+			INTERACTIVE=true
+	esac
 done
 
 if [ ! -f service-account.json ]; then
@@ -46,18 +46,17 @@ if [ -z "$SENTRY_DSN" ]; then
 fi
 
 if $INTERACTIVE; then
-  COMMAND="/bin/bash"
+	COMMAND="/bin/bash"
 else
-  COMMAND="gunicorn \
-      --bind :8000 \
-      --worker-class gevent \
-      --workers 2 \
-      --timeout 600 \
-      --reload \
-      --log-level DEBUG \
-      clic.wsgi"
+	COMMAND="gunicorn \
+		--bind :8000 \
+		--worker-class gevent \
+		--workers 2 \
+		--timeout 600 \
+		--reload \
+		--log-level DEBUG \
+		clic.wsgi"
 fi
-
 
 # open connection to MySQL server
 docker run \
