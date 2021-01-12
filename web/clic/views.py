@@ -275,7 +275,7 @@ def leaderboard(request, task, phase):
 	subs_best = {measurement.submission for measurement in subs_best.values()}
 
 
-	phases = submissions.models.Phase.objects.filter(hidden=False)
+	phases = submissions.models.Phase.objects.filter(hidden=False).order_by('task')
 	phases = phases.prefetch_related('task')
 
 	for p in phases:
