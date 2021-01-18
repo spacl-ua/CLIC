@@ -192,6 +192,25 @@ def logs(request, pk, container=['decode', 'evaluate']):
 	pods = client.list_pods(label_selector=f'id={submission.id}')
 
 	if len(pods) == 0:
+		# pods are gone, try to load logs stored with the submission
+		fs = GoogleCloudStorage(bucket_name=settings.GS_BUCKET_SUBMISSIONS)
+		fs_path = submission.fs_path()
+
+		log_path_decode = os.path.join(fs_path, '.log_decode')
+		log_path_eval = os.path.join(fs_path, '.log_evaluate')
+
+		logs = b''
+		if fs.exists(log_path_decode):
+			with fs.open(log_path_decode) as handle:
+				logs += handle.read()
+				logs += b'\n'
+		if fs.exists(log_path_eval):
+			with fs.open(log_path_eval) as handle:
+				logs += handle.read()
+
+		if logs:
+			return HttpResponse(logs, content_type='text/plain')
+
 		return HttpResponse('Logs are no longer available.', content_type='text/plain')
 
 	# stream logs
