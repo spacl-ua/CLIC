@@ -96,7 +96,7 @@ DATABASES = {
 # Caching
 # https://docs.djangoproject.com/en/2.2/topics/cache/#local-memory-caching
 CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_SECONDS = 1 if DEBUG else 60
+CACHE_MIDDLEWARE_SECONDS = 20 if DEBUG else 60
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHES = {
 	'default': {
@@ -134,8 +134,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-MEDIA_URL = 'http://storage.googleapis.com/clic2020_public/'
-STATIC_URL = '/static/' if DEBUG else 'http://storage.googleapis.com/clic2020_public/static/'
+MEDIA_URL = 'http://storage.googleapis.com/clic2021_public/'
+STATIC_URL = '/static/' if DEBUG else 'http://storage.googleapis.com/clic2021_public/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 
