@@ -1,21 +1,21 @@
 steps:
-#- name: 'gcr.io/cloud-builders/docker'
-#  args: [
-#    'build',
-#    '-t', 'gcr.io/$PROJECT_ID/compression:cpu',
-#    '-t', 'gcr.io/$PROJECT_ID/compression:latest',
-#    'environments/compression']
-#- name: 'gcr.io/cloud-builders/docker'
-#  args: ['build', '-t', 'gcr.io/$PROJECT_ID/decoding:latest', 'environments/decoding']
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-t', 'gcr.io/$PROJECT_ID/compression:cpu',
+    '-t', 'gcr.io/$PROJECT_ID/compression:latest',
+    'environments/compression']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/decoding:latest', 'environments/decoding']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/evaluation:latest', 'environments/evaluation']
-#- name: 'gcr.io/cloud-builders/docker'
-#  args: ['build', '-t', 'gcr.io/$PROJECT_ID/web-clic2021:latest', 'web']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/web-clic2021:latest', 'web']
 options:
   machineType: 'N1_HIGHCPU_32'
 images:
-#  - 'gcr.io/$PROJECT_ID/compression:cpu'
-#  - 'gcr.io/$PROJECT_ID/compression:latest'
-#  - 'gcr.io/$PROJECT_ID/decoding:latest'
+  - 'gcr.io/$PROJECT_ID/compression:cpu'
+  - 'gcr.io/$PROJECT_ID/compression:latest'
+  - 'gcr.io/$PROJECT_ID/decoding:latest'
   - 'gcr.io/$PROJECT_ID/evaluation:latest'
-#  - 'gcr.io/$PROJECT_ID/web-clic2021:latest'
+  - 'gcr.io/$PROJECT_ID/web-clic2021:latest'
