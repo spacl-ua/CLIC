@@ -4,6 +4,9 @@
 {% load static %}
 
 {% block content %}
+<div class="alert alert-primary" role="alert">
+To ensure that decoders are not optimized for the test set, only decoders submitted during the validation phase can be used during the test phase. We are using hashing to determine if a decoder has changed, so even minor changes will not be possible.
+</div>
 <div class="card">
 	{% if user.is_authenticated %}
 		<div class="card-body">
