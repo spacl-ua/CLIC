@@ -83,4 +83,4 @@ Note that most changes to the webserver require rebuilding the Docker images fir
 
 If there is an issue with the website, it is often easier to debug it locally:
 
-  ./scripts/start_webserver_local.sh
+	./scripts/start_webserver_local.sh
