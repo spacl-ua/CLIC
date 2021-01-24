@@ -1,0 +1,20 @@
+#!/bin/zsh
+
+mkdir -p valid_encoded;
+
+for src in valid/*.png; do
+	target=$(basename "${src/.png/.jpg}");
+	target="valid_encoded/${target}";
+	convert "${src}" -strip -sampling-factor "4:2:0" -quality 3 "${target}";
+done
+
+for src in valid/*.png; do
+	if [ $(./file_size.py) -lt 857362 ];
+		then break;
+	fi
+	target=$(basename "${src/.png/.jpg}");
+	target="valid_encoded/${target}";
+	convert "${src}" -sampling-factor "4:2:0" -quality 2 "${target}";
+done
+
+zip data.zip valid_encoded/*.jpg

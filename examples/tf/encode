@@ -1,0 +1,11 @@
+#!/bin/zsh
+
+mkdir -p valid_encoded;
+
+for src in valid/*.png; do
+	target=$(basename "${src/.png/.jpg}");
+	target="valid_encoded/${target}";
+	convert "${src}" -strip -sampling-factor "4:2:0" -quality 18 "${target}";
+done
+
+zip data.zip valid_encoded/*.jpg
