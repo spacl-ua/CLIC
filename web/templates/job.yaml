@@ -61,10 +61,10 @@ spec:
         resources:
           requests:
             cpu: 1
-            memory: "2G"
+            memory: "{{ submission.phase.memory }}M"
             nvidia.com/gpu: 1
           limits:
-            memory: "4G"
+            memory: "{{ submission.phase.memory|add:500 }}M"
             cpu: 1
             nvidia.com/gpu: 1
         command: [
