@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+import glob
+import numpy as np
+import os
+import tensorflow as tf
+import zipfile
+
+tf.get_logger().setLevel('ERROR')
+
+# unzip encoded images
+with zipfile.ZipFile('./data.zip', 'r') as zip_ref:
+	zip_ref.extractall('.')
+
+# load image
+image_path_in = tf.placeholder(tf.string)
+image = tf.io.read_file(image_path_in)
+image = tf.image.decode_image(image)
+
+# save image
+image_path_out = tf.placeholder(tf.string)
+image = tf.image.encode_png(image)
+write_op = tf.write_file(image_path_out, image)
+
+with tf.Session() as sess:
+	# initialize kernel
+	sess.run(tf.global_variables_initializer())
+
+	# load JPEG image and save as PNG
+	for file_path_in in glob.glob('**/*.jpg', recursive=True):
+		print('Decoding {0}'.format(file_path_in))
+		file_path_out = os.path.splitext(file_path_in)[0] + '.png'
+		image = sess.run(write_op, feed_dict={
+			image_path_in: file_path_in,
+			image_path_out: file_path_out})
