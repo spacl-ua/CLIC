@@ -281,13 +281,13 @@ def leaderboard(request, task, phase):
 		hidden=False,
 		status=submissions.models.Submission.STATUS_SUCCESS)
 	subs = subs.prefetch_related('measurement_set').select_related('team')
-	subs_best = defaultdict(lambda: submissions.models.Measurement(value=float("-inf")))
+	subs_best = defaultdict(lambda: None)
 
 	metrics = set()
 	for sub in subs:
 		for measurement in sub.measurement_set.all():
 			# keep submission if it dominates others in at least one metric
-			if measurement.value > subs_best[sub.team, measurement.metric].value:
+			if measurement.better_than(subs_best[sub.team, measurement.metric]):
 				subs_best[sub.team, measurement.metric] = measurement
 			# collect metrics
 			metrics.add(measurement.metric)

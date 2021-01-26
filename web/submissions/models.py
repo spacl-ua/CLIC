@@ -158,3 +158,10 @@ class Measurement(models.Model):
 	metric = models.CharField(max_length=128)
 	value = models.FloatField()
 	submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
+
+	def better_than(self, measurement):
+		if measurement is None:
+			return True
+		if self.metric in ['FID', 'KID']:
+			return self.value < measurement.value
+		return self.value > measurement.value
