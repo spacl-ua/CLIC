@@ -3,10 +3,10 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+	<div class="alert alert-warning" role="alert">Please sign up with only one account per team.</div>
 	<div class="card">
 		<div class="card-body">
 			<h5 class="card-title">Sign up</h5>
-			<div class="alert alert-warning" role="alert">Please sign up with only one account per team.</div>
 			<form method="post">
 				{% csrf_token %}
 				{{ form | crispy }}
