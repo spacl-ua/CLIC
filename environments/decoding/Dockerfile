@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.0-base-ubuntu18.04
+FROM nvidia/cuda:11.0.3-base-ubuntu18.04
 MAINTAINER Lucas Theis
 
 ENV DEBIAN_FRONTEND=noninteractive
