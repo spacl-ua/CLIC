@@ -78,16 +78,20 @@ def main(args):
 		shell=True)
 
 	try:
-		logger.info('Checking image dimensions')
-
 		# check images
 		target_images = glob(os.path.join(target_dir, '*.png'))
+		any_images = len(target_images) > 0
+		target_images += glob(os.path.join(target_dir, '*.csv'))
 		target_images = {os.path.basename(path): path for path in target_images}
 		submission_images = glob(os.path.join(submission_dir, '**/*.png'), recursive=True)
+		submission_images += glob(os.path.join(submission_dir, '**/*.csv'), recursive=True)
 		submission_images = {os.path.basename(path): path for path in submission_images}
 
+		if any_images:
+			logger.info('Checking image dimensions')
+
 		if not target_images:
-			logger.error('Failed to locate target images')
+			logger.error('Failed to locate target files')
 			submission.status = Submission.STATUS_ERROR
 			submission.save()
 			return 1
@@ -95,10 +99,13 @@ def main(args):
 		for name in target_images:
 			# check if image is present
 			if name not in submission_images:
-				logger.error('Submission is missing image: {}'.format(name))
+				logger.error('Submission is missing file: {}'.format(name))
 				submission.status = Submission.STATUS_EVALUATION_FAILED
 				submission.save()
 				return 1
+
+			if name.endswith('.csv'):
+				continue
 
 			# check if image has correct size
 			image_size = Image.open(submission_images[name]).size
