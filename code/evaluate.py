@@ -99,6 +99,15 @@ def main(args):
 		for name in target_images:
 			# check if image is present
 			if name not in submission_images:
+				if name.endswith('.csv') and \
+						len(submission_images) == 1 and \
+						len(target_images) == 1:
+					# hack so that CSV file can be named anything in perceptual track
+					path = list(submission_images.values())[0]
+					if path.lower().endswith('.csv'):
+						submission_images[name] = path
+						continue
+
 				logger.error('Submission is missing file: {}'.format(name))
 				submission.status = Submission.STATUS_EVALUATION_FAILED
 				submission.save()
