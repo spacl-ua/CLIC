@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.contrib.auth import login, authenticate
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import transaction
@@ -102,11 +103,21 @@ def _decode(request, **kwargs):
 	for file in request.FILES.getlist('data'):
 		fs.save(name=os.path.join(fs_path, file.name), content=file)
 
-	# upload decoder to storage bucket
-	if request.FILES['decoder'].name.lower().endswith('.zip'):
-		fs.save(name=os.path.join(fs_path, 'decoder.zip'), content=request.FILES['decoder'])
+	if 'decoder' in request.FILES:
+		# upload decoder to storage bucket
+		if request.FILES['decoder'].name.lower().endswith('.zip'):
+			fs.save(
+				name=os.path.join(fs_path, 'decoder.zip'),
+				content=request.FILES['decoder'])
+		else:
+			fs.save(
+				name=os.path.join(fs_path, 'decode'),
+				content=request.FILES['decoder'])
 	else:
-		fs.save(name=os.path.join(fs_path, 'decode'), content=request.FILES['decoder'])
+		# no decoder provided, use dummy
+		fs.save(
+			name=os.path.join(fs_path, 'decode'),
+			content=ContentFile(b'#!/bin/bash'))
 
 	# create job
 	job_template = get_template('job.yaml')

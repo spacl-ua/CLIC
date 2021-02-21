@@ -37,13 +37,19 @@ def evaluate(submission_files, target_files, settings={}, logger=None):
 			file0 = read_csv(target_files[name], logger)
 			file1 = read_csv(submission_files[name], logger)
 
-			if 'accuracy' in metrics:
-				value = accuracy(file0, file1, logger)
-				if value is None or np.isnan(value):
-					logger.error('Evaluation of accuracy failed, assuming accuracy of 0%')
-					accuracy_values.append(0.0)
-				else:
-					accuracy_values.append(value)
+			if file0 is None:
+				logger.error('Failed to load targets')
+			if file1 is None:
+				logger.error('Could not read CSV file')
+
+			if file0 and file1:
+				if 'accuracy' in metrics:
+					value = accuracy(file0, file1, logger)
+					if value is None or np.isnan(value):
+						logger.error('Evaluation of accuracy failed, assuming accuracy of 0%')
+						accuracy_values.append(0.0)
+					else:
+						accuracy_values.append(value)
 
 		else:
 			image0 = np.asarray(Image.open(target_files[name]).convert('RGB'), dtype=np.float32)

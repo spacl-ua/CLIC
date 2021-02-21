@@ -39,4 +39,36 @@ To ensure that decoders are not optimized for the test set, only decoders submit
 	<script>
 		$("#submission").uploadprogress();
 	</script>
+	{% if user.is_authenticated %}
+		<script>
+			var phase = document.getElementById('id_phase');
+			var div_decoder = document.getElementById('div_id_decoder');
+			var div_docker = document.getElementById('div_id_docker_image');
+			var hint_data = document.getElementById('hint_id_data');
+			var decoder = document.getElementById('id_decoder');
+
+			function onPhaseChange() {
+				var option = phase.options[phase.selectedIndex]
+				if (option.text.toLowerCase().includes("percept")) {
+					div_decoder.style.display = "none";
+					div_docker.style.display = "none";
+					hint_data.textContent = "Single CSV file containing predicted decisions";
+					decoder.required = false;
+				} else {
+					div_decoder.style.display = "block";
+					div_docker.style.display = "block";
+					hint_data.textContent = "Files representing the encoded images";
+					decoder.required = true;
+				}
+			}
+
+			if (phase.addEventListener) {
+				phase.addEventListener('change', onPhaseChange, false);
+			} else {
+				phase.attachEvent('onchange', onPhaseChange, false);
+			}
+
+			onPhaseChange();
+		</script>
+	{% endif %}
 {% endblock %}

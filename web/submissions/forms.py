@@ -14,6 +14,7 @@ class SubmitForm(forms.Form):
 		empty_label=None,
 		label="Task and phase")
 	decoder = forms.FileField(
+		required=False,
 		help_text='An executable or a zip file containing an executable named \'decode\'')
 	data = forms.FileField(
 		widget=forms.ClearableFileInput(attrs={'multiple': True}),
@@ -72,7 +73,6 @@ class SubmitForm(forms.Form):
 		else:
 			self.cleaned_data['decoder_size'] = 0
 			self.cleaned_data['decoder_hash'] = ''
-			self.add_error('decoder', ValidationError('Please select a file'))
 
 		if self.cleaned_data['phase'].decoder_fixed:
 			submissions = models.Submission.objects.filter(
