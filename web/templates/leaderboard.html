@@ -15,54 +15,83 @@
 	<div class="bg-white border-left border-bottom border-right rounded-bottom mb-2">
 		<table class="table table-borderless table-hover text-center" data-toggle="table" data-classes="table table-hover text-center">
 			<thead>
-				<tr>
-					<th scope="col" data-sortable="true">Team</th>
-					{% for metric in metrics %}
-						{% if metric != 'Sahand' %}
+				{% if phase.task.name == 'perceptual' %}
+					<tr>
+						<th scope="col" data-sortable="true">Team</th>
+						{% for metric in metrics %}
+						<th scope="col" data-sortable="true">
+							<span style="text-transform: capitalize;">{{ metric }}</span>
+							{% if metric == 'accuracy' %}
+								<i class="fas fa-award text-warning"></i>
+							{% endif %}
+							</th>
+						{% endfor %}
+						<th scope="col" data-sortable="true">Date</th>
+					</tr>
+				{% else %}
+					<tr>
+						<th scope="col" data-sortable="true">Team</th>
+						{% for metric in metrics %}
 							<th scope="col" data-sortable="true">{{ metric }}{% if phase.task.name != 'video' and metric == 'ELO' %} <i class="fas fa-award text-warning"></i>{% endif %}{% if phase.task.name == 'video' and metric == 'MSSSIM' %} <i class="fas fa-award text-warning"></i>{% endif %}</th>
-						{% endif %}
-					{% endfor %}
-					<th scope="col" data-sortable="true">
-						<a data-toggle="tooltip" data-placement="top" title="Bytes">
-							Data size
-						</a>
-					</th>
-					<th scope="col" data-sortable="true">
-						<a data-toggle="tooltip" data-placement="top" title="Bytes">
-							Decoder size
-						</a>
-					</th>
-					<th scope="col" data-sortable="true">
-						<a data-toggle="tooltip" data-placement="top" title="Seconds">
-							Decoding time
-						</a>
-					</th>
-					<th scope="col" data-sortable="true">Date</th>
-				</tr>
+						{% endfor %}
+						<th scope="col" data-sortable="true">
+							<a data-toggle="tooltip" data-placement="top" title="Bytes">
+								Data size
+							</a>
+						</th>
+						<th scope="col" data-sortable="true">
+							<a data-toggle="tooltip" data-placement="top" title="Bytes">
+								Decoder size
+							</a>
+						</th>
+						<th scope="col" data-sortable="true">
+							<a data-toggle="tooltip" data-placement="top" title="Seconds">
+								Decoding time
+							</a>
+						</th>
+						<th scope="col" data-sortable="true">Date</th>
+					</tr>
+				{% endif %}
 			</thead>
 			<tbody>
-				{% for submission in submissions %}
-					<tr>
-						{% if submission.link %}
-							<td><a href="{{ submission.link }}">{{ submission.team }}</a></td>
-						{% else %}
-							<td>{{ submission.team }}</td>
-						{% endif %}
-						{% for metric in metrics %}
-							{% if metric == 'MSSSIM' %}
-								<td>{{ submission.measurements|get:metric|floatformat:5 }}</td>
-							{% elif metric == 'ELO' %}
-								<td>{{ submission.measurements|get:metric|floatformat:0 }}</td>
-							{% elif metric != 'Sahand' %}
-								<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
+				{% if phase.task.name == 'perceptual' %}
+					{% for submission in submissions %}
+						<tr>
+							{% if submission.link %}
+								<td><a href="{{ submission.link }}">{{ submission.team }}</a></td>
+							{% else %}
+								<td>{{ submission.team }}</td>
 							{% endif %}
-						{% endfor %}
-						<td>{{ submission.data_size }}</td>
-						<td>{{ submission.decoder_size }}</td>
-						<td>{{ submission.decoding_time|default_if_none:"" }}</td>
-						<td>{{ submission.timestamp|date:"M d, H:i" }}</td>
-					</tr>
-				{% endfor %}
+							{% for metric in metrics %}
+								<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
+							{% endfor %}
+							<td>{{ submission.timestamp|date:"M d, H:i" }}</td>
+						</tr>
+					{% endfor %}
+				{% else %}
+					{% for submission in submissions %}
+						<tr>
+							{% if submission.link %}
+								<td><a href="{{ submission.link }}">{{ submission.team }}</a></td>
+							{% else %}
+								<td>{{ submission.team }}</td>
+							{% endif %}
+							{% for metric in metrics %}
+								{% if metric == 'MSSSIM' %}
+									<td>{{ submission.measurements|get:metric|floatformat:5 }}</td>
+								{% elif metric == 'ELO' %}
+									<td>{{ submission.measurements|get:metric|floatformat:0 }}</td>
+								{% elif metric != 'Sahand' %}
+									<td>{{ submission.measurements|get:metric|floatformat:3 }}</td>
+								{% endif %}
+							{% endfor %}
+							<td>{{ submission.data_size }}</td>
+							<td>{{ submission.decoder_size }}</td>
+							<td>{{ submission.decoding_time|default_if_none:"" }}</td>
+							<td>{{ submission.timestamp|date:"M d, H:i" }}</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
 			</tbody>
 		</table>
 	</div>
@@ -71,6 +100,8 @@
 		<i class="fas fa-award text-warning"></i>
 		{% if phase.task.name == 'video' %}
 		Winners are determined based only on MSSSIM
+		{% elif phase.task.name == 'perceptual' %}
+		Winners are determined based on accuracy
 		{% else %}
 		Winners are determined based on a perceptual quality test using human evaluators
 		{% endif %}
