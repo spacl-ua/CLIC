@@ -18,6 +18,11 @@
 		</a>
 	</li>
 	<li class="nav-item">
+		<a class="nav-link{% if request.path == '/cfp/' %} active{% endif %}" href="/cfp/">
+			<i data-feather="send"></i> Submit
+		</a>
+	</li>
+	<li class="nav-item">
 		<a class="nav-link{% if request.path == '/organizers/' %} active{% endif %}" href="/organizers/">
 			<i data-feather="user"></i> Organizers
 		</a>
