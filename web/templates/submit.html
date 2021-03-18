@@ -46,6 +46,13 @@ To ensure that decoders are not optimized for the test set, only decoders submit
 			var div_docker = document.getElementById('div_id_docker_image');
 			var hint_data = document.getElementById('hint_id_data');
 			var decoder = document.getElementById('id_decoder');
+			var permission = document.getElementById('id_permission');
+			var div_permission = document.getElementById('div_id_permission');
+			var ask_permission = {
+				{% for phase in phases %}
+					{{ phase.id }}: '{{ phase.ask_permission }}'{% if not forloop.last %},{% endif %}
+				{% endfor %}
+			};
 
 			function onPhaseChange() {
 				var option = phase.options[phase.selectedIndex]
@@ -59,6 +66,17 @@ To ensure that decoders are not optimized for the test set, only decoders submit
 					div_docker.style.display = "block";
 					hint_data.textContent = "Files representing the encoded images";
 					decoder.required = true;
+				}
+
+				if (ask_permission[phase.value] == "required") {
+					div_permission.style.display = "block";
+					permission.required = true;
+				} else if (ask_permission[phase.value] == "optional") {
+					div_permission.style.display = "block";
+					permission.required = false;
+				} else {
+					div_permission.style.display = "none";
+					permission.required = false;
 				}
 			}
 

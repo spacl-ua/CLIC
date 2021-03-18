@@ -45,6 +45,14 @@ class Phase(models.Model):
 	data_fraction = models.FloatField(null=True, blank=True,
 		help_text='Fraction of complete dataset (used to estimate total dataset size)')
 	settings = JSONField(blank=True, default='')
+	ask_permission = models.CharField(
+		choices=(
+			('no', 'No'),
+			('optional', 'Yes (optional)'),
+			('required', 'Yes (required)')),
+		max_length=32,
+		default='no',
+		help_text='Ask for permission to publish reconstructions?')
 
 	def __str__(self):
 		return '{0} ({1})'.format(self.task, self.description.lower())
@@ -105,7 +113,10 @@ class Submission(models.Model):
 	data_size = models.IntegerField()
 	hidden = models.BooleanField(default=False)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_WAITING)
-	link = models.CharField(max_length=512, blank=True)
+	link = models.CharField(max_length=512, blank=True,
+		help_text='An optional link to some website')
+	permission = models.BooleanField(default=False,
+		help_text='Are we allowed to publish reconstructions?')
 
 	def job_name(self):
 		"""

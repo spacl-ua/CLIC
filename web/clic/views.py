@@ -63,7 +63,13 @@ def submit(request):
 	else:
 		form = teams.forms.AuthenticationForm()
 
-	return render(request, 'submit.html', {'form': form}, status=status)
+	phases = submissions.models.Phase.objects.all()
+
+	return render(
+		request,
+		'submit.html',
+		{'form': form, 'phases': phases},
+		status=status)
 
 
 def _decode(request, **kwargs):

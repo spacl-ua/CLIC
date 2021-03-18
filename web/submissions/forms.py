@@ -26,6 +26,15 @@ class SubmitForm(forms.Form):
 	hidden = forms.BooleanField(
 		help_text='Hide submission from leaderboard',
 		required=False)
+	permission = forms.BooleanField(
+		label='We grant permission to publish reconstructions ',
+		help_text= \
+			'We will only publish reconstructed PNGs, <u>not</u> your decoder. ' \
+			'Images will be released under the '
+			'<a href="https://data.vision.ee.ethz.ch/cvl/clic/LICENSE_professional_2020.txt">Unsplash license</a>. ' \
+			'Videos will be released under a ' \
+			'<a href="https://creativecommons.org/share-your-work/public-domain/cc0/">CC0 license</a>.',
+		required=False)
 
 	def __init__(self, *args, **kwargs):
 		self.user = kwargs.pop('user', None)
@@ -117,5 +126,10 @@ class SubmitForm(forms.Form):
 							total_size,
 							self.cleaned_data['phase'].total_size_limit))
 					self.add_error('data', error)
+
+		if self.cleaned_data['phase'].ask_permission == 'required':
+			if not self.cleaned_data.get('permission', False):
+				error = ValidationError('Permission to publish is required for this track')
+				self.add_error('permission', error)
 
 		return self.cleaned_data

@@ -9,12 +9,12 @@ class MeasurementInline(admin.StackedInline):
 
 
 class SubmissionAdmin(admin.ModelAdmin):
-	list_display = ('id', 'team', 'phase', 'status', 'decoder_size', 'data_size', 'docker_image',)
+	list_display = ('id', 'team', 'phase', 'status', 'decoder_size', 'data_size', 'docker_image', 'timestamp',)
 	inlines = [MeasurementInline]
 
 
 class PhaseAdmin(admin.ModelAdmin):
-	list_display = ('task', 'name', 'active')
+	list_display = ('task', 'name', 'active', 'hidden', 'decoder_fixed', 'ask_permission', 'cpu', 'timeout', 'memory')
 
 
 admin.site.register(models.Submission, SubmissionAdmin)
