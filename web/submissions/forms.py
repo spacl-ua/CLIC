@@ -132,4 +132,7 @@ class SubmitForm(forms.Form):
 				error = ValidationError('Permission to publish is required for this track')
 				self.add_error('permission', error)
 
+		if 'permission' not in self.cleaned_data:
+			self.cleaned_data['permission'] = False
+
 		return self.cleaned_data

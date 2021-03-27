@@ -98,7 +98,8 @@ def _decode(request, **kwargs):
 		hidden=kwargs['hidden'],
 		decoder_size=kwargs['decoder_size'],
 		decoder_hash=kwargs['decoder_hash'],
-		data_size=kwargs['data_size'])
+		data_size=kwargs['data_size'],
+		permission=kwargs['permission'])
 	submission.save()
 
 	# submission will be stored here
