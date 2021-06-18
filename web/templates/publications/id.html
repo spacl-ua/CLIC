@@ -22,9 +22,16 @@
 
 {% block content %}
 	{% for publication in publications %}
-		<h2>{{ publication.type.description }}</h2>
-		{% include "publications/publication.html" %}<br/>
-		<h2>Reference</h2>
-		<pre lang="bibtex">{% include "publications/publication.bib" %}</pre>
+	<div class="card mb-3">
+		<div class="card-body">
+			{% include "publications/publication.html" %}<br/>
+		</div>
+	</div>
+	<div class="card mb-3">
+		<div class="card-body">
+			<h5 class="card-title">Reference</h5>
+			<pre lang="bibtex">{% include "publications/publication.bib" %}</pre>
+		</div>
+	</div>
 	{% endfor %}
 {% endblock %}
