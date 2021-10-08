@@ -13,13 +13,18 @@
 	</ul>
 
 	<div class="bg-white border-left border-bottom border-right rounded-bottom mb-2">
-		<table class="table table-borderless table-hover text-center" data-toggle="table" data-classes="table table-hover text-center">
+		<table
+			class="table table-borderless table-hover text-center"
+			data-toggle="table"
+			data-classes="table table-hover text-center"
+			data-sort-name="{% if phase.task.name == 'perceptual' %}accuracy{% elif phase.task.name == 'video' %}MSSSIM{% else %}ELO{% endif %}"
+			data-sort-order="desc">
 			<thead>
 				{% if phase.task.name == 'perceptual' %}
 					<tr>
 						<th scope="col" data-sortable="true">Team</th>
 						{% for metric in metrics %}
-						<th scope="col" data-sortable="true">
+						<th scope="col" data-sortable="true" data-field="{{ metric }}">
 							<span style="text-transform: capitalize;">{{ metric }}</span>
 							{% if metric == 'accuracy' %}
 								<i class="fas fa-award text-warning"></i>
@@ -32,7 +37,7 @@
 					<tr>
 						<th scope="col" data-sortable="true">Team</th>
 						{% for metric in metrics %}
-							<th scope="col" data-sortable="true">{{ metric }}{% if phase.task.name != 'video' and metric == 'ELO' %} <i class="fas fa-award text-warning"></i>{% endif %}{% if phase.task.name == 'video' and metric == 'MSSSIM' %} <i class="fas fa-award text-warning"></i>{% endif %}</th>
+						<th scope="col" data-sortable="true" data-field="{{ metric }}">{{ metric }}{% if phase.task.name != 'video' and metric == 'ELO' %} <i class="fas fa-award text-warning"></i>{% endif %}{% if phase.task.name == 'video' and metric == 'MSSSIM' %} <i class="fas fa-award text-warning"></i>{% endif %}</th>
 						{% endfor %}
 						<th scope="col" data-sortable="true">
 							<a data-toggle="tooltip" data-placement="top" title="Bytes">

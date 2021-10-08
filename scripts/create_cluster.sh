@@ -67,3 +67,6 @@ kubectl create secret generic sentry-${LABEL} --from-literal dsn="$SENTRY_DSN"
 
 # add evaluation code to kubernetes
 kubectl create configmap code-${LABEL} --from-file code/
+
+# add SSL keys
+kubectl create secret generic clic-ssl-key --from-file ssl
