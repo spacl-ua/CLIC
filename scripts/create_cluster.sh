@@ -1,4 +1,5 @@
 #!/bin/bash
+set -uxe
 
 LABEL=clic2021
 

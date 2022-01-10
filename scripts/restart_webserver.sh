@@ -1,4 +1,5 @@
 #!/bin/bash
+set -uxe
 
 # collect and upload static files
 docker run --rm -ti \
