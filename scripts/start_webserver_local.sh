@@ -14,7 +14,7 @@ done
 if [ ! -f service-account.json ]; then
 	# create service account key file
 	if ( kubectl get secret clic-sa-key 2>&1 > /dev/null ); then
-		kubectl get secrets clic-sa-key -o 'go-template={{index .data "service-account.json"}}' | base64 -D - > service-account.json;
+		kubectl get secrets clic-sa-key -o 'go-template={{index .data "service-account.json"}}' | base64 -d - > service-account.json;
 	else
 		read -p "Please enter a service account [clic2019@clic-215616.iam.gserviceaccount.com]: " SERVICE_ACCOUNT
 		SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-clic2019@clic-215616.iam.gserviceaccount.com}
@@ -23,10 +23,10 @@ if [ ! -f service-account.json ]; then
 fi
 
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
-DB_NAME=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -D -)
-DB_PASSWORD=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -D -)
-SECRET_KEY=$(kubectl get secrets django-${LABEL} -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -D -)
-SENTRY_DSN=$(kubectl get secrets sentry-${LABEL} -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -D -)
+DB_NAME=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -d -)
+DB_PASSWORD=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -d -)
+SECRET_KEY=$(kubectl get secrets django-${LABEL} -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -d -)
+SENTRY_DSN=$(kubectl get secrets sentry-${LABEL} -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -d -)
 
 if [ -z "$DB_PASSWORD" ]; then
 	read -p "Please enter the SQL password: " DB_PASSWORD
