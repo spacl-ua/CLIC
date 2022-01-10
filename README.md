@@ -1,3 +1,13 @@
+# 0. Install Google Cloud SDK & Docker
+
+Cloud SDK (Mac):
+
+	curl https://sdk.cloud.google.com | bash
+
+Docker:
+
+	TODO
+
 # 1. Select Google Cloud project
 
 Select a Google Cloud project:
@@ -19,9 +29,9 @@ In the Google Cloud console, you can enable public access to the Docker images u
 
 Create the following storage buckets:
 
-	gsutil mb gs://clic2021_targets
-	gsutil mb gs://clic2021_environments
-	gsutil mb gs://clic2021_submissions
+	gsutil mb gs://clic2022_targets
+	gsutil mb gs://clic2022_environments
+	gsutil mb gs://clic2022_submissions
 
 For each task and phase, create folders `<task>/<phase>/` and upload corresponding files into these
 directories. The first bucket contains the target images, the second bucket contains any extra files
@@ -33,13 +43,14 @@ Create a MySQL instance if it does not already exist:
 
 	gcloud sql instances create clic --database-version=MYSQL_5_7
 
-Change the root password:
+<!-- Do not do this unless you update kubernetes secrets!
+ Change the root password:
 
-	gcloud sql users set-password root --instance clic --host % --password <password>
+	gcloud sql users set-password root --instance clic --host % --password <password> -->
 
 Create a database for this year's competition:
 
-	gcloud sql databases create clic2021 --instance clic
+	gcloud sql databases create clic2022 --instance clic
 
 # 5. Create kubernetes cluster
 
@@ -66,8 +77,8 @@ Create an admin:
 
 Create a public storage bucket to host static content:
 
-	gsutil mb gs://clic2021_public
-	gsutil iam ch allUsers:objectViewer gs://clic2020_public
+	gsutil mb gs://clic2022_public
+	gsutil iam ch allUsers:objectViewer gs://clic2022_public
 
 Start webserver:
 
