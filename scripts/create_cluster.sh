@@ -1,7 +1,7 @@
 #!/bin/bash
 set -uxe
 
-LABEL=clic2021
+LABEL=clic2022
 
 # request some information
 read -p "Please enter the SQL username [root]: " DB_USER

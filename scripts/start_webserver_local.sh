@@ -1,7 +1,7 @@
 #!/bin/sh
 set -uxe
 
-LABEL=clic2021
+LABEL=clic2022
 
 INTERACTIVE=false
 

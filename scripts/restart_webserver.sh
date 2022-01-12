@@ -1,6 +1,8 @@
 #!/bin/bash
 set -uxe
 
+LABEL=clic2022
+
 # collect and upload static files
 docker run --rm -ti \
 	-w "$(pwd)/web" \
@@ -10,7 +12,7 @@ docker run --rm -ti \
 gsutil -m rsync -R web/static/ gs://clic2021_public/static/
 
 # allocate IP address if it does not already exist
-gcloud compute addresses create clic2021-web --region us-west1 2> /dev/null
+gcloud compute addresses create clic2022-web --region us-west1 2> /dev/null
 IP_ADDRESS=$(gcloud compute addresses describe ${LABEL}-web --region us-west1 --format 'value(address)')
 
 # get sha256 of latest image

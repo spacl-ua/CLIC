@@ -43,9 +43,9 @@ spec:
             value: "/var/run/secret/cloud.google.com/service-account.json"
         envFrom:
           - secretRef:
-              name: cloudsql-clic2021
+              name: cloudsql-clic2022
           - secretRef:
-              name: buckets-clic2021
+              name: buckets-clic2022
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
@@ -80,9 +80,9 @@ spec:
             value: "/var/run/secret/cloud.google.com/service-account.json"
         envFrom:
           - secretRef:
-              name: cloudsql-clic2021
+              name: cloudsql-clic2022
           - secretRef:
-              name: buckets-clic2021
+              name: buckets-clic2022
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
@@ -101,5 +101,5 @@ spec:
             path: "/var/lib/docker"
         - name: code-volume
           configMap:
-            name: code-clic2020
+            name: code-clic2022
   backoffLimit: 0

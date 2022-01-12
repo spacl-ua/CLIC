@@ -134,8 +134,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-MEDIA_URL = 'http://storage.googleapis.com/clic2021_public/'
-STATIC_URL = '/static/' if DEBUG else 'http://storage.googleapis.com/clic2021_public/static/'
+MEDIA_URL = 'http://storage.googleapis.com/clic2022_public/'
+STATIC_URL = '/static/' if DEBUG else 'http://storage.googleapis.com/clic2022_public/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 
