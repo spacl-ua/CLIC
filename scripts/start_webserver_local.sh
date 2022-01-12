@@ -74,6 +74,10 @@ docker run \
 		-instances=${DB_INSTANCE}=tcp:0.0.0.0:5432
 
 # start webserver
+
+# Note --add-host due to
+# https://stackoverflow.com/questions/48546124/what-is-linux-equivalent-of-host-docker-internal/61001152
+
 docker run \
 	--rm \
 	-ti \
@@ -82,6 +86,7 @@ docker run \
 	-e DB_NAME="${DB_NAME}" \
 	-e DB_USER=root \
 	-e DB_PASSWORD="${DB_PASSWORD}" \
+	--add-host=host.docker.internal:host-gateway \
 	-e DB_HOST="host.docker.internal" \
 	-e DB_PORT="5432" \
 	-e BUCKET_SUBMISSIONS="${LABEL}_submissions" \
