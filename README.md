@@ -52,7 +52,7 @@ Create a database for this year's competition:
 
 	gcloud sql databases create clic2022 --instance clic
 
-# 5. Create kubernetes cluster
+# 5. a. Create kubernetes cluster (if needed, so far shared across years)
 
 Create a cluster which will run decoders and other servers:
 
@@ -63,15 +63,41 @@ the server, run:
 
 	./scripts/delete_cluster.sh
 
+# 5. b. Alternatively just create new secrets.
+
+	./scripts/create_secrets.sh
+
+# 5 + 1/2
+Build images
+
+	./scripts/build_images.sh
+
+# (Optional) Migrate data:
+
+	./scripts/start_local_sql_proxy.sh
+
+	mysqldump --port 1234 -h 127.0.0.1 --user root -p clic2021 > clic2021.sql
+
+	cat clic2021.sql | mysql --port 1234 -h 127.0.0.1 --user root -p clic2022
+
+(followed by truncating/deleting irrelevant data)
+
+
 # 6. Create SQL tables
+Enter environment with code + DB proxy:
+
+./scripts/start_webserver_local.sh  -i
 
 Create database tables:
 
-	python3 manage.py migrate
+	./manage.py migrate
 
 Create an admin:
 
-	python3 manage.py createsuperuser
+	./manage.py createsuperuser
+
+(exit when done)
+
 
 # 7. Start webserver
 

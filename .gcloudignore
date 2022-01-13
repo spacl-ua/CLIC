@@ -3,3 +3,7 @@ examples
 service-account.json
 code
 web/static
+
+# Python pycache:
+__pycache__/
+*.pyc

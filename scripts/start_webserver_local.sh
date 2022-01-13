@@ -1,7 +1,7 @@
 #!/bin/sh
 set -uxe
 
-LABEL=clic2022
+LABEL=${1-clic2022}
 
 INTERACTIVE=false
 
@@ -71,7 +71,8 @@ docker run \
 	gcr.io/cloudsql-docker/gce-proxy:1.16 \
 	/cloud_sql_proxy \
 		-dir=/cloudsql \
-		-instances=${DB_INSTANCE}=tcp:0.0.0.0:5432
+		-instances=${DB_INSTANCE}=tcp:0.0.0.0:5432 \
+		 || echo "Failed starting proxy" # 
 
 # start webserver
 
@@ -97,7 +98,7 @@ docker run \
 	-w "$(pwd)/web" \
 	-v "$(pwd)/web":"$(pwd)/web" \
 	-p 8000:8000 \
-	gcr.io/clic-215616/web \
+	"gcr.io/clic-215616/web-${LABEL}" \
 	/bin/bash \
 	-c "${COMMAND}"
 
