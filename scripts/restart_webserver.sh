@@ -1,19 +1,19 @@
 #!/bin/bash
 set -uxe
 
+./scripts/build_web_image.sh
+
 # Split up to support deploying clic2022 into clic2021 deployment.
 LABEL="clic2022"
 DEPLOYMENT="clic2021"
 
-# TODO: Uncomment.
-
-# # collect and upload static files
-# docker run --rm -ti \
-# 	-w "$(pwd)/web" \
-# 	-v "$(pwd)/web":"$(pwd)/web" \
-# 	gcr.io/clic-215616/web-${LABEL} \
-# 	python3 manage.py collectstatic --no-input && \
-# gsutil -m rsync -R web/static/ gs://${LABEL}_public/static/
+# collect and upload static files
+docker run --rm -ti \
+	-w "$(pwd)/web" \
+	-v "$(pwd)/web":"$(pwd)/web" \
+	gcr.io/clic-215616/web-${LABEL} \
+	python3 manage.py collectstatic --no-input && \
+gsutil -m rsync -R web/static/ gs://${LABEL}_public/static/
 
 # To be safe, lets not run thess unless  we have to.
 
