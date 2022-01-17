@@ -2,7 +2,7 @@
 set -uxe
 
 # Split up to support deploying clic2022 into clic2021 deployment.
-LABEL="clic2021"
+LABEL="clic2022"
 DEPLOYMENT="clic2021"
 
 # TODO: Uncomment.
@@ -29,5 +29,4 @@ echo "IP_ADDRESS: $IP_ADDRESS"
 DIGEST=$(gcloud container images describe --format 'get(image_summary.digest)' gcr.io/clic-215616/web-${LABEL})
 
 # start webserver
-# TODO: disable --dry-run
-cat web/web.yaml | sed "s/{{ LABEL }}/${LABEL}/g" | sed "s/{{ DEPLOYMENT }}/${DEPLOYMENT}/g" | sed "s/{{ IP_ADDRESS }}/${IP_ADDRESS}/g" | sed "s/{{ DIGEST }}/${DIGEST}/g" | kubectl apply -f - --dry_run
+cat web/web.yaml | sed "s/{{ LABEL }}/${LABEL}/g" | sed "s/{{ DEPLOYMENT }}/${DEPLOYMENT}/g" | sed "s/{{ IP_ADDRESS }}/${IP_ADDRESS}/g" | sed "s/{{ DIGEST }}/${DIGEST}/g" | kubectl apply -f -
