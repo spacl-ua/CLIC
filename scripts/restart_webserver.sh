@@ -1,6 +1,7 @@
 #!/bin/bash
 set -uxe
 
+# Build new docker image
 ./scripts/build_web_image.sh
 
 # Split up to support deploying clic2022 into clic2021 deployment.
