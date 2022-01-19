@@ -78,8 +78,8 @@ spec:
             cpu: 4
         command: [
             "gunicorn",
-            "--certfile=/var/run/secret/ssl/compression_cc.crt",
-            "--keyfile=/var/run/secret/ssl/compression_cc.key",
+            #"--certfile=/var/run/secret/ssl/compression_cc.crt",
+            #"--keyfile=/var/run/secret/ssl/compression_cc.key",
             "--bind", ":4343",
             "--worker-class", "gevent",
             "--workers", "12",

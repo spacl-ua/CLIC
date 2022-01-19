@@ -1,7 +1,7 @@
 #!/bin/sh
 set -uxe
 
-LABEL=${1-clic2022}
+LABEL="clic2022"
 
 INTERACTIVE=false
 
