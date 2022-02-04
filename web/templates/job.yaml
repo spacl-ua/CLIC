@@ -64,7 +64,7 @@ spec:
             memory: "{{ submission.phase.memory }}M"
             nvidia.com/gpu: 1
           limits:
-            memory: "{{ submission.phase.memory|add:500 }}M"
+            memory: "{{ submission.phase.memory|add:2000 }}M"
             cpu: 1
             nvidia.com/gpu: 1
         command: [

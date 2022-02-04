@@ -13,7 +13,7 @@ RUN apt-get install -y python3.7 python3-pip
 RUN apt-get install -y libssl-dev default-libmysqlclient-dev
 # https://stackoverflow.com/questions/44043906/the-headers-or-library-files-could-not-be-found-for-jpeg-installing-pillow-on
 RUN apt-get install -y libjpeg-dev
-
+RUN apt-get install -y ffmpeg
 
 WORKDIR /tmp
 COPY requirements.txt .

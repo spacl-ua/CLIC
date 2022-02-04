@@ -43,7 +43,7 @@ gcloud container node-pools create gpu-pool \
 	--verbosity error
 
 # install nvidia drivers on GPU nodes
-kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-nvidia-v450.yaml
+kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
 
 # add service account information to kubernetes
 kubectl create secret generic clic-sa-key --from-file service-account.json
