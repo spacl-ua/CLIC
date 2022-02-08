@@ -7,162 +7,163 @@ from PIL import Image
 from msssim import MultiScaleSSIM
 
 def evaluate(submission_files, target_files, settings={}, logger=None):
-	"""
-	Calculates metrics for the given images.
-	"""
+    """
+    Calculates metrics for the given images.
+    """
 
-	if settings is None:
-		settings = {}
-	if isinstance(settings, str):
-		try:
-			settings = json.loads(settings)
-		except json.JSONDecodeError:
-			settings = {}
+    if settings is None:
+        settings = {}
+    if isinstance(settings, str):
+        try:
+            settings = json.loads(settings)
+        except json.JSONDecodeError:
+            settings = {}
 
-	metrics = settings.get('metrics', ['PSNR', 'MSSSIM'])
-	patch_size = settings.get('patch_size', 256)
+    metrics = settings.get('metrics', ['PSNR', 'MSSSIM'])
+    patch_size = settings.get('patch_size', 256)
 
-	num_dims = 0
-	sqerror_values = []
-	msssim_values = []
-	accuracy_values = []
+    num_dims = 0
+    sqerror_values = []
+    msssim_values = []
+    accuracy_values = []
 
-	# used by FID
-	target_patches = []
-	submission_patches = []
-	rs = np.random.RandomState(0)
+    # used by FID
+    target_patches = []
+    submission_patches = []
+    rs = np.random.RandomState(0)
 
-	for name in target_files:
-		if name.endswith('.csv'):
-			file0 = read_csv(target_files[name], logger)
-			file1 = read_csv(submission_files[name], logger)
+    for file_idx, name in enumerate(target_files):
+        if name.endswith('.csv'):
+            file0 = read_csv(target_files[name], logger)
+            file1 = read_csv(submission_files[name], logger)
 
-			if file0 is None:
-				logger.error('Failed to load targets')
-			if file1 is None:
-				logger.error('Could not read CSV file')
+            if file0 is None:
+                logger.error('Failed to load targets')
+            if file1 is None:
+                logger.error('Could not read CSV file')
 
-			if file0 and file1:
-				if 'accuracy' in metrics:
-					value = accuracy(file0, file1, logger)
-					if value is None or np.isnan(value):
-						logger.error('Evaluation of accuracy failed, assuming accuracy of 0%')
-						accuracy_values.append(0.0)
-					else:
-						accuracy_values.append(value)
+            if file0 and file1:
+                if 'accuracy' in metrics:
+                    value = accuracy(file0, file1, logger)
+                    if value is None or np.isnan(value):
+                        logger.error('Evaluation of accuracy failed, assuming accuracy of 0%')
+                        accuracy_values.append(0.0)
+                    else:
+                        accuracy_values.append(value)
 
-		else:
-			image0 = np.asarray(Image.open(target_files[name]).convert('RGB'), dtype=np.float32)
-			image1 = np.asarray(Image.open(submission_files[name]).convert('RGB'), dtype=np.float32)
+        else:
+            logger.debug(f'Metrics for image number `{file_idx}` of `{len(target_files)}`: `{name}`')
+            image0 = np.asarray(Image.open(target_files[name]).convert('RGB'), dtype=np.float32)
+            image1 = np.asarray(Image.open(submission_files[name]).convert('RGB'), dtype=np.float32)
 
-			num_dims += image0.size
+            num_dims += image0.size
 
-			if 'PSNR' in metrics:
-				sqerror_values.append(mse(image1, image0))
-			if 'MSSSIM' in metrics:
-				value = msssim(image0, image1) * image0.size
-				if np.isnan(value):
-					value = 0.0
-					if logger:
-						logger.warning(
-							f'Evaluation of MSSSIM for `{name}` returned NaN. Assuming MSSSIM is zero.')
-				msssim_values.append(value)
-			if 'KID' in metrics or 'FID' in metrics:
-				if image0.shape[0] >= patch_size and image0.shape[1] >= patch_size:
-					# extract random patches for later use
-					i = rs.randint(image0.shape[0] - patch_size + 1)
-					j = rs.randint(image0.shape[1] - patch_size + 1)
-					target_patches.append(image0[i:i + patch_size, j:j + patch_size])
-					submission_patches.append(image1[i:i + patch_size, j:j + patch_size])
+            if 'PSNR' in metrics:
+                sqerror_values.append(mse(image1, image0))
+            if 'MSSSIM' in metrics:
+                value = msssim(image0, image1) * image0.size
+                if np.isnan(value):
+                    value = 0.0
+                    if logger:
+                        logger.warning(
+                                f'Evaluation of MSSSIM for `{name}` returned NaN. Assuming MSSSIM is zero.')
+                msssim_values.append(value)
+            if 'KID' in metrics or 'FID' in metrics:
+                if image0.shape[0] >= patch_size and image0.shape[1] >= patch_size:
+                    # extract random patches for later use
+                    i = rs.randint(image0.shape[0] - patch_size + 1)
+                    j = rs.randint(image0.shape[1] - patch_size + 1)
+                    target_patches.append(image0[i:i + patch_size, j:j + patch_size])
+                    submission_patches.append(image1[i:i + patch_size, j:j + patch_size])
 
-	results = {}
+    results = {}
 
-	if 'PSNR' in metrics:
-		results['PSNR'] = mse2psnr(np.sum(sqerror_values) / num_dims)
-	if 'MSSSIM' in metrics:
-		results['MSSSIM'] = np.sum(msssim_values) / num_dims
-	if 'FID' in metrics:
-		results['FID'] = fid(target_patches, submission_patches)
-	if 'accuracy' in metrics:
-		results['accuracy'] = np.mean(accuracy_values)
+    if 'PSNR' in metrics:
+        results['PSNR'] = mse2psnr(np.sum(sqerror_values) / num_dims)
+    if 'MSSSIM' in metrics:
+        results['MSSSIM'] = np.sum(msssim_values) / num_dims
+    if 'FID' in metrics:
+        results['FID'] = fid(target_patches, submission_patches)
+    if 'accuracy' in metrics:
+        results['accuracy'] = np.mean(accuracy_values)
 
-	return results
+    return results
 
 
 def fid(images0, images1):
-	with open(os.devnull, 'w') as devnull:
-		kwargs = {
-			'get_codes': True,
-			'get_preds': False,
-			'batch_size': 100,
-			'output': devnull}
-		model = mmd.Inception()
-		features0 = mmd.featurize(images0, model, **kwargs)[-1]
-		features1 = mmd.featurize(images1, model, **kwargs)[-1]
-		# average across splits
-		score = np.mean(
-			mmd.fid_score(
-				features0,
-				features1,
-				splits=10,
-				split_method='bootstrap',
-				output=devnull))
-	return score
+    with open(os.devnull, 'w') as devnull:
+        kwargs = {
+                'get_codes': True,
+                'get_preds': False,
+                'batch_size': 100,
+                'output': devnull}
+        model = mmd.Inception()
+        features0 = mmd.featurize(images0, model, **kwargs)[-1]
+        features1 = mmd.featurize(images1, model, **kwargs)[-1]
+        # average across splits
+        score = np.mean(
+                mmd.fid_score(
+                        features0,
+                        features1,
+                        splits=10,
+                        split_method='bootstrap',
+                        output=devnull))
+    return score
 
 
 def mse(image0, image1):
-	return np.sum(np.square(image1 - image0))
+    return np.sum(np.square(image1 - image0))
 
 
 def mse2psnr(mse):
-	return 20. * np.log10(255.) - 10. * np.log10(mse)
+    return 20. * np.log10(255.) - 10. * np.log10(mse)
 
 
 def msssim(image0, image1):
-	return MultiScaleSSIM(image0[None], image1[None])
+    return MultiScaleSSIM(image0[None], image1[None])
 
 
 def accuracy(file0, file1, logger=None):
-	matches = 0.
-	nonmatches = 0.
-	for k in file0.keys():
-		if k not in file1:
-			if logger:
-				logger.error(f'Missing key {k}')
-			return None
-		if file0[k] == file1[k]:
-			matches += 1
-		else:
-			nonmatches += 1
-	return matches / float(matches + nonmatches)
+    matches = 0.
+    nonmatches = 0.
+    for k in file0.keys():
+        if k not in file1:
+            if logger:
+                logger.error(f'Missing key {k}')
+            return None
+        if file0[k] == file1[k]:
+            matches += 1
+        else:
+            nonmatches += 1
+    return matches / float(matches + nonmatches)
 
 
 def read_csv(file_name, logger=None):
-	"""Read CSV file.
+    """Read CSV file.
 
-	The CSV file contains 4 columns:
-	FileA,FileB,OriginalFile,BinaryScore
+    The CSV file contains 4 columns:
+    FileA,FileB,OriginalFile,BinaryScore
 
-	FileA/FileB: paths to images generated by the two methods will be compared.
-	OriginalFile: path to the original (uncompressed) image filed.
-	BinaryScore: 0/1. This should be 0 if FileA is closer to the original than
-	FileB.
+    FileA/FileB: paths to images generated by the two methods will be compared.
+    OriginalFile: path to the original (uncompressed) image filed.
+    BinaryScore: 0/1. This should be 0 if FileA is closer to the original than
+    FileB.
 
-	Args:
-		file_name: file name to read.
+    Args:
+            file_name: file name to read.
 
-	Returns:
-		dict({a/b/c} -> score).
-	"""
-	contents = {}
-	with open(file_name) as csvfile:
-		reader = csv.reader(csvfile)
+    Returns:
+            dict({a/b/c} -> score).
+    """
+    contents = {}
+    with open(file_name) as csvfile:
+        reader = csv.reader(csvfile)
 
-		for row in reader:
-			if len(row) != 4:
-				if logger:
-					logger.error('Expected CSV file to contain 4 columns. Found %d.', len(row))
-				return None
+        for row in reader:
+            if len(row) != 4:
+                if logger:
+                    logger.error('Expected CSV file to contain 4 columns. Found %d.', len(row))
+                return None
 
-			contents[','.join(row[:3])] = row[3]
-	return contents
+            contents[','.join(row[:3])] = row[3]
+    return contents
