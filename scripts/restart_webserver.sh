@@ -1,12 +1,13 @@
 #!/bin/bash
 set -uxe
 
-# Build new docker image
-./scripts/build_web_image.sh
+# Build new docker image if needed.
+
+# ./scripts/build_web_image.sh
 
 # Split up to support deploying clic2022 into clic2021 deployment.
 LABEL="clic2022"
-DEPLOYMENT="clic2021"
+DEPLOYMENT="clic2022"
 
 # collect and upload static files
 docker run --rm -ti \

@@ -66,68 +66,68 @@ spec:
           periodSeconds: 30
           successThreshold: 1
 
-      - name: clic-app-https
-        image: gcr.io/clic-215616/web-{{ LABEL }}@{{ DIGEST }}
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: "1G"
-            cpu: 1
-          limits:
-            memory: "4G"
-            cpu: 4
-        command: [
-            "gunicorn",
-            #"--certfile=/var/run/secret/ssl/compression_cc.crt",
-            #"--keyfile=/var/run/secret/ssl/compression_cc.key",
-            "--bind", ":4343",
-            "--worker-class", "gevent",
-            "--workers", "12",
-            "--timeout", "600",
-            "--log-level", "DEBUG",
-            "clic.wsgi"]
-        env:
-          - name: DB_HOST
-            value: "127.0.0.1"
-          - name: DB_PORT
-            value: "5432"
-          - name: SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: django-{{ LABEL }}
-                key: secret_key
-          - name: SENTRY_DSN
-            valueFrom:
-              secretKeyRef:
-                name: sentry-{{ LABEL }}
-                key: dsn
-          - name: GOOGLE_APPLICATION_CREDENTIALS
-            value: "/var/run/secret/cloud.google.com/service-account.json"
-        envFrom:
-          - secretRef:
-              name: cloudsql-{{ LABEL }}
-          - secretRef:
-              name: buckets-{{ LABEL }}
-        volumeMounts:
-          - name: clic-sa-key-volume
-            mountPath: "/var/run/secret/cloud.google.com"
-            readOnly: true
-          - name: clic-ssl-key-volume
-            mountPath: "/var/run/secret/ssl"
-            readOnly: true
-        ports:
-        - containerPort: 4343
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 4343
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          successThreshold: 1
+      # - name: clic-app-https
+      #   image: gcr.io/clic-215616/web-{{ LABEL }}@{{ DIGEST }}
+      #   imagePullPolicy: Always
+      #   resources:
+      #     requests:
+      #       memory: "1G"
+      #       cpu: 1
+      #     limits:
+      #       memory: "4G"
+      #       cpu: 4
+      #   command: [
+      #       "gunicorn",
+      #       "--certfile=/var/run/secret/ssl/compression_cc.crt",
+      #       "--keyfile=/var/run/secret/ssl/compression_cc.key",
+      #       "--bind", ":4343",
+      #       "--worker-class", "gevent",
+      #       "--workers", "12",
+      #       "--timeout", "600",
+      #       "--log-level", "DEBUG",
+      #       "clic.wsgi"]
+      #   env:
+      #     - name: DB_HOST
+      #       value: "127.0.0.1"
+      #     - name: DB_PORT
+      #       value: "5432"
+      #     - name: SECRET_KEY
+      #       valueFrom:
+      #         secretKeyRef:
+      #           name: django-{{ LABEL }}
+      #           key: secret_key
+      #     - name: SENTRY_DSN
+      #       valueFrom:
+      #         secretKeyRef:
+      #           name: sentry-{{ LABEL }}
+      #           key: dsn
+      #     - name: GOOGLE_APPLICATION_CREDENTIALS
+      #       value: "/var/run/secret/cloud.google.com/service-account.json"
+      #   envFrom:
+      #     - secretRef:
+      #         name: cloudsql-{{ LABEL }}
+      #     - secretRef:
+      #         name: buckets-{{ LABEL }}
+      #   volumeMounts:
+      #     - name: clic-sa-key-volume
+      #       mountPath: "/var/run/secret/cloud.google.com"
+      #       readOnly: true
+      #     - name: clic-ssl-key-volume
+      #       mountPath: "/var/run/secret/ssl"
+      #       readOnly: true
+      #   ports:
+      #   - containerPort: 4343
+      #   readinessProbe:
+      #     httpGet:
+      #       path: /
+      #       port: 4343
+      #     initialDelaySeconds: 10
+      #     periodSeconds: 30
+      #     successThreshold: 1
 
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.16
-        command: ["/cloud_sql_proxy", "-dir=/cloudsql", "-instances=$(DB_INSTANCE)=tcp:5432"]
+        command: ["/cloud_sql_proxy", "-dir=/cloudsql", "-instances=$(DB_INSTANCE)=tcp:5432", "-log_debug_stdout"]
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: "/var/run/secret/cloud.google.com/service-account.json"
@@ -175,8 +175,10 @@ spec:
     - name: "http"
       port: 80
       targetPort: 8080
-    - name: "https"
-      port: 8001
-      targetPort: 4343
+      protocol: TCP
+    # - name: "https"
+    #   port: 443
+    #   targetPort: 4343
+    #   protocol: TCP
   selector:
     app: {{ DEPLOYMENT }}

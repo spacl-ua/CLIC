@@ -2,3 +2,5 @@
 service-account.json
 web/static
 scratch.html
+ssl/
+ssl.zip

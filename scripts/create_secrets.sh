@@ -11,7 +11,9 @@ DB_USER=${DB_USER:-root}
 DB_NAME="${LABEL}"
 
 # https://humberto.io/blog/tldr-generate-django-secret-key/
-SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
+RANDOM_SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
+read -p "Please enter the django secret key (optional): " SECRET_KEY
+SECRET_KEY=${SECRET_KEY:-$RANDOM_SECRET_KEY}
 read -p "Please enter the Sentry DSN (optional): " SENTRY_DSN
 
 # add SQL account information to kubernetes
