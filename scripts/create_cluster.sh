@@ -38,8 +38,9 @@ gcloud container node-pools create gpu-pool \
 	--cluster clic-cluster \
 	--enable-autoscaling \
 	--min-nodes 0 \
-	--max-nodes 8 \
+	--max-nodes 16 \
 	--num-nodes 0 \
+        --disk-size 250GB \
 	--verbosity error
 
 # install nvidia drivers on GPU nodes
