@@ -1,1 +1,1 @@
-gcloud builds submit --timeout 30m --config cloudbuild.yaml
+gcloud builds submit --timeout 120m --config cloudbuild.yaml
