@@ -1,4 +1,5 @@
 #!/bin/zsh
+# Targeted for about 0.150 bpp right now
 
 mkdir -p valid_encoded;
 
@@ -9,7 +10,9 @@ for src in valid/*.png; do
 done
 
 for src in valid/*.png; do
-	if [ $(python file_size.py) -lt 4722341 ];
+	# Update total number of bytes here for it to correctly resize.
+	# May need to update the lower quality below as well.
+	if [ $(python file_size.py) -lt 3239424 ];
 		then break;
 	fi
 	target=$(basename "${src/.png/.jpg}");

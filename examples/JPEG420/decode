@@ -2,6 +2,11 @@
 
 from PIL import Image
 from glob import glob
+from zipfile import ZipFile
+
+FILES_ZIP = 'outputs.zip'    
+with ZipFile(FILES_ZIP) as zipfile:
+	zipfile.extractall()
 
 for image_file in glob('**/*.jpg', recursive=True):
 	print('Decoding ' + image_file)
