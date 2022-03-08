@@ -1,5 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/libtorch1_8_2_cuda10_2:latest', 'environments/custom_containers/libtorch1_8_2_cuda10_2']
+- name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/aivc:latest', 'environments/custom_containers/aivc']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/torch131_opencv_scipy:latest', 'environments/custom_containers/torch131_opencv_scipy']
@@ -17,3 +19,4 @@ images:
   - 'gcr.io/$PROJECT_ID/custom_containers/torch131_opencv_scipy:latest'
   - 'gcr.io/$PROJECT_ID/custom_containers/pytorch_plus:latest'
   - 'gcr.io/$PROJECT_ID/custom_containers/libtorch1_10_2__cuda11_3:latest'
+  - 'gcr.io/$PROJECT_ID/custom_containers/libtorch1_8_2_cuda10_2:latest'
