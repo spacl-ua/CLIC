@@ -112,10 +112,11 @@ def fid(images0, images1):
 
 
 def mse(image0, image1):
-    return np.sum(np.square(image1 - image0))
+    return np.sum(np.square(image1.astype(np.float64) - image0.astype(np.float64)))
 
 
 def mse2psnr(mse):
+    mse = mse.astype(np.float64)
     return 20. * np.log10(255.) - 10. * np.log10(mse)
 
 
