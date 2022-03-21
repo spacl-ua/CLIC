@@ -1,5 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/david_cuda113:latest', 'environments/custom_containers/david_cuda113']
+- name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/david_cuda111:latest', 'environments/custom_containers/david_cuda111']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/arch_ffmpeg:latest', 'environments/custom_containers/arch_ffmpeg']
@@ -32,3 +34,4 @@ images:
   - 'gcr.io/$PROJECT_ID/custom_containers/david_compressai_opencv_cupy:latest'
   - 'gcr.io/$PROJECT_ID/custom_containers/arch_ffmpeg:latest'
   - 'gcr.io/$PROJECT_ID/custom_containers/david_cuda111:latest'
+  - 'gcr.io/$PROJECT_ID/custom_containers/david_cuda113:latest'
