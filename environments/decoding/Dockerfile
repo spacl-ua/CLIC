@@ -9,7 +9,7 @@ RUN apt-get upgrade -y
 
 RUN apt-get install -y rsync
 RUN apt-get install -y docker.io
-RUN apt-get install -y python3.7 python3-pip
+RUN apt-get install -y python3.7 python3-pip python3.7-dev
 RUN apt-get install -y libssl-dev default-libmysqlclient-dev
 # https://stackoverflow.com/questions/44043906/the-headers-or-library-files-could-not-be-found-for-jpeg-installing-pillow-on
 RUN apt-get install -y libjpeg-dev
@@ -17,7 +17,7 @@ RUN apt-get install -y ffmpeg
 
 WORKDIR /tmp
 COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+RUN python3.7 -m pip install -r requirements.txt
 
 # install gcsfuse for mounting cloud storage
 RUN apt-get install -y lsb-release curl gnupg2
