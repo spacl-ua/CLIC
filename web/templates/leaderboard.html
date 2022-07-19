@@ -17,7 +17,7 @@
 			class="table table-borderless table-hover text-center"
 			data-toggle="table"
 			data-classes="table table-hover text-center"
-			data-sort-name="{% if phase.task.name == 'perceptual' %}accuracy{% elif phase.task.name == 'video' %}MSSSIM{% else %}ELO{% endif %}"
+			data-sort-name="{% if phase.task.name == 'perceptual' %}accuracy{% elif phase.task.name == 'video' %}MOS{% else %}ELO{% endif %}"
 			data-sort-order="desc">
 			<thead>
 				{% if phase.task.name == 'perceptual' %}
