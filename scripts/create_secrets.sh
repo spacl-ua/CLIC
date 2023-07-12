@@ -1,7 +1,7 @@
 #!/bin/bash
 set -uxe
 
-LABEL=clic2022
+LABEL=clic2023
 
 # request some information
 read -p "Please enter the SQL username [root]: " DB_USER
@@ -9,6 +9,19 @@ read -p "Please enter the SQL password: " DB_PASSWORD
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
 DB_USER=${DB_USER:-root}
 DB_NAME="${LABEL}"
+
+PROJECT_ID=$(gcloud config get-value project)
+DEFAULT_SERVICE_ACCOUNT="clic-sa@${PROJECT_ID}.iam.gserviceaccount.com"
+
+if [ ! -f service-account.json ]; then
+	# create service account key file
+	read -p "Please enter a service account [${DEFAULT_SERVICE_ACCOUNT}]: " SERVICE_ACCOUNT
+	SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-${DEFAULT_SERVICE_ACCOUNT}}
+	gcloud iam service-accounts keys create --iam-account "${SERVICE_ACCOUNT}" service-account.json
+fi
+
+# add service account information to kubernetes
+kubectl create secret generic clic-sa-key --from-file service-account.json
 
 # https://humberto.io/blog/tldr-generate-django-secret-key/
 RANDOM_SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
@@ -36,3 +49,6 @@ kubectl create secret generic sentry-${LABEL} --from-literal dsn="$SENTRY_DSN"
 
 # add evaluation code to kubernetes
 kubectl create configmap code-${LABEL} --from-file code/
+
+# add SSL keys
+kubectl create secret generic clic-ssl-key --from-file ssl

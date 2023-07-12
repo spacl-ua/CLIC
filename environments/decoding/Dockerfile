@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.0.3-base-ubuntu18.04
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 MAINTAINER Lucas Theis
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,7 +9,7 @@ RUN apt-get upgrade -y
 
 RUN apt-get install -y rsync
 RUN apt-get install -y docker.io
-RUN apt-get install -y python3.7 python3-pip python3.7-dev
+RUN apt-get install -y python3.11 python3-pip python3.11-dev
 RUN apt-get install -y libssl-dev default-libmysqlclient-dev
 # https://stackoverflow.com/questions/44043906/the-headers-or-library-files-could-not-be-found-for-jpeg-installing-pillow-on
 RUN apt-get install -y libjpeg-dev
