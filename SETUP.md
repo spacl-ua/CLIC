@@ -1,5 +1,5 @@
-> **Info**
-> Before you launch any script, check tem to see if you are happy with the
+> **Note**
+> Before you launch any script, check them to see if you are happy with the
 > settings or to see if they need to be updated.
 
 # 0. Install Google Cloud SDK & Docker
@@ -50,6 +50,10 @@ which will be provided to the decoders. The third bucket will be used to store s
 
 # 4. Create MySQL server
 
+> **Warning**
+> Whenever you change the MySQL password, you will also need to update the corresponding secret
+> in kubernetes so that the website continues to function.
+
 Create a MySQL instance _if it does not already exist_:
 
 	gcloud sql instances create clic --database-version=MYSQL_8_0
@@ -57,10 +61,6 @@ Create a MySQL instance _if it does not already exist_:
  Change the root password:
 
 	gcloud sql users set-password root --instance clic --host % --password <password>
-
-> **Warning**
-> Whenever you change the MySQL password, you will also need to update the corresponding secret
-> in kubernetes so that the server continues to have access.
 
 Create a database for this year's competition:
 

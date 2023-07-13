@@ -1,7 +1,8 @@
 #!/bin/sh
 set -uxe
 
-LABEL="clic2022"
+LABEL="clic2023"
+PROJECT_ID=$(gcloud config get-value project)
 
 INTERACTIVE=false
 
@@ -17,17 +18,17 @@ if [ ! -f service-account.json ]; then
 	if ( kubectl get secret clic-sa-key 2>&1 > /dev/null ); then
 		kubectl get secrets clic-sa-key -o 'go-template={{index .data "service-account.json"}}' | base64 -d - > service-account.json;
 	else
-		read -p "Please enter a service account [clic2019@clic-215616.iam.gserviceaccount.com]: " SERVICE_ACCOUNT
-		SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-clic2019@clic-215616.iam.gserviceaccount.com}
+		read -p "Please enter a service account [clic-sa@${PROJECT_ID}.iam.gserviceaccount.com]: " SERVICE_ACCOUNT
+		SERVICE_ACCOUNT=${SERVICE_ACCOUNT:-clic-sa@${PROJECT_ID}.iam.gserviceaccount.com}
 		gcloud iam service-accounts keys create --iam-account "${SERVICE_ACCOUNT}" service-account.json
 	fi
 fi
 
 DB_INSTANCE=$(gcloud sql instances describe clic --format 'value(connectionName)')
-DB_NAME=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -d -)
-DB_PASSWORD=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -d -)
-SECRET_KEY=$(kubectl get secrets django-${LABEL} -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -d -)
-SENTRY_DSN=$(kubectl get secrets sentry-${LABEL} -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -d -)
+DB_NAME=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_NAME"}}' 2> /dev/null | base64 -d -i -)
+DB_PASSWORD=$(kubectl get secrets cloudsql-${LABEL} -o 'go-template={{index .data "DB_PASSWORD"}}' 2> /dev/null | base64 -d -i -)
+SECRET_KEY=$(kubectl get secrets django-${LABEL} -o 'go-template={{index .data "secret_key"}}' 2> /dev/null | base64 -d -i -)
+SENTRY_DSN=$(kubectl get secrets sentry-${LABEL} -o 'go-template={{index .data "dsn"}}' 2> /dev/null | base64 -d -i -)
 
 if [ -z "$DB_PASSWORD" ]; then
 	read -p "Please enter the SQL password: " DB_PASSWORD
@@ -98,7 +99,7 @@ docker run \
 	-w "$(pwd)/web" \
 	-v "$(pwd)/web":"$(pwd)/web" \
 	-p 8000:8000 \
-	"gcr.io/clic-215616/web-${LABEL}" \
+	"gcr.io/${PROJECT_ID}/web-${LABEL}" \
 	/bin/bash \
 	-c "${COMMAND}"
 

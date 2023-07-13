@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: clic-app
-        image: gcr.io/clic-215616/web-{{ LABEL }}@{{ DIGEST }}
+        image: gcr.io/clic-392518/web-{{ LABEL }}@{{ DIGEST }}
         imagePullPolicy: Always
         resources:
           requests:
@@ -67,7 +67,7 @@ spec:
           successThreshold: 1
 
       # - name: clic-app-https
-      #   image: gcr.io/clic-215616/web-{{ LABEL }}@{{ DIGEST }}
+      #   image: gcr.io/clic-392518/web-{{ LABEL }}@{{ DIGEST }}
       #   imagePullPolicy: Always
       #   resources:
       #     requests:

@@ -1,2 +1,2 @@
-scikit-learn==0.24.0
-tensorflow-gpu==1.14
+scikit-learn
+tensorflow

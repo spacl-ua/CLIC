@@ -17,7 +17,7 @@ RUN apt-get install -y ffmpeg
 
 WORKDIR /tmp
 COPY requirements.txt .
-RUN python3.7 -m pip install -r requirements.txt
+RUN python3.11 -m pip install -r requirements.txt
 
 # install gcsfuse for mounting cloud storage
 RUN apt-get install -y lsb-release curl gnupg2
@@ -29,12 +29,15 @@ RUN \
 	apt-get update && \
 	apt-get install -y gcsfuse
 
+# install Google Cloud CLI
 RUN \
-	export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-	echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list && \
-	curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+	apt-get install -y apt-transport-https ca-certificates gnupg curl
+RUN \
+	echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+	curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
 	apt-get update && \
-	apt-get install -y google-cloud-sdk
+	apt-get install google-cloud-cli
+
 
 # connects to SQL server
 RUN \

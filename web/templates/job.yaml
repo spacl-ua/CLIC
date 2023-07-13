@@ -18,7 +18,7 @@ spec:
     spec:{% if not eval_only %}
       initContainers:
       - name: decode
-        image: "gcr.io/clic-215616/decoding:latest"
+        image: "gcr.io/clic-392518/decoding:latest"
         imagePullPolicy: Always
         resources:
           requests:
@@ -43,9 +43,9 @@ spec:
             value: "/var/run/secret/cloud.google.com/service-account.json"
         envFrom:
           - secretRef:
-              name: cloudsql-clic2022
+              name: cloudsql-clic2023
           - secretRef:
-              name: buckets-clic2022
+              name: buckets-clic2023
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
@@ -57,7 +57,7 @@ spec:
             mountPath: "/code"{% endif %}
       containers:
       - name: evaluate
-        image: "gcr.io/clic-215616/evaluation"
+        image: "gcr.io/clic-392518/evaluation"
         resources:
           requests:
             cpu: 12
@@ -80,9 +80,9 @@ spec:
             value: "/var/run/secret/cloud.google.com/service-account.json"
         envFrom:
           - secretRef:
-              name: cloudsql-clic2022
+              name: cloudsql-clic2023
           - secretRef:
-              name: buckets-clic2022
+              name: buckets-clic2023
         volumeMounts:
           - name: clic-sa-key-volume
             mountPath: "/var/run/secret/cloud.google.com"
@@ -101,5 +101,5 @@ spec:
             path: "/var/lib/docker"
         - name: code-volume
           configMap:
-            name: code-clic2022
+            name: code-clic2023
   backoffLimit: 0

@@ -45,5 +45,5 @@
 - model: submissions.dockerimage
   pk: 1
   fields:
-    name: "gcr.io/clic-215616/compression:latest"
+    name: "gcr.io/clic-392518/compression:latest"
     active: true

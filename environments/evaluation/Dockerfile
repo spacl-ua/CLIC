@@ -1,4 +1,4 @@
-ARG PROJECT_ID=clic-215616
+ARG PROJECT_ID=clic-392518
 
 FROM gcr.io/$PROJECT_ID/decoding:latest
 MAINTAINER Lucas Theis
