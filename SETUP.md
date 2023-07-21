@@ -93,12 +93,17 @@ If you later want to shut down the server, run:
 
 # 7. Create secrets
 
+Ensure kubectl is already installed. If not:
+
+ 	gcloud components install gke-gcloud-auth-plugin
+  	gcloud container clusters get-credentials clic-cluster --zone us-west1-b
+
 Add secrets to kubernetes:
 
 	./scripts/create_secrets.sh
 
 
-# 6. Create SQL tables
+# 8. Create SQL tables
 
 Enter environment with code + DB proxy:
 
@@ -113,7 +118,7 @@ Create an admin:
 	./manage.py createsuperuser
 
 
-# 7. Start webserver
+# 9. Start webserver
 
 Create a public storage bucket to host static content:
 
@@ -130,7 +135,7 @@ for the server.
 The same script can be used to restart the webserver if its configuration is changed.
 Note that most changes to the webserver require rebuilding the Docker images first.
 
-# 8. Debugging
+# 10. Debugging
 
 If there is an issue with the website, it is often easier to debug it locally:
 
