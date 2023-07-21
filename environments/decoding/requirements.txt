@@ -1,4 +1,4 @@
-django==2.2.6
-django-storages[google]==1.7.2
-mysqlclient==1.4.4
+django==4.2.3
+django-storages[google]==1.13.2
 jsonfield==2.0.2
+mysqlclient==1.4.4

@@ -122,8 +122,8 @@ Create an admin:
 
 Create a public storage bucket to host static content:
 
-	gsutil mb gs://clic2022_public
-	gsutil iam ch allUsers:objectViewer gs://clic2022_public
+	gsutil mb gs://clic2023_public
+	gsutil iam ch allUsers:objectViewer gs://clic2023_public
 
 Start webserver:
 

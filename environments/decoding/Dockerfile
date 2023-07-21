@@ -15,9 +15,14 @@ RUN apt-get install -y libssl-dev default-libmysqlclient-dev
 RUN apt-get install -y libjpeg-dev
 RUN apt-get install -y ffmpeg
 
+# use Python 3.11 by default
+RUN \
+	rm /usr/bin/python3 && \
+	ln -s $(which python3.11) /usr/bin/python3
+
 WORKDIR /tmp
 COPY requirements.txt .
-RUN python3.11 -m pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # install gcsfuse for mounting cloud storage
 RUN apt-get install -y lsb-release curl gnupg2
@@ -38,8 +43,7 @@ RUN \
 	apt-get update && \
 	apt-get install google-cloud-cli
 
-
-# connects to SQL server
+# add proxy for connecting to SQL server
 RUN \
 	mkdir /cloudsql && \
 	cd /cloudsql && \

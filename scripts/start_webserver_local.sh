@@ -73,7 +73,7 @@ docker run \
 	/cloud_sql_proxy \
 		-dir=/cloudsql \
 		-instances=${DB_INSTANCE}=tcp:0.0.0.0:5432 \
-		 || echo "Failed starting proxy" # 
+		 || echo "Failed starting proxy"
 
 # start webserver
 
@@ -102,6 +102,7 @@ docker run \
 	"gcr.io/${PROJECT_ID}/web-${LABEL}" \
 	/bin/bash \
 	-c "${COMMAND}"
+
 
 # close connection to MySQL server
 docker stop cloudsql

@@ -13,7 +13,8 @@ RUN apt-get install -y libpq-dev
 
 WORKDIR /tmp
 COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+RUN python3.11 -m pip install -r requirements.txt
+RUN python3.11 -m pip install git+https://github.com/lucastheis/django-publications.git@develop
 
 ENV PYTHONWARNINGS "ignore:Unverified HTTPS request"
 

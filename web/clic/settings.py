@@ -142,7 +142,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 
 # Google Cloud Storage
 # https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
-DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+STORAGES = {"default": {"BACKEND": "storages.backends.gcloud.GoogleCloudStorage"}}
 GS_BUCKET_NAME = os.environ.get('BUCKET_PUBLIC')
 GS_BUCKET_SUBMISSIONS = os.environ.get('BUCKET_SUBMISSIONS')
 GS_MAX_MEMORY_SIZE = 10000000

@@ -4,7 +4,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/web-clic2023:latest', 'web']
 options:
-  machineType: 'N1_HIGHCPU_32'
+  machineType: 'N1_HIGHCPU_8'
 images:
   - 'gcr.io/$PROJECT_ID/decoding:latest'
-  - 'gcr.io/$PROJECT_ID/web-clic2022:latest'
+  - 'gcr.io/$PROJECT_ID/web-clic2023:latest'
