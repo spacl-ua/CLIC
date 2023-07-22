@@ -10,6 +10,9 @@ DEPLOYMENT="clic2023"
 
 PROJECT_ID=$(gcloud config get-value project)
 
+# make sure we're using the latest image
+docker pull gcr.io/${PROJECT_ID}/web-${LABEL}
+
 # collect and upload static files
 docker run --rm -ti \
 	-w "$(pwd)/web" \
@@ -19,9 +22,9 @@ docker run --rm -ti \
 gsutil -m rsync -R web/static/ gs://${LABEL}_public/static/
 
 # allocate IP address if it does not already exist
-# gcloud compute addresses create ${LABEL}-web --region us-west1 2> /dev/null && rc=$? || rc=$?
 # https://stackoverflow.com/questions/9629710/what-is-the-proper-way-to-detect-shell-exit-code-when-errexit-option-is-set
-# echo "exit code for ip allocation: $rc"
+gcloud compute addresses create ${LABEL}-web --region us-west1 2> /dev/null && rc=$? || rc=$?
+echo "exit code for ip allocation: $rc"
 
 IP_ADDRESS=$(gcloud compute addresses describe ${DEPLOYMENT}-web --region us-west1 --format 'value(address)')
 echo "IP_ADDRESS: $IP_ADDRESS"

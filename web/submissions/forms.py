@@ -5,6 +5,24 @@ import teams
 from . import models, utils
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+	allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+	def __init__(self, *args, **kwargs):
+		kwargs.setdefault("widget", MultipleFileInput())
+		super().__init__(*args, **kwargs)
+
+	def clean(self, data, initial=None):
+		single_file_clean = super().clean
+		if isinstance(data, (list, tuple)):
+			result = [single_file_clean(d, initial) for d in data]
+		else:
+			result = single_file_clean(data, initial)
+		return result
+
+
 class SubmitForm(forms.Form):
 	team = forms.ModelChoiceField(
 		teams.models.Team.objects.all(),
@@ -16,8 +34,7 @@ class SubmitForm(forms.Form):
 	decoder = forms.FileField(
 		required=False,
 		help_text='An executable or a zip file containing an executable named \'decode\'')
-	data = forms.FileField(
-		widget=forms.ClearableFileInput(attrs={'multiple': True}),
+	data = MultipleFileField(
 		help_text='Files representing the encoded images')
 	docker_image = forms.ModelChoiceField(
 		models.DockerImage.objects.filter(active=True),

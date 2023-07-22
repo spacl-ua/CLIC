@@ -22,6 +22,7 @@ INSTALLED_APPS = [
 	'submissions.apps.SubmissionsConfig',
 	'clic.apps.CLICConfig',
 	'crispy_forms',
+	'crispy_bootstrap4',
 	'pagedown',
 	'markdown_deux',
 	'publications',
@@ -132,21 +133,28 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-MEDIA_URL = 'http://storage.googleapis.com/clic2022_public/'
-STATIC_URL = '/static/' if DEBUG else 'http://storage.googleapis.com/clic2022_public/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
-
-
 # Google Cloud Storage
 # https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
-STORAGES = {"default": {"BACKEND": "storages.backends.gcloud.GoogleCloudStorage"}}
+STORAGES = {
+	"default": {
+		"BACKEND": "storages.backends.gcloud.GoogleCloudStorage"
+	},
+	"staticfiles": {
+		"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+	},
+}
 GS_BUCKET_NAME = os.environ.get('BUCKET_PUBLIC')
 GS_BUCKET_SUBMISSIONS = os.environ.get('BUCKET_SUBMISSIONS')
 GS_MAX_MEMORY_SIZE = 10000000
 GS_BLOB_CHUNK_SIZE = 1048576
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.1/howto/static-files/
+MEDIA_URL = f'http://storage.googleapis.com/{GS_BUCKET_NAME}/'
+STATIC_URL = '/static/' if DEBUG else f'http://storage.googleapis.com/{GS_BUCKET_NAME}/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 
 
 # Markdown
