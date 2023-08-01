@@ -34,9 +34,10 @@
 		</a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link{% if request.resolver_match.url_name == "leaderboard" %} inactive{% endif %}" href="/leaderboard/image_075/test/">
+	        <!-- Change this back to anchor when we turn on leaderboards -->
+		<div class="nav-link{% if request.resolver_match.url_name == "leaderboard" %} active{% endif %}" href="/leaderboard/image_075/test/">
 			<i data-feather="align-justify"></i> Leaderboards (Off)
-		</a>
+		</div>
 	</li>
 	<li class="nav-item">
 		<a class="nav-link" href="https://groups.google.com/g/clic-list">
