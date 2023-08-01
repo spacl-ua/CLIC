@@ -151,8 +151,8 @@ GS_BLOB_CHUNK_SIZE = 1048576
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-MEDIA_URL = f'http://storage.googleapis.com/{GS_BUCKET_NAME}/'
-STATIC_URL = '/static/' if DEBUG else f'http://storage.googleapis.com/{GS_BUCKET_NAME}/static/'
+MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
+STATIC_URL = '/static/' if DEBUG else f'https://storage.googleapis.com/{GS_BUCKET_NAME}/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'media'),)
 
