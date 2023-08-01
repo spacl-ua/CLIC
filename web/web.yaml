@@ -1,4 +1,5 @@
-apiVersion: apps/v1kind: Deployment
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: {{ DEPLOYMENT }}
   labels:
@@ -71,10 +72,10 @@ spec:
         resources:
           requests:
             memory: "1G"
-            cpu: 4
+            cpu: 1
           limits:
             memory: "4G"
-            cpu: 2
+            cpu: 4
         command: [
             "gunicorn",
             "--certfile=/var/run/secret/ssl/compression_cc.crt",
@@ -120,6 +121,7 @@ spec:
           httpGet:
             path: /
             port: 4343
+            scheme: HTTPS
           initialDelaySeconds: 10
           periodSeconds: 30
           successThreshold: 1
