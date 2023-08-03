@@ -3,19 +3,19 @@
 # create cluster and CPU nodes
 gcloud container clusters create clic-cluster \
 	--zone us-west1-b \
-	--machine-type n1-standard-2 \
+	--machine-type n1-standard-4 \
 	--enable-autoscaling \
 	--min-nodes 1 \
-	--max-nodes 2 \
+	--max-nodes 4 \
 	--num-nodes 1 \
 	--verbosity error
 
 # add GPU nodes
 gcloud container node-pools create gpu-pool \
-	--zone us-west1-b \
-	--machine-type n1-standard-16 \
-	--accelerator type=nvidia-tesla-p100,count=1 \
 	--cluster clic-cluster \
+	--zone us-west1-b \
+	--machine-type g2-standard-8 \
+	--accelerator type=nvidia-l4-vws,count=1 \
 	--enable-autoscaling \
 	--min-nodes 0 \
 	--max-nodes 4 \
