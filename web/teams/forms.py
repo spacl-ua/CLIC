@@ -7,7 +7,8 @@ from . import models
 class TeamCreationForm(auth.forms.UserCreationForm):
 	class Meta:
 		model = models.Team
-		fields = ('username', 'email', 'affiliation', 'members', 'paperid')
+		fields = ('username', 'email', 'affiliation', 'members')
+                exclude = ('paperid')
 
 	username = forms.CharField(label='Team name', max_length=32)
 
