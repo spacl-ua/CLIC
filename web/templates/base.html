@@ -20,12 +20,12 @@
 		{% endblock %}
 	</head>
 	<body class="bg-light">
-		<div class="container-fluid">
+		<div class="container-fluid" id="container-top">
 			<nav class="row navbar navbar-dark sticky-top bg-primary flex-md-nowrap p-0">
 				<a class="navbar-brand col-sm-12 col-md-2 mr-0" href="#">CLIC 2024</a>
 				<span class="navbar-text d-none d-md-block">6th Challenge on Learned Image Compression</span>
 				<span class="navbar-text d-block d-md-none">
-					<a data-toggle="collapse" href="#collapseSidebar" class="px-3"><i data-feather="menu"></i></a>
+					<a data-toggle="collapse" href="#collapseSidebar" class="px-3" onclick="document.getElementById('container-top').scrollIntoView();"><i data-feather="menu"></i></a>
 				</span>
 				<ul class="navbar-nav px-3">
 					<li class="nav-item text-nowrap">
@@ -52,7 +52,6 @@
 						Sponsored by<br>
 						<a href="https://google.com" target="_blank"><img src="{% static 'img/sponsors/google.png' %}" height="40"></a>
 						<a href="https://www.informatik.uni-wuerzburg.de/computervision/" target="_blank"><img src="{% static 'img/sponsors/wurzburg.png' %}" height="38"></a>
-						<a href="https://apple.com" target="_blank"><img src="{% static 'img/sponsors/apple.png' %}" height="60"></a>
 						<a href="https://netflix.com" target="_blank"><img src="{% static 'img/sponsors/netflix.png' %}" height="65"></a>
 						<a href="https://interdigital.com" target="_blank"><img src="{% static 'img/sponsors/interdigital.png' %}" height="30"></a>
 						<a href="https://www.alibaba.com" target="_blank"><img src="{% static 'img/sponsors/alibaba.png' %}" height="75"></a>
