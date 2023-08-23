@@ -58,13 +58,13 @@ spec:
             readOnly: true
         ports:
         - containerPort: 8080
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          successThreshold: 1
+          #readinessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: 8080
+          #  initialDelaySeconds: 10
+          #  periodSeconds: 30
+          #  successThreshold: 1
 
       - name: clic-app-https
         image: gcr.io/clic-392518/web-{{ LABEL }}@{{ DIGEST }}

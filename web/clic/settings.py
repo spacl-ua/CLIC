@@ -8,6 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '') or '\$t5(+2v272pm0ig76)ex1hgg-$s2%
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = bool(os.environ.get('DEBUG', False))
 ALLOWED_HOSTS = ['*']
+SECURE_SSL_REDIRECT = True
 
 INSTALLED_APPS = [
 	'django.contrib.admin',
