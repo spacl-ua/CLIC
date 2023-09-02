@@ -17,7 +17,7 @@ class KubernetesClient():
 
 		# obtain cluster
 		cluster_manager = ClusterManagerClient(credentials=credentials)
-		cluster = cluster_manager.get_cluster(project, 'us-west1-b', 'clic-cluster')
+		cluster = cluster_manager.get_cluster(project_id=project, zone='us-west1-b', cluster_id='clic-cluster')
 
 		# configure client
 		config = client.Configuration()

@@ -10,7 +10,8 @@ RUN apt-get upgrade -y
 RUN apt-get install -y rsync
 RUN apt-get install -y docker.io
 RUN apt-get install -y python3.11 python3-pip python3.11-dev
-RUN apt-get install -y libssl-dev default-libmysqlclient-dev
+RUN apt-get install -y libssl-dev default-libmysqlclient-dev build-essential
+RUN apt-get install -y pkg-config
 # https://stackoverflow.com/questions/44043906/the-headers-or-library-files-could-not-be-found-for-jpeg-installing-pillow-on
 RUN apt-get install -y libjpeg-dev
 RUN apt-get install -y ffmpeg

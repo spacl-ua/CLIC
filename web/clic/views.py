@@ -130,7 +130,7 @@ def _decode(request, **kwargs):
 	job_template = get_template('job.yaml')
 	job = yaml.load(job_template.render({
 		'submission': submission,
-		'debug': request.user.is_staff}))
+		'debug': request.user.is_staff}), Loader=yaml.Loader)
 
 	# submit job
 	client = KubernetesClient()
@@ -175,9 +175,9 @@ def reevaluate(request, pk):
 	# create job
 	job_template = get_template('job.yaml')
 	job = yaml.load(job_template.render({
-    'eval_only': True,
+                'eval_only': True,
 		'submission': submission,
-		'debug': request.user.is_staff}))
+		'debug': request.user.is_staff}), Loader=yaml.Loader)
 
 	# submit job
 	client = KubernetesClient()

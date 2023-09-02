@@ -60,12 +60,12 @@ spec:
         image: "gcr.io/clic-392518/evaluation"
         resources:
           requests:
-            cpu: 12
+            cpu: 6
             memory: "{{ submission.phase.memory }}M"
             nvidia.com/gpu: 1
           limits:
             memory: "{{ submission.phase.memory|add:8000 }}M"
-            cpu: 12
+            cpu: 6
             nvidia.com/gpu: 1
         command: [
           "python3",
