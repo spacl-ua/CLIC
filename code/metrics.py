@@ -129,7 +129,7 @@ def evaluate(submission_files, target_files, settings={}, logger=None):
 
 
 def _missing_keys(file0, file1):
-    for k in file0,keys():
+    for k in file0.keys():
         if k not in file1:
             return k
     return None
@@ -147,9 +147,9 @@ def pcc(file0, file1, logger=None):
     x_list = []
     y_list = []
     for k in file0.keys():
-        x_list.append(file0[k])
-        y_list.append(file1[k])
-    value = scipy.stats.pearsonr(x_list, y_list).pvalue
+        x_list.append(float(file0[k]))
+        y_list.append(float(file1[k]))
+    value = scipy.stats.pearsonr(x_list, y_list).statistic
     return value
 
 
@@ -165,9 +165,9 @@ def srcc(file0, file1, logger=None):
     x_list = []
     y_list = []
     for k in file0.keys():
-        x_list.append(file0[k])
-        y_list.append(file1[k])
-    value = scipy.stats.spearmanr(x_list, y_list).pvalue
+        x_list.append(float(file0[k]))
+        y_list.append(float(file1[k]))
+    value = scipy.stats.spearmanr(x_list, y_list).statistic
     return value
 
 def kendall_tau_b(file0, file1, logger=None):
@@ -182,9 +182,9 @@ def kendall_tau_b(file0, file1, logger=None):
     x_list = []
     y_list = []
     for k in file0.keys():
-        x_list.append(file0[k])
-        y_list.append(file1[k])
-    value = scipy.stats.kendalltau(x_list, y_list).pvalue
+        x_list.append(float(file0[k]))
+        y_list.append(float(file1[k]))
+    value = scipy.stats.kendalltau(x_list, y_list).statistic
     return value
 
 
@@ -264,7 +264,7 @@ def read_csv(file_name, logger=None):
 
         # We actually allow CSVs of either length 4 (image track) or length 2 (video track)
         for row in reader:
-            if len(row) != 4 or len(row) != 2:
+            if len(row) != 4 and len(row) != 2:
                 if logger:
                     logger.error('Expected CSV file to contain 4 columns. Found %d.', len(row))
                 return None
