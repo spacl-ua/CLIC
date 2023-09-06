@@ -7,7 +7,7 @@
 	<ul class="nav nav-tabs pt-2">
 		{% for phase in phases %}
 		<li class="nav-item">
-			<a class="nav-link{% if phase.current %} active{% endif %}" href="/leaderboard/{{ phase.task.name }}/{{ phase.name }}/">{{ phase }}</a>
+			<a class="nav-link{% if phase.current %} active{% endif %}" href="/leaderboard/{{ phase.task.name }}/{{ phase.name }}/">{{ phase.task }}</a>
 		</li>
 		{% endfor %}
 	</ul>
