@@ -13,6 +13,8 @@ from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.utils.crypto import get_random_string
 from storages.backends.gcloud import GoogleCloudStorage
+from django.views.decorators.clickjacking import xframe_options_exempt
+
 
 import teams
 import submissions.forms
@@ -189,6 +191,7 @@ def reevaluate(request, pk):
 		content_type='application/json')
 
 
+@xframe_options_exempt
 def logs(request, pk, container=['decode', 'evaluate']):
 	"""
 	Streams logs of running submissions
@@ -235,8 +238,9 @@ def logs(request, pk, container=['decode', 'evaluate']):
 	logs = client.stream_log(pods[0], container=container)
 
 	if 'Gecko' in request.META['HTTP_USER_AGENT']:
-		# Firefox will try to download a text/event-stream
 		response = StreamingHttpResponse(logs, content_type='text/plain')
+
+		# Firefox will try to download a text/event-stream
 		response['X-Content-Type-Options'] = 'nosniff'
 		return response
 	return StreamingHttpResponse(logs, content_type='text/event-stream')
