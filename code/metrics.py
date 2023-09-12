@@ -140,7 +140,7 @@ def pcc(file0, file1, logger=None):
     missing_key_question_mark = _missing_keys(file0, file1)
     if missing_key_question_mark != None:
         if logger:
-            logger.error(f'Missing key {k}')
+            logger.error(f'Missing key {missing_key_question_mark}')
         return None
 
     # Get all the values of each mapped up. Don't assume they are in same order.
@@ -158,7 +158,7 @@ def srcc(file0, file1, logger=None):
     missing_key_question_mark = _missing_keys(file0, file1)
     if missing_key_question_mark != None:
         if logger:
-            logger.error(f'Missing key {k}')
+            logger.error(f'Missing key {missing_key_question_mark}')
         return None
 
     # Get all the values of each mapped up. Don't assume they are in same order.
@@ -175,7 +175,7 @@ def kendall_tau_b(file0, file1, logger=None):
     missing_key_question_mark = _missing_keys(file0, file1)
     if missing_key_question_mark != None:
         if logger:
-            logger.error(f'Missing key {k}')
+            logger.error(f'Missing key {missing_key_question_mark}')
         return None
 
     # Get all the values of each mapped up. Don't assume they are in same order.
