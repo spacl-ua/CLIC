@@ -95,6 +95,7 @@ docker run \
 	-e BUCKET_PUBLIC="${LABEL}_public" \
 	-e SENTRY_DSN="${SENTRY_DSN}" \
 	-e SECRET_KEY="${SECRET_KEY}" \
+	-e SECURE_SSL_REDIRECT=0 \
 	-e DEBUG=1 \
 	-w "$(pwd)/web" \
 	-v "$(pwd)/web":"$(pwd)/web" \

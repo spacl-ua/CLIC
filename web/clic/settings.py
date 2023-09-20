@@ -6,9 +6,9 @@ from sentry_sdk.integrations.django import DjangoIntegration
 SITE_ID = 1
 SECRET_KEY = os.environ.get('SECRET_KEY', '') or '\$t5(+2v272pm0ig76)ex1hgg-$s2%h@78xb#m*b^wz31fo_1bk'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEBUG = bool(os.environ.get('DEBUG', False))
+DEBUG = bool(int(os.environ.get('DEBUG', 0)))
 ALLOWED_HOSTS = ['*']
-SECURE_SSL_REDIRECT = bool(os.environ.get('SECURE_SSL_REDIRECT', True))
+SECURE_SSL_REDIRECT = bool(int(os.environ.get('SECURE_SSL_REDIRECT', 1)))
 
 INSTALLED_APPS = [
 	'django.contrib.admin',
