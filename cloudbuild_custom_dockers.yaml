@@ -23,6 +23,8 @@ steps:
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/libtorch1_10_2__cuda11_3:latest', 'environments/custom_containers/libtorch1_10_2__cuda11_3']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/pytorch_cool_chic:latest', 'environments/custom_containers/pytorch_cool_chic']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/custom_containers/pytorch_neuralcompression_compressai:latest', 'environments/custom_containers/pytorch_neuralcompression_compressai']
 options:
   machineType: 'N1_HIGHCPU_32'
 images:
@@ -38,3 +40,4 @@ images:
   - 'gcr.io/$PROJECT_ID/custom_containers/david_cuda111:latest'
   - 'gcr.io/$PROJECT_ID/custom_containers/david_cuda113:latest'
   - 'gcr.io/$PROJECT_ID/custom_containers/pytorch_cool_chic:latest'
+  - 'gcr.io/$PROJECT_ID/custom_containers/pytorch_neuralcompression_compressai:latest'
