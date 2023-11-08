@@ -1,0 +1,12 @@
+torch
+torchvision
+lightning[extra]
+imageio
+lmdb
+pytorch-msssim
+scipy
+memory_profiler
+torchmetrics[image]
+wandb
+einops
+timm
